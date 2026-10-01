@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class FundingSource extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'funding_source_name',
+        'sub_category',
+        'description',
+    ];
+}
