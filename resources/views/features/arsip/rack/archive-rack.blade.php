@@ -857,6 +857,16 @@
                            via-blue-50/40 to-indigo-50/50
                            border border-blue-100"
                 >
+                    <!-- Menjaga parameter tanggal & klasifikasi agar tidak mereset saat cari/filter divisi -->
+                    @if(request('tanggal_mulai'))
+                        <input type="hidden" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}">
+                    @endif
+                    @if(request('tanggal_selesai'))
+                        <input type="hidden" name="tanggal_selesai" value="{{ request('tanggal_selesai') }}">
+                    @endif
+                    @if(request('category'))
+                        <input type="hidden" name="category" value="{{ request('category') }}">
+                    @endif
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
@@ -1063,6 +1073,9 @@
                     $isCdsActive = in_array($activeCategory, ['CDS.001', 'CDS.002', 'CDS.003']);
                     $isEbaActive = $activeCategory === 'EBA.994';
                     $isWaActive = $activeCategory === 'WA.4376';
+
+                    // Buat query string helper agar parameter lain (tanggal, divisi, dll) tetap terbawa
+                    $queryParams = request()->except('category', 'page');
                 @endphp
 
 
@@ -1086,7 +1099,7 @@
                         @if ($activeCategory)
 
                             <a
-                                href="{{ url()->current() }}"
+                                href="{{ url()->current() . '?' . http_build_query($queryParams) }}"
                                 class="hidden sm:inline-flex items-center gap-1.5
                                        text-xs font-semibold text-blue-600
                                        hover:text-blue-800"
@@ -1107,7 +1120,7 @@
 
                         {{-- SEMUA --}}
                         <a
-                            href="{{ url()->current() }}"
+                            href="{{ url()->current() . ($queryParams ? '?' . http_build_query($queryParams) : '') }}"
                             class="flex items-center justify-between
                                    px-4 py-3 rounded-xl
                                    text-sm font-bold
@@ -1181,7 +1194,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=AEC.001"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'AEC.001'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'AEC.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1238,7 +1251,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=BAH.001"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.001'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'BAH.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1248,7 +1261,7 @@
                                 </a>
 
                                 <a
-                                    href="{{ url()->current() }}?category=BAH.002"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.002'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'BAH.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1258,7 +1271,7 @@
                                 </a>
 
                                 <a
-                                    href="{{ url()->current() }}?category=BAH.003"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.003'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'BAH.003'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1315,7 +1328,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=CBR.001"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBR.001'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'CBR.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1372,7 +1385,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=CBT.002"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBT.002'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'CBT.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1429,7 +1442,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=CDS.001"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.001'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'CDS.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1439,7 +1452,7 @@
                                 </a>
 
                                 <a
-                                    href="{{ url()->current() }}?category=CDS.002"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.002'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'CDS.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1449,7 +1462,7 @@
                                 </a>
 
                                 <a
-                                    href="{{ url()->current() }}?category=CDS.003"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.003'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'CDS.003'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1506,7 +1519,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=EBA.994"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'EBA.994'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'EBA.994'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1564,7 +1577,7 @@
                             >
 
                                 <a
-                                    href="{{ url()->current() }}?category=WA.4376"
+                                    href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'WA.4376'])) }}"
                                     class="block px-3 py-3 rounded-xl text-sm transition
                                     {{ $activeCategory === 'WA.4376'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
@@ -1584,7 +1597,7 @@
 
 
                 {{-- ========================================================= --}}
-                {{-- PERIODE + EXPORT PDF --}}
+                {{-- PERIODE + EXPORT PDF & EXCEL --}}
                 {{-- ========================================================= --}}
 
                 <div
@@ -1631,12 +1644,21 @@
                     </div>
 
 
+                    {{-- FORM MENGGUNAKAN METHOD GET KE HALAMAN SAAT INI --}}
                     <form
-                        id="form-export-pdf"
-                        action="{{ route('digital.report.pdf', ['id' => $category->id]) }}"
                         method="GET"
-                        target="_blank"
+                        action="{{ url()->current() }}"
                     >
+                        <!-- Menjaga parameter pencarian, divisi, dan klasifikasi agar tidak hilang -->
+                        @if(request('search_digital'))
+                            <input type="hidden" name="search_digital" value="{{ request('search_digital') }}">
+                        @endif
+                        @if(request('divisi'))
+                            <input type="hidden" name="divisi" value="{{ request('divisi') }}">
+                        @endif
+                        @if(request('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -1650,8 +1672,9 @@
 
                                 <input
                                     type="date"
+                                    id="input_tanggal_mulai"
                                     name="tanggal_mulai"
-                                    value="{{ request('tanggal_mulai', now()->startOfYear()->format('Y-m-d')) }}"
+                                    value="{{ request('tanggal_mulai') }}"
                                     class="w-full px-4 py-3
                                            border border-gray-200
                                            rounded-xl text-sm
@@ -1659,7 +1682,6 @@
                                            focus:outline-none
                                            focus:ring-2 focus:ring-blue-500/30
                                            focus:border-blue-500"
-                                    required
                                 >
 
                             </div>
@@ -1675,8 +1697,9 @@
 
                                 <input
                                     type="date"
+                                    id="input_tanggal_selesai"
                                     name="tanggal_selesai"
-                                    value="{{ request('tanggal_selesai', now()->endOfYear()->format('Y-m-d')) }}"
+                                    value="{{ request('tanggal_selesai') }}"
                                     class="w-full px-4 py-3
                                            border border-gray-200
                                            rounded-xl text-sm
@@ -1684,7 +1707,6 @@
                                            focus:outline-none
                                            focus:ring-2 focus:ring-blue-500/30
                                            focus:border-blue-500"
-                                    required
                                 >
 
                             </div>
@@ -1697,6 +1719,7 @@
                                    mt-5 pt-5 border-t border-gray-200"
                         >
 
+                            <!-- TOMBOL SUBMIT UNTUK MEMFILTER DATA TANGGAL PADA WEB -->
                             <button
                                 type="submit"
                                 class="inline-flex items-center gap-2
@@ -1741,10 +1764,10 @@
                             </a>
 
 
+                            {{-- EXPORT PDF --}}
                             <button
-                                type="submit"
-                                formtarget="_blank"
-                                formaction="{{ route('digital.report.pdf', ['id' => $category->id]) }}"
+                                type="button"
+                                onclick="exportReport('{{ route('digital.report.pdf', ['id' => $category->id]) }}')"
                                 class="inline-flex items-center gap-2
                                        px-5 py-2.5
                                        bg-gradient-to-r from-red-500 to-rose-600
@@ -1770,6 +1793,39 @@
                                 </svg>
 
                                 Export PDF
+
+                            </button>
+
+
+                            {{-- EXPORT EXCEL --}}
+                            <button
+                                type="button"
+                                onclick="exportReport('{{ route('digital.report.excel', ['id' => $category->id]) }}')"
+                                class="inline-flex items-center gap-2
+                                       px-5 py-2.5
+                                       bg-gradient-to-r from-emerald-600 to-teal-600
+                                       hover:from-emerald-700 hover:to-teal-700
+                                       text-white text-sm font-semibold
+                                       rounded-xl shadow-lg
+                                       shadow-emerald-500/20
+                                       transition"
+                            >
+
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+
+                                Export Excel
 
                             </button>
 
@@ -2034,7 +2090,7 @@
 
                         {{-- PAGINATION --}}
                         <div class="pt-5">
-                            {{ $digitalarchive->links() }}
+                            {{ $digitalarchive->withQueryString()->links() }}
                         </div>
 
                     </div>
@@ -2104,10 +2160,28 @@
 
 
     {{-- ========================================================= --}}
-    {{-- DROPDOWN SCRIPT --}}
+    {{-- SCRIPT JAVASCRIPT --}}
     {{-- ========================================================= --}}
 
     <script>
+        // Fungsi untuk Export PDF / Excel dengan membawa filter tanggal
+        function exportReport(baseUrl) {
+            const tMulai = document.getElementById('input_tanggal_mulai').value;
+            const tSelesai = document.getElementById('input_tanggal_selesai').value;
+            let url = baseUrl;
+            
+            const params = new URLSearchParams();
+            if (tMulai) params.append('tanggal_mulai', tMulai);
+            if (tSelesai) params.append('tanggal_selesai', tSelesai);
+            
+            const queryString = params.toString();
+            if (queryString) {
+                url += (url.includes('?') ? '&' : '?') + queryString;
+            }
+            
+            window.open(url, '_blank');
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
 
             const dropdownContainer =

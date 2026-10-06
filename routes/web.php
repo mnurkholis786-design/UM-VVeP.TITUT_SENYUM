@@ -54,6 +54,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | WEB ROUTES
@@ -534,6 +535,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         '/year/{id}/export-pdf',
         [DigitalArchiveController::class, 'exportReportPdf']
     )->name('digital.report.pdf');
+
+    Route::get('/digital-archive/report-excel/{id}', [DigitalArchiveController::class, 'exportReportExcel'])->name('digital.report.excel');
 
 
     /*

@@ -143,12 +143,6 @@ class DigitalArchiveController extends Controller
             'folder_id' =>
                 'nullable|exists:document_folders,id',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Basic Information
-            |--------------------------------------------------------------------------
-            */
-
             'digital_name' =>
                 'required|string|max:255',
 
@@ -158,24 +152,12 @@ class DigitalArchiveController extends Controller
             'from_division' =>
                 'nullable|string|max:255',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Kategori
-            |--------------------------------------------------------------------------
-            */
-
             'kategori' =>
                 'required|in:' .
                 implode(
                     ',',
                     DigitalArchive::KATEGORI_LIST
                 ),
-
-            /*
-            |--------------------------------------------------------------------------
-            | Classification & Indexing
-            |--------------------------------------------------------------------------
-            */
 
             'kode_klasifikasi' =>
                 'nullable|string|max:100',
@@ -189,23 +171,11 @@ class DigitalArchiveController extends Controller
             'no_item' =>
                 'nullable|string|max:100',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Financial Information
-            |--------------------------------------------------------------------------
-            */
-
             'nominal' =>
                 'nullable|numeric|min:0',
 
             'uraian' =>
                 'nullable|string',
-
-            /*
-            |--------------------------------------------------------------------------
-            | SPBy & SPM
-            |--------------------------------------------------------------------------
-            */
 
             'no_spby' =>
                 'nullable|string|max:100',
@@ -215,12 +185,6 @@ class DigitalArchiveController extends Controller
 
             'jenis_spm' =>
                 'nullable|string|max:100',
-
-            /*
-            |--------------------------------------------------------------------------
-            | SP2D Information
-            |--------------------------------------------------------------------------
-            */
 
             'no_sp2d' =>
                 'nullable|string|max:100',
@@ -237,12 +201,6 @@ class DigitalArchiveController extends Controller
             'tgl_selesai_sp2d' =>
                 'nullable|date|after_or_equal:tgl_sp2d',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Invoice Information
-            |--------------------------------------------------------------------------
-            */
-
             'no_invoice' =>
                 'nullable|string|max:100',
 
@@ -251,12 +209,6 @@ class DigitalArchiveController extends Controller
 
             'tgl_terima' =>
                 'nullable|date',
-
-            /*
-            |--------------------------------------------------------------------------
-            | Archive Management
-            |--------------------------------------------------------------------------
-            */
 
             'tingkat_pertimbangan' =>
                 'nullable|string|max:100',
@@ -282,12 +234,6 @@ class DigitalArchiveController extends Controller
             'disposal_date' =>
                 'nullable|date',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Personnel Information
-            |--------------------------------------------------------------------------
-            */
-
             'submiter_name' =>
                 'nullable|string|max:255',
 
@@ -297,12 +243,6 @@ class DigitalArchiveController extends Controller
             'revenue_officer_name' =>
                 'nullable|string|max:255',
 
-            /*
-            |--------------------------------------------------------------------------
-            | File & Link
-            |--------------------------------------------------------------------------
-            */
-
             'file_path_digital' =>
                 'nullable|array|max:5',
 
@@ -311,12 +251,6 @@ class DigitalArchiveController extends Controller
 
             'link_arsip' =>
                 'nullable|url|max:500',
-
-            /*
-            |--------------------------------------------------------------------------
-            | Additional Notes
-            |--------------------------------------------------------------------------
-            */
 
             'keterangan' =>
                 'nullable|string',
@@ -345,12 +279,6 @@ class DigitalArchiveController extends Controller
                 'Ukuran setiap file maksimal 20MB.',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Upload File
-        |--------------------------------------------------------------------------
-        */
-
         $filePaths = [];
 
         if ($request->hasFile('file_path_digital')) {
@@ -374,12 +302,6 @@ class DigitalArchiveController extends Controller
                 );
             }
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Create Archive
-        |--------------------------------------------------------------------------
-        */
 
         DigitalArchive::create([
 
@@ -708,12 +630,6 @@ class DigitalArchiveController extends Controller
                 'Ukuran setiap file maksimal 20MB.',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Existing Files
-        |--------------------------------------------------------------------------
-        */
-
         $existingFiles =
             $archive->file_path_archive ?? [];
 
@@ -724,12 +640,6 @@ class DigitalArchiveController extends Controller
                 ? [$existingFiles]
                 : [];
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Delete Selected Files
-        |--------------------------------------------------------------------------
-        */
 
         $deleteIndexes =
             $request->input(
@@ -763,12 +673,6 @@ class DigitalArchiveController extends Controller
         $existingFiles =
             array_values($existingFiles);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Upload New Files
-        |--------------------------------------------------------------------------
-        */
-
         $newFiles = [];
 
         if ($request->hasFile('file_path_digital')) {
@@ -794,12 +698,6 @@ class DigitalArchiveController extends Controller
             }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Merge Files
-        |--------------------------------------------------------------------------
-        */
-
         $allFiles =
             array_merge(
                 $existingFiles,
@@ -815,12 +713,6 @@ class DigitalArchiveController extends Controller
                 ])
                 ->withInput();
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Archive
-        |--------------------------------------------------------------------------
-        */
 
         $archive->update([
 
@@ -977,12 +869,6 @@ class DigitalArchiveController extends Controller
 
         if (isset($pengajuan)) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Delete Requirement File
-            |--------------------------------------------------------------------------
-            */
-
             if (
                 $pengajuan->path_file_requirements_status &&
                 Storage::disk('private')->exists(
@@ -995,12 +881,6 @@ class DigitalArchiveController extends Controller
                 );
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Delete Submission File
-            |--------------------------------------------------------------------------
-            */
-
             if (
                 $pengajuan->path_file_submission &&
                 Storage::disk('private')->exists(
@@ -1012,12 +892,6 @@ class DigitalArchiveController extends Controller
                     $pengajuan->path_file_submission
                 );
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Delete Digital Archive Files
-            |--------------------------------------------------------------------------
-            */
 
             $filesToDelete =
                 $archive->file_path_archive ?? [];
@@ -1298,12 +1172,6 @@ class DigitalArchiveController extends Controller
             ],
         ];
 
-        /*
-        |--------------------------------------------------------------------------
-        | Header Excel
-        |--------------------------------------------------------------------------
-        */
-
         $sheet->setCellValue(
             'A1',
             'Field'
@@ -1318,12 +1186,6 @@ class DigitalArchiveController extends Controller
             ->getStyle('A1:B1')
             ->getFont()
             ->setBold(true);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Isi Excel
-        |--------------------------------------------------------------------------
-        */
 
         $rowNumber = 2;
 
@@ -1342,12 +1204,6 @@ class DigitalArchiveController extends Controller
             $rowNumber++;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Lebar Kolom
-        |--------------------------------------------------------------------------
-        */
-
         $sheet
             ->getColumnDimension('A')
             ->setWidth(25);
@@ -1355,12 +1211,6 @@ class DigitalArchiveController extends Controller
         $sheet
             ->getColumnDimension('B')
             ->setWidth(40);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Nama File
-        |--------------------------------------------------------------------------
-        */
 
         $safeCode =
             $archive->archive_code
@@ -1375,12 +1225,6 @@ class DigitalArchiveController extends Controller
             'arsip-digital-' .
             $safeCode .
             '.xlsx';
-
-        /*
-        |--------------------------------------------------------------------------
-        | Download Excel
-        |--------------------------------------------------------------------------
-        */
 
         $writer =
             new Xlsx($spreadsheet);
@@ -1402,69 +1246,35 @@ class DigitalArchiveController extends Controller
 
     /**
      * Export laporan arsip digital ke PDF.
-     *
-     * Laporan mencakup seluruh kategori:
-     *
-     * 1. PERJALANAN DINAS
-     * 2. PRODUKSI
-     * 3. PENGADAAN BARANG DAN JASA
-     * 4. BELANJA PEGAWAI
      */
     public function exportReportPdf(
         Request $request,
         string $id
     ) {
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil Category
-        |--------------------------------------------------------------------------
-        */
-
         $category =
             Category::findOrFail($id);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Query Arsip
-        |--------------------------------------------------------------------------
-        |
-        | Tidak difilter berdasarkan kategori arsip.
-        | Jadi PDF akan menampilkan seluruh 4 kategori.
-        |
-        */
 
         $query =
             DigitalArchive::where(
                 'category_id',
                 $category->id
             );
-/*
-|--------------------------------------------------------------------------
-| Filter Periode Tanggal
-|--------------------------------------------------------------------------
-*/
 
-if ($request->filled('tanggal_mulai')) {
-    $query->whereDate(
-        'created_at',
-        '>=',
-        $request->tanggal_mulai
-    );
-}
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate(
+                'created_at',
+                '>=',
+                $request->tanggal_mulai
+            );
+        }
 
-if ($request->filled('tanggal_selesai')) {
-    $query->whereDate(
-        'created_at',
-        '<=',
-        $request->tanggal_selesai
-    );
-}
-        /*
-        
-        |--------------------------------------------------------------------------
-        | Filter Search Digital
-        |--------------------------------------------------------------------------
-        */
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate(
+                'created_at',
+                '<=',
+                $request->tanggal_selesai
+            );
+        }
 
         if (
             $request->filled(
@@ -1482,12 +1292,6 @@ if ($request->filled('tanggal_selesai')) {
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Divisi
-        |--------------------------------------------------------------------------
-        */
-
         if (
             $request->filled('divisi')
         ) {
@@ -1499,84 +1303,40 @@ if ($request->filled('tanggal_selesai')) {
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil Semua Data
-        |--------------------------------------------------------------------------
-        |
-        | Tidak menggunakan pagination.
-        |
-        */
-
         $archives =
             $query
                 ->orderBy('kategori')
                 ->orderBy('created_at')
                 ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Kelompokkan Berdasarkan Kategori
-        |--------------------------------------------------------------------------
-        */
-
         $groupedArchives =
             $archives->groupBy(
                 'kategori'
             );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tentukan Tahun Laporan
-        |--------------------------------------------------------------------------
-        |
-        | Jangan menggunakan:
-        |
-        | $created_at->year
-        |
-        | karena pada environment tertentu Laravel dapat
-        | mengembalikan Symfony\Component\Clock\DatePoint.
-        |
-        | Kita parse terlebih dahulu menggunakan Carbon.
-        |
-        */
-
-        $tahun =
-            now()->year;
-
-        $firstArchive =
-            $archives->first();
-
-        if (
-            $firstArchive &&
-            !empty(
-                $firstArchive->created_at
-            )
-        ) {
-
-            $tahun =
-                \Carbon\Carbon::parse(
-                    $firstArchive->created_at
-                )->year;
+        // Penentuan Periode Mulai & Selesai Berdasarkan Filter Tanggal
+        if ($request->filled('tanggal_mulai')) {
+            $periodeMulai = \Carbon\Carbon::parse($request->tanggal_mulai)->locale('id')->translatedFormat('d F Y');
+        } else {
+            $firstArchive = $archives->first();
+            $tahun = ($firstArchive && !empty($firstArchive->created_at)) 
+                ? \Carbon\Carbon::parse($firstArchive->created_at)->year 
+                : date('Y');
+            $periodeMulai = '01 JANUARI ' . $tahun;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Periode Laporan
-        |--------------------------------------------------------------------------
-        */
+        if ($request->filled('tanggal_selesai')) {
+            $periodeSelesai = \Carbon\Carbon::parse($request->tanggal_selesai)->locale('id')->translatedFormat('d F Y');
+        } else {
+            $firstArchive = $archives->first();
+            $tahun = ($firstArchive && !empty($firstArchive->created_at)) 
+                ? \Carbon\Carbon::parse($firstArchive->created_at)->year 
+                : date('Y');
+            $periodeSelesai = '31 DESEMBER ' . $tahun;
+        }
 
-        $periodeMulai =
-            '01 JANUARI ' . $tahun;
-
-        $periodeSelesai =
-            '31 DESEMBER ' . $tahun;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generate PDF
-        |--------------------------------------------------------------------------
-        */
+        $periodeMulai = strtoupper($periodeMulai);
+        $periodeSelesai = strtoupper($periodeSelesai);
 
         $pdf =
             Pdf::loadView(
@@ -1593,12 +1353,6 @@ if ($request->filled('tanggal_selesai')) {
                 'landscape'
             );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Nama File PDF
-        |--------------------------------------------------------------------------
-        */
-
         $categoryName =
             $category->category_name
             ?? 'arsip';
@@ -1614,14 +1368,167 @@ if ($request->filled('tanggal_selesai')) {
             ) .
             '.pdf';
 
-        /*
-        |--------------------------------------------------------------------------
-        | Download PDF
-        |--------------------------------------------------------------------------
-        */
-
         return $pdf->download(
             $fileName
+        );
+    }
+
+    /**
+     * Export laporan arsip digital sesuai layout Daftar Arsip Aktif.
+     */
+    public function exportReportExcel(
+        Request $request,
+        string $id
+    ) {
+        $category = Category::findOrFail($id);
+
+        $query = DigitalArchive::where('category_id', $category->id);
+
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('created_at', '>=', $request->tanggal_mulai);
+        }
+
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('created_at', '<=', $request->tanggal_selesai);
+        }
+
+        if ($request->filled('search_digital')) {
+            $query->where('archive_name', 'like', '%' . $request->search_digital . '%');
+        }
+
+        if ($request->filled('divisi')) {
+            $query->where('submiter_name', 'like', '%' . $request->divisi . '%');
+        }
+
+        $archives = $query->orderBy('kategori')->orderBy('created_at')->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Daftar Arsip');
+
+        // Header Judul Atas
+        $sheet->setCellValue('A2', 'ARSIP AKTIF');
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED));
+
+        $tahun = $category->year ?? date('Y');
+        $sheet->setCellValue('A4', 'TAHUN ' . $tahun);
+        $sheet->getStyle('A4')->getFont()->setBold(true);
+
+        // Keterangan Informasi
+        $sheet->setCellValue('A6', 'Pencipta Arsip');
+        $sheet->setCellValue('B6', ': Tim Perencanaan dan Pengendalian Anggaran');
+        $sheet->setCellValue('A7', 'Unit Kearsipan');
+        $sheet->setCellValue('B7', ': Unit Kearsipan II, TVRI Stasiun Kalimantan Selatan');
+
+        // Layout Header Tabel (Baris 8 & 9)
+        $sheet->setCellValue('A8', 'No');
+        $sheet->setCellValue('B8', "Kode\nKlasifikasi");
+        $sheet->setCellValue('C8', 'Indeks 1');
+        $sheet->setCellValue('D8', 'Indeks 2');
+        $sheet->setCellValue('E8', "No\nItem");
+        $sheet->setCellValue('F8', 'Uraian');
+        $sheet->setCellValue('G8', 'Tgl Terima');
+        $sheet->setCellValue('H8', "Tingkat\nPerkembangan");
+        $sheet->setCellValue('I8', 'Jumlah');
+        $sheet->setCellValue('J8', 'Retensi Arsip');
+        $sheet->setCellValue('J9', 'Aktif');
+        $sheet->setCellValue('K9', 'Inaktif');
+        $sheet->setCellValue('L8', "Nasib Akhir\nArsip");
+        $sheet->setCellValue('M8', "Klasifikasi\nKeamanan");
+        $sheet->setCellValue('N8', 'Lokasi Simpan');
+        $sheet->setCellValue('O8', 'Keterangan');
+
+        // Merge Header Sesuai Gambar
+        $sheet->mergeCells('A8:A9');
+        $sheet->mergeCells('B8:B9');
+        $sheet->mergeCells('C8:C9');
+        $sheet->mergeCells('D8:D9');
+        $sheet->mergeCells('E8:E9');
+        $sheet->mergeCells('F8:F9');
+        $sheet->mergeCells('G8:G9');
+        $sheet->mergeCells('H8:H9');
+        $sheet->mergeCells('I8:I9');
+        $sheet->mergeCells('J8:K8'); // Parent Retensi Arsip
+        $sheet->mergeCells('L8:L9');
+        $sheet->mergeCells('M8:M9');
+        $sheet->mergeCells('N8:N9');
+        $sheet->mergeCells('O8:O9');
+
+        // Style Header Tabel
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'wrapText' => true
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                ]
+            ]
+        ];
+        $sheet->getStyle('A8:O9')->applyFromArray($headerStyle);
+
+        // Isi Data Tabel
+        $rowNumber = 10;
+        foreach ($archives as $index => $archive) {
+            $sheet->setCellValue('A' . $rowNumber, $index + 1);
+            $sheet->setCellValue('B' . $rowNumber, $archive->kode_klasifikasi ?? '-');
+            $sheet->setCellValue('C' . $rowNumber, $archive->indeks1 ?? '-');
+            $sheet->setCellValue('D' . $rowNumber, $archive->indeks2 ?? '-');
+            $sheet->setCellValue('E' . $rowNumber, $archive->no_item ?? ($index + 1));
+            $sheet->setCellValue('F' . $rowNumber, $archive->uraian ?? $archive->archive_name);
+            $sheet->setCellValue('G' . $rowNumber, $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->translatedFormat('d F Y') : '-');
+            $sheet->setCellValue('H' . $rowNumber, $archive->tingkat_pertimbangan ?? 'Asli');
+            $sheet->setCellValue('I' . $rowNumber, $archive->jumlah_halaman ? $archive->jumlah_halaman . ' Lembar' : '-');
+            $sheet->setCellValue('J' . $rowNumber, $archive->retensi_arsip_aktif ? $archive->retensi_arsip_aktif . ' Tahun' : '-');
+            $sheet->setCellValue('K' . $rowNumber, $archive->retensi_arsip_inaktif ? $archive->retensi_arsip_inaktif . ' Tahun' : '-');
+            $sheet->setCellValue('L' . $rowNumber, $archive->nasib_akhir_arsip ?? 'Musnah');
+            $sheet->setCellValue('M' . $rowNumber, $archive->klasifikasi_keamanan ?? 'Terbatas');
+            $sheet->setCellValue('N' . $rowNumber, $archive->link_arsip ?? $archive->lokasi_simpan_server ?? '-');
+            $sheet->setCellValue('O' . $rowNumber, $archive->keterangan ?? '-');
+
+            $rowNumber++;
+        }
+
+        // Apply Border & Alignment ke Seluruh Data
+        $lastRow = $rowNumber - 1;
+        if ($lastRow >= 10) {
+            $sheet->getStyle('A10:O' . $lastRow)->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ]
+                ],
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+                ]
+            ]);
+
+            // Alignment Tengah untuk Kolom Tertentu
+            $sheet->getStyle('A10:E' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('G10:M' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        }
+
+        // Auto Dimension Column Widths
+        foreach (range('A', 'O') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $categoryName = $category->category_name ?? 'arsip';
+        $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . '.xlsx';
+
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(
+            function () use ($writer) {
+                $writer->save('php://output');
+            },
+            $fileName,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
         );
     }
 }
