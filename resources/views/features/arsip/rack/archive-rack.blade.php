@@ -126,18 +126,8 @@
                            hover:border-blue-200 hover:shadow-md
                            transition-all duration-200"
                 >
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                        />
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
 
                     <span class="font-medium">
@@ -175,25 +165,11 @@
                                        flex items-center justify-center
                                        shadow-lg backdrop-blur-sm"
                             >
-                                <svg
-                                    class="w-8 h-8 sm:w-9 sm:h-9 text-white"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.7"
-                                        d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"
-                                    />
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.7"
-                                        d="M8 12h8M8 16h5"
-                                    />
+                                <svg class="w-8 h-8 sm:w-9 sm:h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
+                                          d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
+                                          d="M8 12h8M8 16h5"/>
                                 </svg>
                             </div>
 
@@ -204,10 +180,7 @@
                                     Kategori Arsip
                                 </p>
 
-                                <h1
-                                    class="text-2xl sm:text-3xl font-bold
-                                           text-white leading-tight break-words"
-                                >
+                                <h1 class="text-2xl sm:text-3xl font-bold text-white leading-tight break-words">
                                     {{ $category->category_name ?? 'Kategori Arsip' }}
                                 </h1>
 
@@ -223,18 +196,9 @@
                                                 bg-white/15 border border-white/20
                                                 text-white text-sm font-semibold">
 
-                                        <svg
-                                            class="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                         </svg>
 
                                         Tahun {{ $category->year }}
@@ -249,12 +213,7 @@
                         {{-- STAT --}}
                         <div class="grid grid-cols-2 gap-3 sm:gap-4">
 
-                            <div
-                                class="min-w-[130px] px-5 py-4
-                                       rounded-2xl bg-white/10
-                                       border border-white/15
-                                       backdrop-blur-sm"
-                            >
+                            <div class="min-w-[130px] px-5 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm">
                                 <p class="text-blue-100 text-xs font-medium">
                                     Arsip Fisik
                                 </p>
@@ -269,12 +228,7 @@
                             </div>
 
 
-                            <div
-                                class="min-w-[130px] px-5 py-4
-                                       rounded-2xl bg-white/10
-                                       border border-white/15
-                                       backdrop-blur-sm"
-                            >
+                            <div class="min-w-[130px] px-5 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm">
                                 <p class="text-blue-100 text-xs font-medium">
                                     Arsip Digital
                                 </p>
@@ -308,10 +262,7 @@
             >
 
                 {{-- HEADER --}}
-                <div
-                    class="flex flex-col sm:flex-row sm:items-center
-                           sm:justify-between gap-4 mb-6"
-                >
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
                     <div class="flex items-center gap-4">
 
@@ -321,18 +272,9 @@
                                    flex items-center justify-center
                                    shadow-lg shadow-emerald-500/20"
                         >
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"
-                                />
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
                             </svg>
                         </div>
 
@@ -355,11 +297,7 @@
                     {{-- TAMBAH RAK --}}
                     <form action="{{ route('rack.create') }}">
 
-                        <input
-                            type="hidden"
-                            name="category_id"
-                            value="{{ $category->id }}"
-                        >
+                        <input type="hidden" name="category_id" value="{{ $category->id }}">
 
                         <button
                             type="submit"
@@ -373,18 +311,8 @@
                                    transition-all duration-200"
                         >
 
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4v16m8-8H4"
-                                />
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
 
                             Tambah Rak Arsip
@@ -407,22 +335,10 @@
 
                     <div class="flex items-center gap-2 mb-4">
 
-                        <div
-                            class="w-8 h-8 rounded-lg bg-blue-100
-                                   flex items-center justify-center"
-                        >
-                            <svg
-                                class="w-4 h-4 text-blue-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
-                                />
+                        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                             </svg>
                         </div>
 
@@ -465,18 +381,9 @@
                                    transition"
                         >
 
-                            <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
-                                />
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                             </svg>
 
                             Cari
@@ -568,18 +475,9 @@
                                                        border border-indigo-100
                                                        text-xs font-semibold"
                                             >
-                                                <svg
-                                                    class="w-3.5 h-3.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M5 5h14M5 12h14M5 19h14"
-                                                    />
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M5 5h14M5 12h14M5 19h14"/>
                                                 </svg>
 
                                                 {{ $rak->category->category_name ?? '-' }}
@@ -613,6 +511,7 @@
                                     </a>
 
 
+                                    {{-- TOMBOL EDIT RAK (ICON PENSIL) --}}
                                     <a
                                         href="{{ route('rack.edit', $rak->id) }}"
                                         class="inline-flex items-center justify-center
@@ -624,17 +523,12 @@
                                         title="Edit"
                                     >
 
-                                        <svg
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-9-5l9-9m0 0l3 3m-3-3v5"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
                                             />
                                         </svg>
 
@@ -661,18 +555,9 @@
                                             title="Hapus"
                                         >
 
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"
-                                                />
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
                                             </svg>
 
                                         </button>
@@ -697,24 +582,10 @@
                                border border-dashed border-gray-300"
                     >
 
-                        <div
-                            class="mx-auto w-20 h-20 rounded-3xl
-                                   bg-white
-                                   shadow-lg
-                                   flex items-center justify-center mb-5"
-                        >
-                            <svg
-                                class="w-10 h-10 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.6"
-                                    d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"
-                                />
+                        <div class="mx-auto w-20 h-20 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-5">
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
                             </svg>
                         </div>
 
@@ -747,10 +618,7 @@
             >
 
                 {{-- HEADER DIGITAL --}}
-                <div
-                    class="flex flex-col sm:flex-row sm:items-center
-                           sm:justify-between gap-4 mb-6"
-                >
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
                     <div class="flex items-center gap-4">
 
@@ -760,25 +628,11 @@
                                    flex items-center justify-center
                                    shadow-lg shadow-blue-500/20"
                         >
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"
-                                />
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M8 8h8M8 12h8M8 16h5"
-                                />
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M8 8h8M8 12h8M8 16h5"/>
                             </svg>
                         </div>
 
@@ -799,16 +653,9 @@
 
 
                     {{-- TAMBAH DIGITAL --}}
-                    <form
-                        action="{{ route('digital.create') }}"
-                        method="GET"
-                    >
+                    <form action="{{ route('digital.create') }}" method="GET">
 
-                        <input
-                            type="hidden"
-                            name="category_id"
-                            value="{{ $category->id }}"
-                        >
+                        <input type="hidden" name="category_id" value="{{ $category->id }}">
 
                         <button
                             type="submit"
@@ -822,18 +669,8 @@
                                    transition-all duration-200"
                         >
 
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4v16m8-8H4"
-                                />
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
 
                             Tambah Arsip Digital
@@ -873,26 +710,11 @@
                         {{-- SEARCH --}}
                         <div>
 
-                            <label
-                                class="flex items-center gap-2
-                                       text-sm font-bold text-gray-700 mb-2"
-                            >
-                                <span
-                                    class="w-7 h-7 rounded-lg bg-blue-100
-                                           flex items-center justify-center"
-                                >
-                                    <svg
-                                        class="w-4 h-4 text-blue-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
-                                        />
+                            <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                                     </svg>
                                 </span>
 
@@ -920,26 +742,11 @@
                         {{-- DIVISI --}}
                         <div>
 
-                            <label
-                                class="flex items-center gap-2
-                                       text-sm font-bold text-gray-700 mb-2"
-                            >
-                                <span
-                                    class="w-7 h-7 rounded-lg bg-indigo-100
-                                           flex items-center justify-center"
-                                >
-                                    <svg
-                                        class="w-4 h-4 text-indigo-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M4 6h16M4 12h16M4 18h10"
-                                        />
+                            <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                                <span class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 6h16M4 12h16M4 18h10"/>
                                     </svg>
                                 </span>
 
@@ -959,49 +766,29 @@
                                        focus:border-blue-500"
                             >
 
-                                <option value="">
-                                    Semua Divisi
-                                </option>
+                                <option value="">Semua Divisi</option>
 
-                                <option
-                                    value="Berita"
-                                    {{ request('divisi') == 'Berita' ? 'selected' : '' }}
-                                >
+                                <option value="Berita" {{ request('divisi') == 'Berita' ? 'selected' : '' }}>
                                     Berita
                                 </option>
 
-                                <option
-                                    value="Umum"
-                                    {{ request('divisi') == 'Umum' ? 'selected' : '' }}
-                                >
+                                <option value="Umum" {{ request('divisi') == 'Umum' ? 'selected' : '' }}>
                                     Umum
                                 </option>
 
-                                <option
-                                    value="Program"
-                                    {{ request('divisi') == 'Program' ? 'selected' : '' }}
-                                >
+                                <option value="Program" {{ request('divisi') == 'Program' ? 'selected' : '' }}>
                                     Program
                                 </option>
 
-                                <option
-                                    value="KMB"
-                                    {{ request('divisi') == 'KMB' ? 'selected' : '' }}
-                                >
+                                <option value="KMB" {{ request('divisi') == 'KMB' ? 'selected' : '' }}>
                                     KMB
                                 </option>
 
-                                <option
-                                    value="Teknik"
-                                    {{ request('divisi') == 'Teknik' ? 'selected' : '' }}
-                                >
+                                <option value="Teknik" {{ request('divisi') == 'Teknik' ? 'selected' : '' }}>
                                     Teknik
                                 </option>
 
-                                <option
-                                    value="Pengembangan usaha"
-                                    {{ request('divisi') == 'Pengembangan usaha' ? 'selected' : '' }}
-                                >
+                                <option value="Pengembangan usaha" {{ request('divisi') == 'Pengembangan usaha' ? 'selected' : '' }}>
                                     Pengembangan usaha
                                 </option>
 
@@ -1023,18 +810,9 @@
                                    rounded-xl shadow-lg shadow-blue-500/20
                                    transition"
                         >
-                            <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
-                                />
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                             </svg>
 
                             Cari
@@ -1114,8 +892,7 @@
 
                     <div
                         id="category-dropdowns"
-                        class="grid grid-cols-1 sm:grid-cols-2
-                               lg:grid-cols-4 gap-3"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
                     >
 
                         {{-- SEMUA --}}
@@ -1130,22 +907,10 @@
                                         : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                         >
 
-                            <span>
-                                SEMUA
-                            </span>
+                            <span>SEMUA</span>
 
-                            <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M5 12h14"
-                                />
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
                             </svg>
 
                         </a>
@@ -1160,38 +925,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isAecActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    AEC - Kerja Sama
-                                </span>
+                                <span class="truncate">AEC - Kerja Sama</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'AEC.001'])) }}"
@@ -1217,38 +965,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isBahActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    BAH - Pelayanan Publik Lainnya
-                                </span>
+                                <span class="truncate">BAH - Pelayanan Publik Lainnya</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.001'])) }}"
@@ -1294,38 +1025,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isCbrActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    CBR - Dukungan Teknis
-                                </span>
+                                <span class="truncate">CBR - Dukungan Teknis</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBR.001'])) }}"
@@ -1351,38 +1065,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isCbtActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    CBT - Prasarana TIK
-                                </span>
+                                <span class="truncate">CBT - Prasarana TIK</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBT.002'])) }}"
@@ -1408,38 +1105,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isCdsActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    CDS OP - Prasarana Bidang Teknologi
-                                </span>
+                                <span class="truncate">CDS OP - Prasarana Bidang Teknologi</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.001'])) }}"
@@ -1485,38 +1165,21 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isEbaActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    EBA - Layanan Dukungan Manajemen
-                                </span>
+                                <span class="truncate">EBA - Layanan Dukungan Manajemen</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div
-                                class="absolute left-0 right-0 top-full mt-2
-                                       bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2"
-                            >
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'EBA.994'])) }}"
@@ -1542,28 +1205,15 @@
                                        px-4 py-3 rounded-xl
                                        text-sm font-bold
                                        border transition-all duration-200
-
                                        {{ $isWaActive
                                             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
-                                <span class="truncate">
-                                    WA - Dukungan Manajemen
-                                </span>
+                                <span class="truncate">WA - Dukungan Manajemen</span>
 
-                                <svg
-                                    class="arrow-icon w-4 h-4 flex-shrink-0 ml-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
+                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
@@ -1608,23 +1258,10 @@
 
                     <div class="flex items-start gap-3 mb-5">
 
-                        <div
-                            class="w-10 h-10 rounded-xl
-                                   bg-red-100
-                                   flex items-center justify-center"
-                        >
-                            <svg
-                                class="w-5 h-5 text-red-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
+                        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
 
@@ -1645,10 +1282,8 @@
 
 
                     {{-- FORM MENGGUNAKAN METHOD GET KE HALAMAN SAAT INI --}}
-                    <form
-                        method="GET"
-                        action="{{ url()->current() }}"
-                    >
+                    <form method="GET" action="{{ url()->current() }}">
+
                         <!-- Menjaga parameter pencarian, divisi, dan klasifikasi agar tidak hilang -->
                         @if(request('search_digital'))
                             <input type="hidden" name="search_digital" value="{{ request('search_digital') }}">
@@ -1664,9 +1299,7 @@
 
                             <div>
 
-                                <label
-                                    class="block text-sm font-semibold text-gray-700 mb-2"
-                                >
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Mulai Tanggal
                                 </label>
 
@@ -1689,9 +1322,7 @@
 
                             <div>
 
-                                <label
-                                    class="block text-sm font-semibold text-gray-700 mb-2"
-                                >
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Sampai Tanggal
                                 </label>
 
@@ -1714,10 +1345,7 @@
                         </div>
 
 
-                        <div
-                            class="flex flex-wrap items-center gap-2
-                                   mt-5 pt-5 border-t border-gray-200"
-                        >
+                        <div class="flex flex-wrap items-center gap-2 mt-5 pt-5 border-t border-gray-200">
 
                             <!-- TOMBOL SUBMIT UNTUK MEMFILTER DATA TANGGAL PADA WEB -->
                             <button
@@ -1731,18 +1359,9 @@
                                        transition"
                             >
 
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414V19l-4 2v-5.293L2.293 7.293A1 1 0 012 6.586V4z"
-                                    />
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414V19l-4 2v-5.293L2.293 7.293A1 1 0 012 6.586V4z"/>
                                 </svg>
 
                                 Terapkan Periode
@@ -1778,18 +1397,9 @@
                                        transition"
                             >
 
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M7 18h10M7 14h10M7 10h4m-4 8V4h10v14"
-                                    />
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 18h10M7 14h10M7 10h4m-4 8V4h10v14"/>
                                 </svg>
 
                                 Export PDF
@@ -1811,18 +1421,9 @@
                                        transition"
                             >
 
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                    />
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
 
                                 Export Excel
@@ -1898,34 +1499,16 @@
                                         </p>
 
 
-                                        <div
-                                            class="flex flex-wrap items-center
-                                                   gap-x-4 gap-y-2 mt-3
-                                                   text-xs sm:text-sm"
-                                        >
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs sm:text-sm">
 
-                                            <span
-                                                class="inline-flex items-center gap-1.5
-                                                       text-gray-600"
-                                            >
+                                            <span class="inline-flex items-center gap-1.5 text-gray-600">
 
-                                                <svg
-                                                    class="w-4 h-4 text-blue-500"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 21a8 8 0 0116 0"
-                                                    />
+                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 21a8 8 0 0116 0"/>
                                                 </svg>
 
-                                                <span class="text-gray-400">
-                                                    Diajukan:
-                                                </span>
+                                                <span class="text-gray-400">Diajukan:</span>
 
                                                 <span class="font-semibold text-gray-700">
                                                     {{ $archive->submiter_name }}
@@ -1934,33 +1517,17 @@
                                             </span>
 
 
-                                            <span class="hidden sm:inline text-gray-300">
-                                                •
-                                            </span>
+                                            <span class="hidden sm:inline text-gray-300">•</span>
 
 
-                                            <span
-                                                class="inline-flex items-center gap-1.5
-                                                       text-gray-600"
-                                            >
+                                            <span class="inline-flex items-center gap-1.5 text-gray-600">
 
-                                                <svg
-                                                    class="w-4 h-4 text-indigo-500"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 3c-2.755 0-5.29.926-7.13 2.484A11.95 11.95 0 003 12c0 2.755.926 5.29 2.484 7.13A11.95 11.95 0 0012 21c2.755 0 5.29-.926 7.13-2.484A11.95 11.95 0 0021 12c0-2.755-.926-5.29-2.484-7.13z"
-                                                    />
+                                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 3c-2.755 0-5.29.926-7.13 2.484A11.95 11.95 0 003 12c0 2.755.926 5.29 2.484 7.13A11.95 11.95 0 0012 21c2.755 0 5.29-.926 7.13-2.484A11.95 11.95 0 0021 12c0-2.755-.926-5.29-2.484-7.13z"/>
                                                 </svg>
 
-                                                <span class="text-gray-400">
-                                                    Ditandatangani:
-                                                </span>
+                                                <span class="text-gray-400">Ditandatangani:</span>
 
                                                 <span class="font-semibold text-gray-700">
                                                     {{ $archive->revenue_officer_name }}
@@ -1997,10 +1564,7 @@
 
 
                                 {{-- AKSI --}}
-                                <div
-                                    class="flex items-center gap-2
-                                           sm:ml-4 self-end sm:self-center"
-                                >
+                                <div class="flex items-center gap-2 sm:ml-4 self-end sm:self-center">
 
                                     <a
                                         href="{{ route('digital.show', $archive->id) }}"
@@ -2015,6 +1579,7 @@
                                     </a>
 
 
+                                    {{-- TOMBOL EDIT ARSIP DIGITAL (ICON PENSIL) --}}
                                     <a
                                         href="{{ route('digital.edit', $archive->id) }}"
                                         class="inline-flex items-center justify-center
@@ -2026,17 +1591,12 @@
                                         title="Edit"
                                     >
 
-                                        <svg
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-9-5l9-9m0 0l3 3m-3-3v5"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
                                             />
                                         </svg>
 
@@ -2063,18 +1623,9 @@
                                             title="Hapus"
                                         >
 
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"
-                                                />
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
                                             </svg>
 
                                         </button>
@@ -2105,34 +1656,12 @@
                                border border-dashed border-gray-300"
                     >
 
-                        <div
-                            class="mx-auto w-20 h-20 rounded-3xl
-                                   bg-white
-                                   shadow-lg
-                                   flex items-center justify-center mb-5"
-                        >
+                        <div class="mx-auto w-20 h-20 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-5">
 
-                            <svg
-                                class="w-10 h-10 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.6"
-                                    d="M4 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"
-                                />
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.6"
-                                    d="M8 13h8"
-                                />
-
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                      d="M4 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M8 13h8"/>
                             </svg>
 
                         </div>
@@ -2169,16 +1698,16 @@
             const tMulai = document.getElementById('input_tanggal_mulai').value;
             const tSelesai = document.getElementById('input_tanggal_selesai').value;
             let url = baseUrl;
-            
+
             const params = new URLSearchParams();
             if (tMulai) params.append('tanggal_mulai', tMulai);
             if (tSelesai) params.append('tanggal_selesai', tSelesai);
-            
+
             const queryString = params.toString();
             if (queryString) {
                 url += (url.includes('?') ? '&' : '?') + queryString;
             }
-            
+
             window.open(url, '_blank');
         }
 

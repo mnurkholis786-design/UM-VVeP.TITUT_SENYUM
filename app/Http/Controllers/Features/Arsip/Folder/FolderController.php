@@ -56,7 +56,10 @@ class FolderController extends Controller
     public function show(string $id)
     {
         $folder = DocumentFolder::findOrFail($id);
-        $archives = ArchiveFile::where('folder_id', $folder->id)->get();
+        
+        // Diubah menggunakan ->latest() agar arsip fisik yang baru di-upload muncul di urutan paling atas
+        $archives = ArchiveFile::where('folder_id', $folder->id)->latest()->get();
+        
         return view('features.arsip.archive.archive-file', compact('archives', 'folder'));
     }
 

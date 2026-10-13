@@ -54,6 +54,56 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
+/*
+|--------------------------------------------------------------------------
+| ARSIP FISIK EXCEL (MANAGE, PREVIEW, DOWNLOAD & DELETE)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Halaman Khusus Manajemen CRUD Arsip Fisik
+    Route::get(
+        '/category/{id}/arsip-fisik',
+        [CategoryController::class, 'manageArsipFisik']
+    )->name('category.manageArsipFisik');
+
+    // Upload / Replace Arsip Fisik
+    Route::post(
+        '/category/{id}/upload-arsip-fisik',
+        [CategoryController::class, 'uploadArsipFisik']
+    )->name('category.uploadArsipFisik');
+
+    // Update / Ganti Nama Tahun Arsip
+    Route::put(
+        '/category/{id}/update-tahun-arsip-fisik/{tahun}',
+        [CategoryController::class, 'updateTahunArsip']
+    )->name('category.updateTahunArsip');
+
+   // Preview Halaman
+    Route::get(
+        '/category/preview-arsip-fisik/{id}/{tahun}',
+        [CategoryController::class, 'previewArsipFisik']
+    )->name('category.previewArsipFisik');
+
+    // Stream Raw File untuk JavaScript
+    Route::get(
+        '/category/stream-arsip-fisik/{id}/{tahun}',
+        [CategoryController::class, 'streamArsipFisik']
+    )->name('category.streamArsipFisik');
+
+    // Download Arsip Fisik
+    Route::get(
+        '/category/download-arsip-fisik/{id}/{tahun}',
+        [CategoryController::class, 'downloadArsipFisik']
+    )->name('category.downloadArsipFisik');
+
+    // Delete Arsip Fisik (Hapus Berkas & Kartu Tahun)
+    Route::delete(
+        '/category/delete-arsip-fisik/{id}/{tahun}',
+        [CategoryController::class, 'deleteArsipFisik']
+    )->name('category.deleteArsipFisik');
+
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -467,76 +517,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | HALAMAN UTAMA DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
     Route::get(
         '/digital',
         [DigitalArchiveController::class, 'index']
     )->name('digital.index');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | TAMBAH DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
 
     Route::get(
         '/digital/create',
         [DigitalArchiveController::class, 'create']
     )->name('digital.create');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SIMPAN DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
     Route::post(
         '/digital',
         [DigitalArchiveController::class, 'store']
     )->name('digital.store');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | EXPORT DIGITAL ARCHIVE EXCEL
-    |--------------------------------------------------------------------------
-    |
-    | Route export HARUS diletakkan sebelum /digital/{id}
-    |
-    */
 
     Route::get(
         '/digital/export/{id}',
         [DigitalArchiveController::class, 'export']
     )->name('digital.export');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | EXPORT LAPORAN ARSIP PDF
-    |--------------------------------------------------------------------------
-    |
-    | Digunakan oleh tombol EXPORT PDF pada halaman /year/{id}
-    |
-    | Method:
-    | DigitalArchiveController@exportReportPdf
-    |
-    */
-
     Route::get(
         '/year/{id}/export-pdf',
         [DigitalArchiveController::class, 'exportReportPdf']
     )->name('digital.report.pdf');
 
-    Route::get('/digital-archive/report-excel/{id}', [DigitalArchiveController::class, 'exportReportExcel'])->name('digital.report.excel');
+    Route::get(
+        '/digital-archive/report-excel/{id}',
+        [DigitalArchiveController::class, 'exportReportExcel']
+    )->name('digital.report.excel');
 
 
     /*
@@ -545,108 +554,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 1. PERJALANAN DINAS
-    |--------------------------------------------------------------------------
-    */
-
     Route::get(
         '/digital/kategori/perjalanan-dinas',
         [DigitalArchiveController::class, 'perjalananDinas']
     )->name('digital.perjalanan-dinas');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 2. PRODUKSI
-    |--------------------------------------------------------------------------
-    */
 
     Route::get(
         '/digital/kategori/produksi',
         [DigitalArchiveController::class, 'produksi']
     )->name('digital.produksi');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 3. PENGADAAN BARANG DAN JASA
-    |--------------------------------------------------------------------------
-    */
-
     Route::get(
         '/digital/kategori/pengadaan-barang-jasa',
         [DigitalArchiveController::class, 'pengadaanBarangJasa']
     )->name('digital.pengadaan-barang-jasa');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4. BELANJA PEGAWAI
-    |--------------------------------------------------------------------------
-    */
 
     Route::get(
         '/digital/kategori/belanja-pegawai',
         [DigitalArchiveController::class, 'belanjaPegawai']
     )->name('digital.belanja-pegawai');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | EDIT DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
     Route::get(
         '/digital/{id}/edit',
         [DigitalArchiveController::class, 'edit']
     )->name('digital.edit');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DETAIL DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
 
     Route::get(
         '/digital/{id}',
         [DigitalArchiveController::class, 'show']
     )->name('digital.show');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
     Route::put(
         '/digital/{id}',
         [DigitalArchiveController::class, 'update']
     )->name('digital.update');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
     Route::delete(
         '/digital/{id}',
         [DigitalArchiveController::class, 'destroy']
     )->name('digital.destroy');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ARCHIVE
-    |--------------------------------------------------------------------------
-    */
 
     Route::resource(
         '/archive',

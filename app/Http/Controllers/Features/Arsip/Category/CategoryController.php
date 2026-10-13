@@ -19,19 +19,13 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        // if ($request->filled('id_cabinet')) {
-        //     $id = $request->query('id_cabinet');
-        // } else {
-        //     $id = $request->id_cabinet;
-        // }
         $id = $request->id_cabinet;
         $cabinet = Cabinet::findOrFail($id);
-        $result = Category::where('cabinet_id', $cabinet->id)->get(); // ambil category berdasarkan cabinet
+        $result = Category::where('cabinet_id', $cabinet->id)->get();
 
         $categories = collect();
-        $temp  = [];
+        $temp = [];
 
-        // ambil kategori yang sama dilewati
         foreach ($result as $category) {
             if (in_array($category->category_name, $temp)) {
                 continue;
@@ -68,25 +62,13 @@ class CategoryController extends Controller
             'url'        => 'nullable|string',
         ]);
 
-        // $code = strtoupper(Str::slug($request->name, '-'));
-        // Category::create([
-        //     'cabinet_id' => $request->cabinet_id,
-        //     'category_name' => $request->name,
-        //     'category_code' => $code,
-        //     'name' => 'required|string',
-        //     'payment_method' => 'nullable',
-        //     'funding_source' => 'nullable',
-        //     'deskripsi' => 'nullable|string',
-        //     'url' => 'nullable|string',
-        // ]);
-
         Category::create([
-            'cabinet_id' => $request->cabinet_id,
-            'category_name' => $request->name,
-            'description' => $request->deskripsi,
+            'cabinet_id'        => $request->cabinet_id,
+            'category_name'     => $request->name,
+            'description'       => $request->deskripsi,
             'payment_method_id' => $request->payment_method,
             'funding_source_id' => $request->funding_source,
-            'url_icon' => $request->url,
+            'url_icon'          => $request->url,
         ]);
 
         return redirect()->route('category.index', ['id_cabinet' => $request->cabinet_id])->with('success', 'Berhasil Membuat Category');
@@ -97,26 +79,45 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        $category = Category::findOrFail($id); // category yang dipilih
-        // $cabinet = Cabinet::findOrFail($category->cabinet_id);
+        $category = Category::findOrFail($id);
+
+        $file2024 = null;
+        $file2025 = null;
+
+        $files2024 = Storage::disk('private')->files('arsip_fisik/2024');
+        foreach ($files2024 as $f) {
+            if (str_contains($f, 'arsip_fisik_2024_category_' . $id . '_')) {
+                $file2024 = basename($f);
+                break;
+            }
+        }
+
+        $files2025 = Storage::disk('private')->files('arsip_fisik/2025');
+        foreach ($files2025 as $f) {
+            if (str_contains($f, 'arsip_fisik_2025_category_' . $id . '_')) {
+                $file2025 = basename($f);
+                break;
+            }
+        }
+
         if (isset($category->sub_category)) {
-            $result = Category::where('category_name', $category->category_name)->get(); // ambil sub category dari category
+            $result = Category::where('category_name', $category->category_name)->get();
 
             $subcategories = collect();
-            $temp  = [];
+            $temp = [];
 
-            // ambil sub kategori dari category dan yang sama dilewati
-            foreach ($result as $category) {
-                if (in_array($category->sub_category, $temp)) { // cek jika sub Kategori sudah ada maka lewati
+            foreach ($result as $cat) {
+                if (in_array($cat->sub_category, $temp)) {
                     continue;
                 }
 
-                $temp[] = $category->sub_category; // simpan sub kategori dalam memori
-                $subcategories->push($category);
+                $temp[] = $cat->sub_category;
+                $subcategories->push($cat);
             }
-            return view('features.arsip.sub_category.sub_category', compact('subcategories', 'category'));
+
+            return view('features.arsip.sub_category.sub_category', compact('subcategories', 'category', 'file2024', 'file2025'));
         } else {
-            $years = Category::where('category_name', $category->category_name)->get(); // cari tahun berdasarkan categori
+            $years = Category::where('category_name', $category->category_name)->get();
             return view('features.arsip.year.year', compact('years', 'category'));
         }
     }
@@ -135,7 +136,7 @@ class CategoryController extends Controller
             'category',
             'cabinet',
             'payment',
-            'funding',
+            'funding'
         ));
     }
 
@@ -145,7 +146,7 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'           => 'required|string|max:255',
             'payment_method' => 'nullable',
             'funding_source' => 'nullable',
         ]);
@@ -155,16 +156,13 @@ class CategoryController extends Controller
         $oldCategoryName = $category->category_name;
         $newCategoryName = $request->name;
 
-        // Update semua records dengan category_name yang sama di cabinet yang sama
-        // Termasuk yang punya sub_category dan year berbeda
         Category::where('cabinet_id', $category->cabinet_id)
             ->where('category_name', $oldCategoryName)
-            ->update(['category_name' => $newCategoryName, 'payment_method_id' => $request->payment_method, 'funding_source_id' => $request->funding_source]);
-
-        // Update juga di field sub_category yang mereferensi category_name ini
-        // Category::where('cabinet_id', $category->cabinet_id)
-        //     ->where('sub_category', $oldCategoryName)
-        //     ->update(['sub_category' => $newCategoryName]);
+            ->update([
+                'category_name'     => $newCategoryName,
+                'payment_method_id' => $request->payment_method,
+                'funding_source_id' => $request->funding_source,
+            ]);
 
         return redirect()->route('category.index', ['id_cabinet' => $cabinetId])
             ->with('success', 'Berhasil edit Category');
@@ -178,14 +176,12 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $cabinetId = $category->cabinet_id;
 
-        // Ambil semua records dengan category_name yang sama
         $categories = Category::where('cabinet_id', $category->cabinet_id)
             ->where('category_name', $category->category_name)
             ->get();
 
         $this->deleteRelatedFiles($categories->pluck('id')->toArray());
 
-        // Hapus semua category beserta sub_category dan year-nya
         Category::where('cabinet_id', $category->cabinet_id)
             ->where('category_name', $category->category_name)
             ->delete();
@@ -194,11 +190,196 @@ class CategoryController extends Controller
             ->with('success', 'Berhasil menghapus Category');
     }
 
+    /**
+     * Tampilkan Halaman Tersendiri Manajemen Arsip Fisik (CRUD).
+     */
+    public function manageArsipFisik($id)
+    {
+        $category = Category::findOrFail($id);
+
+        $directories = Storage::disk('private')->directories('arsip_fisik');
+        $arsipList = [];
+
+        foreach ($directories as $dir) {
+            $tahun = basename($dir);
+            $fileName = null;
+
+            $files = Storage::disk('private')->files($dir);
+            foreach ($files as $f) {
+                if (str_contains($f, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                    $fileName = basename($f);
+                    break;
+                }
+            }
+
+            $arsipList[$tahun] = $fileName;
+        }
+
+        ksort($arsipList);
+
+        return view('features.arsip.category.manage_arsip_fisik', compact('category', 'arsipList'));
+    }
+
+    /**
+     * Upload / Replace Arsip Fisik Excel.
+     */
+    public function uploadArsipFisik(Request $request, $id)
+    {
+        $request->validate([
+            'tahun'      => 'required|string|max:10',
+            'file_excel' => 'required|mimes:xlsx,xls|max:10240',
+        ]);
+
+        if ($request->hasFile('file_excel')) {
+            $tahun = trim($request->tahun);
+            $file = $request->file('file_excel');
+
+            if (!Storage::disk('private')->exists('arsip_fisik/' . $tahun)) {
+                Storage::disk('private')->makeDirectory('arsip_fisik/' . $tahun);
+            }
+
+            $existingFiles = Storage::disk('private')->files('arsip_fisik/' . $tahun);
+            foreach ($existingFiles as $ef) {
+                if (str_contains($ef, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                    Storage::disk('private')->delete($ef);
+                }
+            }
+
+            $fileName = 'arsip_fisik_' . $tahun . '_category_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('arsip_fisik/' . $tahun, $fileName, 'private');
+
+            return redirect()->back()->with('success', "Berhasil menyimpan file Arsip Fisik Excel Tahun $tahun!");
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengunggah file.');
+    }
+
+    /**
+     * Update / Ganti Nama Tahun Arsip.
+     */
+    public function updateTahunArsip(Request $request, $id, $tahunLama)
+    {
+        $request->validate([
+            'tahun_baru' => 'required|string|max:10',
+        ]);
+
+        $tahunBaru = trim($request->tahun_baru);
+
+        if ($tahunLama === $tahunBaru) {
+            return redirect()->back()->with('success', 'Tidak ada perubahan tahun.');
+        }
+
+        if (!Storage::disk('private')->exists('arsip_fisik/' . $tahunBaru)) {
+            Storage::disk('private')->makeDirectory('arsip_fisik/' . $tahunBaru);
+        }
+
+        $files = Storage::disk('private')->files('arsip_fisik/' . $tahunLama);
+        foreach ($files as $file) {
+            if (str_contains($file, 'arsip_fisik_' . $tahunLama . '_category_' . $id . '_')) {
+                $fileNameOld = basename($file);
+                $fileNameNew = str_replace('arsip_fisik_' . $tahunLama, 'arsip_fisik_' . $tahunBaru, $fileNameOld);
+
+                Storage::disk('private')->move($file, 'arsip_fisik/' . $tahunBaru . '/' . $fileNameNew);
+            }
+        }
+
+        // Cek jika folder lama kosong, hapus foldernya
+        $remainingFiles = Storage::disk('private')->files('arsip_fisik/' . $tahunLama);
+        if (empty($remainingFiles)) {
+            Storage::disk('private')->deleteDirectory('arsip_fisik/' . $tahunLama);
+        }
+
+        return redirect()->back()->with('success', "Berhasil mengubah Tahun Arsip dari $tahunLama menjadi $tahunBaru!");
+    }
+
+    /**
+     * Preview File Arsip Fisik Excel.
+     */
+    public function previewArsipFisik($id, $tahun)
+    {
+        $category = Category::findOrFail($id);
+        $fileName = null;
+
+        $files = Storage::disk('private')->files('arsip_fisik/' . $tahun);
+        foreach ($files as $file) {
+            if (str_contains($file, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                $fileName = basename($file);
+                break;
+            }
+        }
+
+        if (!$fileName) {
+            return redirect()->back()->with('error', 'File tidak ditemukan.');
+        }
+
+        return view('features.arsip.category.preview_arsip_fisik', compact('category', 'tahun', 'fileName'));
+    }
+
+    /**
+     * Stream Raw File khusus untuk dibaca oleh SheetJS di browser.
+     */
+    public function streamArsipFisik($id, $tahun)
+    {
+        $files = Storage::disk('private')->files('arsip_fisik/' . $tahun);
+
+        foreach ($files as $file) {
+            if (str_contains($file, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                return response()->file(Storage::disk('private')->path($file));
+            }
+        }
+
+        abort(404);
+    }
+
+    /**
+     * Unduh / Download File Arsip Fisik Excel.
+     */
+    public function downloadArsipFisik($id, $tahun)
+    {
+        $files = Storage::disk('private')->files('arsip_fisik/' . $tahun);
+
+        foreach ($files as $file) {
+            if (str_contains($file, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                return Storage::disk('private')->download($file);
+            }
+        }
+
+        return redirect()->back()->with('error', 'File tidak ditemukan.');
+    }
+
+    /**
+     * Hapus Folder dan Berkas Arsip Fisik (Menghapus Kartu Tahun).
+     */
+    public function deleteArsipFisik($id, $tahun)
+    {
+        $directoryPath = 'arsip_fisik/' . $tahun;
+
+        if (Storage::disk('private')->exists($directoryPath)) {
+            $files = Storage::disk('private')->files($directoryPath);
+            foreach ($files as $file) {
+                if (str_contains($file, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
+                    Storage::disk('private')->delete($file);
+                }
+            }
+
+            $remainingFiles = Storage::disk('private')->files($directoryPath);
+            if (empty($remainingFiles)) {
+                Storage::disk('private')->deleteDirectory($directoryPath);
+            }
+
+            return redirect()->back()->with('success', "Berhasil menghapus kartu dan berkas Arsip Fisik Tahun $tahun!");
+        }
+
+        return redirect()->back()->with('error', 'Data tidak ditemukan.');
+    }
+
     private function deleteRelatedFiles($categoryIds)
     {
         $folders = DocumentFolder::whereIn('category_id', $categoryIds)->pluck('id');
 
-        if ($folders->isEmpty()) return;
+        if ($folders->isEmpty()) {
+            return;
+        }
 
         $files = ArchiveFile::whereIn('folder_id', $folders)->get();
 

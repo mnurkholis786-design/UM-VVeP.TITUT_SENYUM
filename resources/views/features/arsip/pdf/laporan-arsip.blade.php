@@ -19,12 +19,13 @@
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .header h1 {
             font-size: 16px;
-            margin: 0 0 8px 0;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
         }
 
         .header p {
@@ -37,27 +38,41 @@
             font-size: 11px;
         }
 
-        table {
+        .header .periode {
+            font-weight: bold;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .sub-kategori-container {
+            width: 100%;
+            margin-bottom: 5px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        table.main-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
-        th,
-        td {
+        table.main-table th,
+        table.main-table td {
             border: 1px solid #000;
             padding: 4px 2px;
             vertical-align: middle;
             word-wrap: break-word;
         }
 
-        th {
+        table.main-table th {
             text-align: center;
             font-weight: bold;
-            background-color: #f2f2f2;
+            background-color: #c1e5fa;
         }
 
-        td {
+        table.main-table td {
             font-size: 8px;
         }
 
@@ -70,20 +85,10 @@
             vertical-align: top;
         }
 
-        .center {
-            text-align: center;
-        }
+        .center { text-align: center; }
+        .left { text-align: left; }
+        .empty { text-align: center; font-style: italic; }
 
-        .left {
-            text-align: left;
-        }
-
-        .empty {
-            text-align: center;
-            font-style: italic;
-        }
-
-        /* Lebar Kolom Dioptimalkan */
         .col-no { width: 3%; }
         .col-kode { width: 9%; }
         .col-nama { width: 17%; }
@@ -93,7 +98,6 @@
         .col-tanggal-item { width: 8%; }
         .col-jumlah { width: 7.5%; }
         
-        /* Kolom Retensi Diperlebar Agar Teks INAKTIF Tidak Terpotong */
         .col-retensi { 
             width: 8.5%; 
             white-space: nowrap; 
@@ -107,15 +111,48 @@
 
 <body>
 
-    {{-- HEADER --}}
     <div class="header">
-        <h1>Laporan</h1>
+        <h1>{{ $judulLaporan ?? 'LAPORAN UP BENDAHARA' }}</h1>
         <p class="unit">Daftar Arsip Uang Pertanggung Jawaban Bendahara</p>
-        <p>PERIODE: {{ $periodeMulai }} - {{ $periodeSelesai }}</p>
+        <p class="periode">PERIODE: {{ $periodeMulai }} - {{ $periodeSelesai }}</p>
     </div>
 
-    {{-- TABEL --}}
-    <table>
+    @php
+        $displaySubKategori = null;
+
+        // 1. Ambil dari variabel controller
+        if (!empty($subKategoriNama) && $subKategoriNama !== '-') {
+            $displaySubKategori = $subKategoriNama;
+        }
+
+        // 2. Jika masih kosong, cari dari relasi folder di koleksi archives
+        if (!$displaySubKategori && isset($archives) && $archives->count() > 0) {
+            foreach ($archives as $arc) {
+                if (!empty($arc->folder)) {
+                    $displaySubKategori = $arc->folder->name ?? $arc->folder->folder_name ?? $arc->folder->nama_folder ?? null;
+                    if ($displaySubKategori) break;
+                } elseif (!empty($arc->folder_id)) {
+                    $f = \App\Models\DocumentFolder::find($arc->folder_id);
+                    if ($f) {
+                        $displaySubKategori = $f->name ?? $f->folder_name ?? $f->nama_folder ?? null;
+                        if ($displaySubKategori) break;
+                    }
+                }
+            }
+        }
+
+        // 3. Fallback ke category name
+        if (!$displaySubKategori && isset($category)) {
+            $displaySubKategori = $category->category_name ?? $category->name ?? null;
+        }
+    @endphp
+
+    {{-- Menampilkan Sub Kategori secara dinamis --}}
+    <div class="sub-kategori-container">
+        Sub Kategori: {{ $displaySubKategori ?? 'UP Bendahara' }}
+    </div>
+
+    <table class="main-table">
         <thead>
             <tr>
                 <th rowspan="2" class="col-no">NO</th>
@@ -165,22 +202,23 @@
 
             @foreach ($klasifikasiUrutan as $keyKlasifikasi => $namaKlasifikasi)
                 @php
-                    $subKategoriList = array_map(
-                        'strtoupper',
-                        $subKategoriPerKlasifikasi[$keyKlasifikasi] ?? []
-                    );
+                    $subKategoriList = array_map('strtoupper', $subKategoriPerKlasifikasi[$keyKlasifikasi] ?? []);
 
-                    $dataKlasifikasi = $archives->filter(function ($archive) use ($subKategoriList) {
-                        return in_array(
-                            strtoupper(trim($archive->kategori ?? '')),
-                            $subKategoriList
-                        );
+                    $dataKlasifikasi = $archives->filter(function ($archive) use ($subKategoriList, $keyKlasifikasi) {
+                        $kat = strtoupper(trim($archive->kategori ?? ''));
+                        if (empty($kat)) return false;
+
+                        foreach ($subKategoriList as $subKat) {
+                            if ($kat === $subKat || \Illuminate\Support\Str::startsWith($kat, $subKat) || \Illuminate\Support\Str::startsWith($kat, $keyKlasifikasi)) {
+                                return true;
+                            }
+                        }
+                        return false;
                     })->values();
 
                     $totalItem = $dataKlasifikasi->count();
                 @endphp
 
-                {{-- BARIS HEADER KLASIFIKASI --}}
                 <tr class="archive-header">
                     <td class="center">{{ $nomorBerkas }}</td>
                     <td class="center">{{ $kodeKlasifikasiDefault }}</td>
@@ -196,27 +234,18 @@
                     <td class="left">Server Arsip Keuangan</td>
                 </tr>
 
-                {{-- BARIS ITEM ARSIP --}}
                 @if ($totalItem > 0)
                     @foreach ($dataKlasifikasi as $index => $archive)
                         @php
-                            $uraianArsip = $archive->uraian ?? '-';
-                            if (trim((string) $uraianArsip) === '') {
-                                $uraianArsip = '-';
-                            }
+                            $uraianArsip = !empty(trim((string)($archive->uraian ?? ''))) ? $archive->uraian : '-';
 
                             $tanggalItem = '-';
                             if ($archive->created_at) {
                                 $tanggalItem = \Carbon\Carbon::parse($archive->created_at)->format('d-m-Y');
                             }
 
-                            $keterangan = $archive->keterangan ?? '-';
+                            $keterangan = !empty(trim((string)($archive->keterangan ?? ''))) ? $archive->keterangan : '-';
 
-                            /*
-                            |--------------------------------------------------------------------------
-                            | MENGHITUNG HALAMAN PDF
-                            |--------------------------------------------------------------------------
-                            */
                             $totalHalaman = 0;
                             $rawFiles = $archive->file_path_archive;
                             if (is_string($rawFiles)) {
@@ -268,22 +297,11 @@
                                 $jumlahFile = '-';
                             }
 
-                            /*
-                            |--------------------------------------------------------------------------
-                            | RETENSI ARSIP (AKTIF & INAKTIF)
-                            |--------------------------------------------------------------------------
-                            */
-                            // Retensi Aktif
                             $rawAktif = trim((string)($archive->retensi_arsip_aktif ?? ''));
                             if (!empty($rawAktif) && $rawAktif !== '-') {
                                 if (is_numeric($rawAktif)) {
                                     $val = (int)$rawAktif;
-                                    if ($val > 1900) {
-                                        $durasi = abs($val - 2000);
-                                        $retensiAktif = ($durasi > 0 ? $durasi : 1) . ' Tahun';
-                                    } else {
-                                        $retensiAktif = $val . ' Tahun';
-                                    }
+                                    $retensiAktif = ($val > 1900 ? max(abs($val - 2000), 1) : $val) . ' Tahun';
                                 } else {
                                     $retensiAktif = str_ireplace('Tahun', '', $rawAktif) . ' Tahun';
                                 }
@@ -291,17 +309,11 @@
                                 $retensiAktif = '-';
                             }
 
-                            // Retensi Inaktif
                             $rawInaktif = trim((string)($archive->retensi_arsip_inaktif ?? ''));
                             if (!empty($rawInaktif) && $rawInaktif !== '-') {
                                 if (is_numeric($rawInaktif)) {
                                     $val = (int)$rawInaktif;
-                                    if ($val > 1900) {
-                                        $durasi = abs($val - 2000);
-                                        $retensiInaktif = ($durasi > 0 ? $durasi : 1) . ' Tahun';
-                                    } else {
-                                        $retensiInaktif = $val . ' Tahun';
-                                    }
+                                    $retensiInaktif = ($val > 1900 ? max(abs($val - 2000), 1) : $val) . ' Tahun';
                                 } else {
                                     $retensiInaktif = str_ireplace('Tahun', '', $rawInaktif) . ' Tahun';
                                 }
@@ -318,8 +330,6 @@
                             <td class="center">{{ $index + 1 }}</td>
                             <td class="left">{{ $uraianArsip }}</td>
                             <td class="center">{{ $tanggalItem }}</td>
-                            
-                            {{-- KOLOM JUMLAH DAN RETENSI ARSIP --}}
                             <td class="center">{{ $jumlahFile }}</td>
                             <td class="center col-retensi">{{ $retensiAktif }}</td>
                             <td class="center col-retensi">{{ $retensiInaktif }}</td>
@@ -327,10 +337,6 @@
                             <td class="left">&nbsp;</td>
                         </tr>
                     @endforeach
-                @else
-                    <tr>
-                        <td colspan="12" class="empty">Belum ada data arsip</td>
-                    </tr>
                 @endif
 
                 @php

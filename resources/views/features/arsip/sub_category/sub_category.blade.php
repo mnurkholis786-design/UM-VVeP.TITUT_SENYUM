@@ -171,7 +171,7 @@
                         border border-white/80
                         rounded-3xl
                         shadow-xl shadow-gray-200/50
-                        overflow-hidden">
+                        overflow-hidden mb-6">
 
                 {{-- HEADER --}}
                 <div class="px-6 sm:px-8 py-6
@@ -525,6 +525,29 @@
 
                 </div>
 
+            </div>
+
+            {{-- KARTU KELOLA ARSIP FISIK TAHUN TERDAHULU (LEBARNYA MENGIKUTI KARTU UTAMA DI ATAS) --}}
+            <div class="bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-xl shadow-gray-200/50 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 shadow-inner">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-gray-800">Kelola Arsip Fisik Tahun Terdahulu</h3>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Buka halaman tersendiri untuk melakukan Upload, Lihat, Unduh, Edit, dan Hapus berkas Excel.</p>
+                    </div>
+                </div>
+                
+                <a href="{{ route('category.manageArsipFisik', $category->id) }}" 
+                   class="shrink-0 group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition duration-200">
+                    <span>Buka Kelola Arsip Fisik</span>
+                    <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
             </div>
 
         </div>
