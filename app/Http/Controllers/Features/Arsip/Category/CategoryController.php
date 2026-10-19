@@ -11,6 +11,7 @@ use App\Models\FundingSource;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -57,12 +58,22 @@ class CategoryController extends Controller
     {
         $request->validate([
             'cabinet_id' => 'required|exists:cabinets,id',
-            'name'       => 'required|string|max:255',
+            'name'       => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'category_name')->where(function ($query) use ($request) {
+                    return $query->where('cabinet_id', $request->cabinet_id);
+                }),
+            ],
             'deskripsi'  => 'nullable|string',
             'url'        => 'nullable|string',
+        ], [
+            'name.unique' => 'Nama kategori sudah digunakan di dalam kabinet ini.',
         ]);
 
         Category::create([
+
             'cabinet_id'        => $request->cabinet_id,
             'category_name'     => $request->name,
             'description'       => $request->deskripsi,
@@ -145,15 +156,29 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name'           => 'required|string|max:255',
-            'payment_method' => 'nullable',
-            'funding_source' => 'nullable',
-        ]);
-
         $category = Category::findOrFail($id);
         $cabinetId = $category->cabinet_id;
         $oldCategoryName = $category->category_name;
+
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'category_name')
+                    ->where(function ($query) use ($cabinetId) {
+                        return $query->where('cabinet_id', $cabinetId);
+                    })
+                    ->where(function ($query) use ($oldCategoryName) {
+                        return $query->where('category_name', '!=', $oldCategoryName);
+                    }),
+            ],
+            'payment_method' => 'nullable',
+            'funding_source' => 'nullable',
+        ], [
+            'name.unique' => 'Nama kategori sudah digunakan di dalam kabinet ini.',
+        ]);
+
         $newCategoryName = $request->name;
 
         Category::where('cabinet_id', $category->cabinet_id)
@@ -267,6 +292,16 @@ class CategoryController extends Controller
 
         if ($tahunLama === $tahunBaru) {
             return redirect()->back()->with('success', 'Tidak ada perubahan tahun.');
+        }
+
+        // Cek apakah tahun tujuan sudah memiliki berkas arsip untuk kategori ini
+        if (Storage::disk('private')->exists('arsip_fisik/' . $tahunBaru)) {
+            $existingNewYearFiles = Storage::disk('private')->files('arsip_fisik/' . $tahunBaru);
+            foreach ($existingNewYearFiles as $existingFile) {
+                if (str_contains($existingFile, 'arsip_fisik_' . $tahunBaru . '_category_' . $id . '_')) {
+                    return redirect()->back()->with('error', "Gagal! Arsip Fisik untuk Tahun $tahunBaru sudah ada pada kategori ini.");
+                }
+            }
         }
 
         if (!Storage::disk('private')->exists('arsip_fisik/' . $tahunBaru)) {

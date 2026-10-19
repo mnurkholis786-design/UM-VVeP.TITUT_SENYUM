@@ -117,7 +117,7 @@
         <p class="periode">PERIODE: {{ $periodeMulai }} - {{ $periodeSelesai }}</p>
     </div>
 
-    @php
+     @php
         $displaySubKategori = null;
 
         // 1. Ambil dari variabel controller
@@ -125,7 +125,12 @@
             $displaySubKategori = $subKategoriNama;
         }
 
-        // 2. Jika masih kosong, cari dari relasi folder di koleksi archives
+        // 2. Ambil dari properti sub_category pada data kategori terpilih
+        if (!$displaySubKategori && !empty($category->sub_category)) {
+            $displaySubKategori = $category->sub_category;
+        }
+
+        // 3. Jika masih kosong, cari dari relasi folder di koleksi archives
         if (!$displaySubKategori && isset($archives) && $archives->count() > 0) {
             foreach ($archives as $arc) {
                 if (!empty($arc->folder)) {
@@ -141,15 +146,15 @@
             }
         }
 
-        // 3. Fallback ke category name
+        // 4. Fallback ke category name jika memang tidak memiliki sub kategori
         if (!$displaySubKategori && isset($category)) {
-            $displaySubKategori = $category->category_name ?? $category->name ?? null;
+            $displaySubKategori = $category->category_name ?? $category->name ?? '-';
         }
     @endphp
 
     {{-- Menampilkan Sub Kategori secara dinamis --}}
     <div class="sub-kategori-container">
-        Sub Kategori: {{ $displaySubKategori ?? 'UP Bendahara' }}
+        Sub Kategori: {{ $displaySubKategori ?? '-' }}
     </div>
 
     <table class="main-table">

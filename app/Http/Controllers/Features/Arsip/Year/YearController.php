@@ -39,8 +39,25 @@ class YearController extends Controller
         $category = Category::findOrFail($request->category_id);
 
         $request->validate([
-            'year' => 'required|string',
+            'year' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 10),
+        ], [
+            'year.required' => 'Kolom tahun wajib diisi.',
+            'year.digits'   => 'Format tahun harus 4 digit angka.',
         ]);
+
+        // Cek duplikat tahun pada sub kategori yang sama
+        $exists = Category::where('cabinet_id', $category->cabinet_id)
+            ->where('category_name', $category->category_name)
+            ->where('sub_category', $category->sub_category)
+            ->where('year', $request->year)
+            ->exists();
+
+        if ($exists) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Tahun ' . $request->year . ' sudah terdaftar pada sub kategori ini.');
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -307,6 +324,7 @@ class YearController extends Controller
             */
             $year = Category::findOrFail($id);
             $cabinetId = $year->cabinet_id;
+            $subCategoryName = $year->sub_category;
 
             /*
             |--------------------------------------------------------------------------
@@ -327,15 +345,33 @@ class YearController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | HAPUS / SET NULL CATEGORY YEAR
+            | HAPUS / SET NULL CATEGORY YEAR & SIMPAN TARGET REDIRECT
             |--------------------------------------------------------------------------
             */
             if ($countSameSubCategory == 1) {
+                // Jika hanya ada 1 tahun, kosongkan tahunnya agar sub kategori tetap ada
                 $year->update(['year' => null]);
-                $message = 'Berhasil menghapus Year (diset null)';
+                $targetId = $year->id;
             } else {
+                // Ambil ID saudara sub kategori sebelum record dihapus
+                $sibling = Category::where('cabinet_id', $year->cabinet_id)
+                    ->where('category_name', $year->category_name)
+                    ->where('sub_category', $year->sub_category)
+                    ->where('id', '!=', $year->id)
+                    ->first();
+
+                $targetId = $sibling ? $sibling->id : null;
                 $year->delete();
-                $message = 'Berhasil menghapus Year';
+            }
+
+            $message = 'Berhasil menghapus Tahun';
+
+            // Redirect tetap di halaman sub kategori
+            if ($targetId) {
+                $route = !empty($subCategoryName) ? 'subcategory.show' : 'category.show';
+                return redirect()
+                    ->route($route, $targetId)
+                    ->with('success', $message);
             }
 
             return redirect()

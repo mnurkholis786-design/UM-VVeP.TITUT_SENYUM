@@ -379,18 +379,20 @@
                                                     {{ $payment->payment_method_name }}
                                                 </h4>
 
-                                                <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                                                @if ($payment->sub_category)
+                                                    <div class="flex flex-wrap items-center gap-2 mt-1.5">
 
-                                                    <span class="inline-flex items-center
-                                                                 px-2.5 py-1 rounded-lg
-                                                                 text-xs font-semibold
-                                                                 bg-blue-100 text-[#0056B3]">
+                                                        <span class="inline-flex items-center
+                                                                    px-2.5 py-1 rounded-lg
+                                                                    text-xs font-semibold
+                                                                    bg-blue-100 text-[#0056B3]">
 
-                                                        {{ $payment->sub_category }}
+                                                            {{ $payment->sub_category }}
 
-                                                    </span>
+                                                        </span>
 
-                                                </div>
+                                                    </div>
+                                                @endif
 
                                                 @if ($payment->description)
 
@@ -660,18 +662,20 @@
                                                     {{ $funding->funding_source_name }}
                                                 </h4>
 
-                                                <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                                                @if ($funding->sub_category)
+                                                    <div class="flex flex-wrap items-center gap-2 mt-1.5">
 
-                                                    <span class="inline-flex items-center
-                                                                 px-2.5 py-1 rounded-lg
-                                                                 text-xs font-semibold
-                                                                 bg-blue-100 text-[#0056B3]">
+                                                        <span class="inline-flex items-center
+                                                                    px-2.5 py-1 rounded-lg
+                                                                    text-xs font-semibold
+                                                                    bg-blue-100 text-[#0056B3]">
 
-                                                        {{ $funding->sub_category }}
+                                                            {{ $funding->sub_category }}
 
-                                                    </span>
+                                                        </span>
 
-                                                </div>
+                                                    </div>
+                                                @endif
 
                                                 @if ($funding->description)
 

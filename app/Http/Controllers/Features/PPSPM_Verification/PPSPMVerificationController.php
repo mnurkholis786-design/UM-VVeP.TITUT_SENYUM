@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mpdf\Mpdf;
+use App\Models\User;
 
 class PPSPMVerificationController extends Controller
 {
@@ -155,6 +156,17 @@ class PPSPMVerificationController extends Controller
             'disposal_date' => Carbon::now()->addYear(5),
             'no_spby' => $request->no_spby,
         ]);
+
+        $adminUsers = User::where('role', 'Admin')->get();
+foreach ($adminUsers as $admin) {
+    Notification::create([
+        'user_id' => $admin->id,
+        'title'   => 'Arsip Digital Baru Tersimpan',
+        'message' => 'Pengajuan <span class="font-semibold text-green-600">' . e($doc->budget_submission_name) . '</span> telah divalidasi PPSPM dan masuk ke Arsip Digital.',
+        'type'    => 'success',
+        'url'     => route('digital.show', $digital->id),
+    ]);
+}
 
         $doc->update([
             'revenue_officer_id' => Auth::id(),

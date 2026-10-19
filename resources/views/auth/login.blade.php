@@ -1612,7 +1612,6 @@
 
                                 viewBox="0 0 24 24"
                             >
-
                                 <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
@@ -1623,12 +1622,26 @@
 
                             </svg>
 
-                        </button>
+                            </button>
 
                     </div>
 
-                </form>
+                    {{-- =================================================
+                        REGISTER LINK
+                    ================================================== --}}
+                    @if (Route::has('register'))
+                        <div class="text-center pt-3">
+                            <p class="text-xs text-gray-600">
+                                Don't have an account?
+                                <a href="{{ route('register') }}"
+                                    class="font-bold text-[#0057b8] hover:text-[#003f8f] transition">
+                                    Register here
+                                </a>
+                            </p>
+                        </div>
+                    @endif
 
+                </form>
 
                 {{-- =================================================
                     FOOTER

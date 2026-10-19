@@ -58,8 +58,8 @@
                             Nama Folder Arsip
                         </label>
                         <div class="relative">
-                            <input type="text" name="name" id="name" value="{{ $folder->folder_name }}"
-                                class="w-full rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 px-4 text-gray-900 placeholder-gray-400"
+                            <input type="text" name="name" id="name" value="{{ old('name', $folder->folder_name) }}"
+                                class="w-full rounded-xl border-2 @error('name') border-red-500 @else border-gray-200 @enderror focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 px-4 text-gray-900 placeholder-gray-400"
                                 placeholder="Masukkan nama folder arsip" required>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                 <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,17 +67,11 @@
                                 </svg>
                             </div>
                         </div>
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                         <p class="mt-2 text-xs text-gray-500">Perbarui nama folder sesuai kebutuhan</p>
                     </div>
-
-                    {{-- <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Kode Folder Arsip
-                        </label>
-                        <input type="text" name="kode_folder" id="name" value="{{ $folder->kode_folder }}"
-                            class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
-                            placeholder="Masukkan kode folder arsip" required>
-                    </div> --}}
 
                     {{-- Keterangan --}}
                     <div class="group">
@@ -88,8 +82,11 @@
                             Deskripsi
                         </label>
                         <textarea name="deskripsi" id="keterangan" rows="2"
-                            class="w-full rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 px-4 text-gray-900 placeholder-gray-400 resize-none"
-                            placeholder="Masukkan deskripsi" required>{{ $folder->description }}</textarea>
+                            class="w-full rounded-xl border-2 @error('deskripsi') border-red-500 @else border-gray-200 @enderror focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 px-4 text-gray-900 placeholder-gray-400 resize-none"
+                            placeholder="Masukkan deskripsi" required>{{ old('deskripsi', $folder->description) }}</textarea>
+                        @error('deskripsi')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                         <p class="mt-2 text-xs text-gray-500">Perbarui informasi tambahan tentang folder</p>
                     </div>
 

@@ -15,14 +15,15 @@ use Mpdf\Mpdf;
 
 class AdminController extends Controller
 {
-    public function index()
-    {
-        $arsip = DigitalArchive::all()->count();
-        $pengajuan = BudgetSubmission::all()->count();
-        $akun = User::all()->count();
-        $arsiplist = DigitalArchive::paginate(10, ['*'], 'arsip_list');
-        return view('admin.admin-dashboard', compact('arsip', 'pengajuan', 'akun', 'arsiplist'));
-    }
+public function index()
+{
+    $arsip = DigitalArchive::count();
+    $pengajuan = BudgetSubmission::count();
+    $akun = User::count();
+    $arsiplist = DigitalArchive::latest()->paginate(10, ['*'], 'arsip_list');
+
+    return view('admin.admin-dashboard', compact('arsip', 'pengajuan', 'akun', 'arsiplist'));
+}
 
     public function input_archive(Request $request)
     {
@@ -39,16 +40,26 @@ class AdminController extends Controller
         return view('admin.setting_environment.setting_environment', compact('payment_method', 'funding_source'));
     }
 
-    public function report()
+     public function report(Request $request)
     {
-        if (isset($request->from_date) && isset($request->target_date)) {
-            $submission = BudgetSubmission::with('user')->where('verification_status', 1)->whereBetween('updated_at', [$request->from_date, $request->target_date])->paginate(10, ['*'], 'submit_result_filter');
-            return view('keuangan.report.report', compact('submission'));
+        $query = BudgetSubmission::with('user')
+            ->where('verification_status', 1);
+
+        // Filter berdasarkan rentang tanggal jika diisi
+        if ($request->filled('from_date') && $request->filled('target_date')) {
+            $query->whereBetween('updated_at', [
+                $request->from_date . ' 00:00:00',
+                $request->target_date . ' 23:59:59'
+            ]);
         }
-        $submission = BudgetSubmission::with('user')->where('verification_status', 1)->paginate(10, ['*'], 'result_no_filter');
+
+        $submission = $query->latest('updated_at')
+            ->paginate(10)
+            ->withQueryString();
+
         return view('admin.report.report', compact('submission'));
     }
-
+    
     public function report_account_submission(Request $request)
     {
         $akun = User::all();

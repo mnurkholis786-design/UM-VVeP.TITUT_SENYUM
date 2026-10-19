@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Notification;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
@@ -43,11 +44,26 @@ class RegisteredUserController extends Controller
             'role' => 'kosong',
             'is_privileged' => 0,
         ]);
+        
+
+// TAMBAHKAN KODE INI (Notifikasi ke Admin):
+$adminUsers = User::where('role', 'Admin')->get();
+foreach ($adminUsers as $admin) {
+    Notification::create([
+        'user_id' => $admin->id,
+        'title'   => 'Registrasi Pengguna Baru',
+        'message' => 'Pengguna baru <span class="font-semibold text-blue-600">' . e($user->name) . '</span> (' . e($user->email) . ') telah mendaftar dan menunggu pengaturan role.',
+        'type'    => 'warning',
+        'url'     => route('account.edit', $user->id),
+        'is_read' => false,
+    ]);
+}
 
         event(new Registered($user));
 
-        Auth::login($user);
+        
 
-        return redirect(route('dashboard', absolute: false));
-    }
+        return redirect()->route('login')
+                    ->with('status', 'Registrasi berhasil! Akun Anda sedang menunggu penetapan Role/Divisi oleh Administrator.');
+     }
 }

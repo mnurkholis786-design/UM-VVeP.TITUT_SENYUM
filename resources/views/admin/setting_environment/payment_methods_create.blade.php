@@ -289,6 +289,7 @@
                                     name="sub_category"
                                     id="sub_category"
                                     value="{{ old('sub_category') }}"
+                                    required
                                     class="w-full pl-12 pr-4 py-3.5
                                            bg-gray-50
                                            border-2 border-gray-200

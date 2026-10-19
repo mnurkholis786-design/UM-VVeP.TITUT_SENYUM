@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\DocumentFolder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class RackController extends Controller
 {
@@ -34,12 +35,23 @@ class RackController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'year_id' => 'required|exists:categories,id',
+            'name'    => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('document_folders', 'rack_name')->where(function ($query) use ($request) {
+                    return $query->where('category_id', $request->year_id);
+                }),
+            ],
+        ], [
+            'name.unique'   => 'Nama rak sudah digunakan pada tahun arsip ini.',
+            'name.required' => 'Nama rak arsip wajib diisi.',
         ]);
 
         DocumentFolder::create([
             'category_id' => $request->year_id,
-            'rack_name' => $request->name,
+            'rack_name'   => $request->name,
         ]);
 
         return redirect()->route('year.show', ['year' => $request->year_id])->with('success', 'Berhasil Menambahkan Rack');
@@ -70,14 +82,32 @@ class RackController extends Controller
     public function update(Request $request, string $id)
     {
         $rack = DocumentFolder::findOrFail($id);
+        $oldRackName = $rack->rack_name;
+        $newRackName = $request->name;
+
         $request->validate([
-            'name' => 'required|string',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('document_folders', 'rack_name')
+                    ->where(function ($query) use ($rack, $oldRackName) {
+                        return $query->where('category_id', $rack->category_id)
+                                     ->where('rack_name', '!=', $oldRackName);
+                    }),
+            ],
+        ], [
+            'name.unique'   => 'Nama rak sudah digunakan pada tahun arsip ini.',
+            'name.required' => 'Nama rak arsip wajib diisi.',
         ]);
 
-        $rack->update([
-            'rack_name' => $request->name,
-        ]);
-        return redirect()->route('year.show', ['year' => $rack->category_id])->with('success', 'Berhasil Menambahkan Folder');
+        DocumentFolder::where('category_id', $rack->category_id)
+            ->where('rack_name', $oldRackName)
+            ->update([
+                'rack_name' => $newRackName,
+            ]);
+
+        return redirect()->route('year.show', ['year' => $rack->category_id])->with('success', 'Berhasil edit Rak');
     }
 
     /**

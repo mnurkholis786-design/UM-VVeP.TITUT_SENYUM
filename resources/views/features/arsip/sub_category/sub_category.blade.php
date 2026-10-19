@@ -23,10 +23,10 @@
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50">
 
-        {{-- BACK BUTTON --}}
+         {{-- BACK BUTTON --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
 
-            <a href="{{ url('/cabinet') }}"
+            <a href="{{ route('cabinet.show', $category->cabinet_id) }}"
                 class="group inline-flex items-center justify-center w-11 h-11
                        bg-white/90 backdrop-blur-xl
                        text-gray-600 rounded-xl

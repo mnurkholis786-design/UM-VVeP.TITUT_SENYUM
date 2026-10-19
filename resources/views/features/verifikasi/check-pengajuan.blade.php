@@ -1345,21 +1345,43 @@
                             value="tambah_dokumen">
 
 
-                        <div class="mb-5">
-
+                        {{-- INPUT NAMA DOKUMEN --}}
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Nama Dokumen & TTD
                             </label>
-
                             <input type="text"
                                 name="nama_dokumen"
                                 required
                                 autocomplete="off"
                                 class="w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
                                 placeholder="Masukkan nama dokumen">
-
                         </div>
 
+                        {{-- PILIHAN LINGKUP PENERAPAN --}}
+                        <div class="mb-5 bg-slate-50 border border-slate-200 rounded-lg p-3.5">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2.5">
+                                Lingkup Penerapan:
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-2.5 cursor-pointer">
+                                    <input type="radio" name="lingkup" value="lokal" checked
+                                        class="mt-0.5 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Hanya untuk pengajuan ini</span>
+                                        <span class="text-xs text-purple-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-slate-200">
+                                    <input type="radio" name="lingkup" value="global"
+                                        class="mt-0.5 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Terapkan ke template pengajuan baru</span>
+                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya otomatis memiliki syarat ini</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
 
                         <div class="flex justify-end gap-2">
 
@@ -1448,6 +1470,31 @@
                         </div>
 
 
+                         {{-- PILIHAN LINGKUP PERUBAHAN NAMA --}}
+                        <div class="mb-5 bg-blue-50 border border-blue-200 rounded-lg p-3.5">
+                            <label class="block text-xs font-bold text-blue-800 uppercase tracking-wider mb-2.5">
+                                Lingkup Perubahan:
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-2.5 cursor-pointer">
+                                    <input type="radio" name="lingkup" value="lokal" checked
+                                        class="mt-0.5 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Hanya untuk pengajuan ini</span>
+                                        <span class="text-xs text-blue-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-blue-200">
+                                    <input type="radio" name="lingkup" value="global"
+                                        class="mt-0.5 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Ubah juga di template pengajuan baru</span>
+                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya otomatis memakai nama baru ini</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end gap-2">
 
                             <button type="button"
@@ -1532,6 +1579,30 @@
 
                         </div>
 
+                                                {{-- PILIHAN LINGKUP PENGHAPUSAN --}}
+                        <div class="mb-5 bg-red-50 border border-red-200 rounded-lg p-3.5">
+                            <label class="block text-xs font-bold text-red-800 uppercase tracking-wider mb-2.5">
+                                Lingkup Penghapusan:
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-start gap-2.5 cursor-pointer">
+                                    <input type="radio" name="lingkup" value="lokal" checked
+                                        class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Hanya dari pengajuan ini</span>
+                                        <span class="text-xs text-red-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-red-200">
+                                    <input type="radio" name="lingkup" value="global"
+                                        class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300">
+                                    <div class="text-sm">
+                                        <span class="font-medium text-gray-800">Hapus juga dari template pengajuan baru</span>
+                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya tidak akan memiliki syarat ini</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
 
                         <div class="flex justify-end gap-2">
 

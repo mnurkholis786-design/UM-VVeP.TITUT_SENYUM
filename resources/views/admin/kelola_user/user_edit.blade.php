@@ -264,17 +264,22 @@
                                                outline-none"
                                         placeholder="Masukkan nama lengkap">
 
-                                    <svg class="absolute left-4 top-1/2 -translate-y-1/2
+                                                  <svg class="absolute left-4 top-1/2 -translate-y-1/2
                                                 w-5 h-5 text-gray-400"
                                         fill="currentColor" viewBox="0 0 20 20">
 
-                                        <path fill-rule="evenodd"
-                                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                            clip-rule="evenodd"/>
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                        <path d="M18 8.118l-8 4v5.882a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
 
                                     </svg>
 
                                 </div>
+
+                                @error('email')
+                                    <p class="mt-2 text-xs font-semibold text-red-500">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
                             </div>
 
                             {{-- EMAIL --}}

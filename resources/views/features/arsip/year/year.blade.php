@@ -40,7 +40,19 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
 
-            <a href="{{ url('/cabinet') }}"
+            @php
+                $backUrl = route('cabinet.show', $category->cabinet_id);
+                if (!empty($category->sub_category)) {
+                    $parentCategory = \App\Models\Category::where('cabinet_id', $category->cabinet_id)
+                        ->where('category_name', $category->category_name)
+                        ->first();
+                    if ($parentCategory) {
+                        $backUrl = route('category.show', $parentCategory->id);
+                    }
+                }
+            @endphp
+
+            <a href="{{ $backUrl }}"
                 title="Kembali ke Sub Kategori"
                 class="group inline-flex items-center justify-center
                        w-11 h-11

@@ -298,7 +298,9 @@
                                 <span>
                                     Sub Kategori
                                 </span>
-
+                                <span class="text-xs text-gray-400 font-normal">
+                                    (Opsional)
+                                </span>
                             </label>
 
 

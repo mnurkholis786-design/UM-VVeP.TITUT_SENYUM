@@ -678,7 +678,7 @@
                                        text-[#003A8F]
                                        font-extrabold"
                             >
-                                {{ $no++ }}
+                            {{ $arsiplist->firstItem() + $loop->index }}
                             </div>
 
 
@@ -847,6 +847,11 @@
                         </div>
 
                     @endforelse
+                    @if ($arsiplist->hasPages())
+                        <div class="mt-6">
+                            {{ $arsiplist->links() }}
+                        </div>
+                    @endif
 
                 </div>
 

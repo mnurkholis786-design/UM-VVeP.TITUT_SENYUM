@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\FundingSource;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class FundingSourceController extends Controller
 {
@@ -30,9 +31,18 @@ class FundingSourceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'funding_source_name' => 'required|string|max:255',
+            'funding_source_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('funding_sources', 'funding_source_name')->where(function ($query) use ($request) {
+                    return $query->where('sub_category', $request->sub_category);
+                }),
+            ],
             'sub_category' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+        ], [
+            'funding_source_name.unique' => 'Sumber dana dengan kombinasi sub kategori tersebut sudah terdaftar.',
         ]);
 
         FundingSource::create($validated);
@@ -67,9 +77,20 @@ class FundingSourceController extends Controller
     {
         $fundingSource = FundingSource::findOrFail($id);
         $validated = $request->validate([
-            'funding_source_name' => 'required|string|max:255',
+            'funding_source_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('funding_sources', 'funding_source_name')
+                    ->where(function ($query) use ($request) {
+                        return $query->where('sub_category', $request->sub_category);
+                    })
+                    ->ignore($fundingSource->id),
+            ],
             'sub_category' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+        ], [
+            'funding_source_name.unique' => 'Sumber dana dengan kombinasi sub kategori tersebut sudah terdaftar.',
         ]);
 
         $fundingSource->update($validated);

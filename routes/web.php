@@ -153,6 +153,13 @@ Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
 
         return redirect()->route('kepala.dashboard');
 
+     } elseif ($role == "kosong" || empty($role)) {
+        Auth::guard('web')->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Akun Anda sedang menunggu penetapan Role/Divisi oleh Administrator.']);
+
     } else {
 
         return redirect()->route('user.dashboard');
@@ -177,9 +184,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
 
     Route::get(
-        '/admin/dashboard',
-        [AdminController::class, 'index']
-    )->name('admin.dashboard');
+    '/admin/dashboard',
+    [AdminController::class, 'index']
+)->middleware('role:Admin')->name('admin.dashboard');
 
 
     /*
@@ -547,33 +554,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         [DigitalArchiveController::class, 'exportReportExcel']
     )->name('digital.report.excel');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | 4 KATEGORI DIGITAL ARCHIVE
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/digital/kategori/perjalanan-dinas',
-        [DigitalArchiveController::class, 'perjalananDinas']
-    )->name('digital.perjalanan-dinas');
-
-    Route::get(
-        '/digital/kategori/produksi',
-        [DigitalArchiveController::class, 'produksi']
-    )->name('digital.produksi');
-
-    Route::get(
-        '/digital/kategori/pengadaan-barang-jasa',
-        [DigitalArchiveController::class, 'pengadaanBarangJasa']
-    )->name('digital.pengadaan-barang-jasa');
-
-    Route::get(
-        '/digital/kategori/belanja-pegawai',
-        [DigitalArchiveController::class, 'belanjaPegawai']
-    )->name('digital.belanja-pegawai');
-
     Route::get(
         '/digital/{id}/edit',
         [DigitalArchiveController::class, 'edit']
@@ -608,41 +588,44 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get(
-    '/admin/search',
-    [AdminController::class, 'search_archive']
-)->name('admin.search');
+Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 
-Route::get(
-    '/input/archive',
-    [AdminController::class, 'input_archive']
-)->name('admin.archive');
+    Route::get(
+        '/admin/search',
+        [AdminController::class, 'search_archive']
+    )->name('admin.search');
 
-Route::get(
-    '/kelola/user',
-    [AdminController::class, 'kelola_user']
-)->name('admin.kelola');
+    Route::get(
+        '/input/archive',
+        [AdminController::class, 'input_archive']
+    )->name('admin.archive');
 
-Route::get(
-    '/setting/environment',
-    [AdminController::class, 'environment']
-)->name('admin.envi');
+    Route::get(
+        '/kelola/user',
+        [AdminController::class, 'kelola_user']
+    )->name('admin.kelola');
 
-Route::get(
-    '/administrator/report',
-    [AdminController::class, 'report']
-)->name('admin.report');
+    Route::get(
+        '/setting/environment',
+        [AdminController::class, 'environment']
+    )->name('admin.envi');
 
-Route::get(
-    '/administrator/report_account',
-    [AdminController::class, 'report_account_submission']
-)->name('admin.report_account');
+    Route::get(
+        '/administrator/report',
+        [AdminController::class, 'report']
+    )->name('admin.report');
 
-Route::get(
-    '/administrator/report_status',
-    [AdminController::class, 'report_count_status']
-)->name('admin.report_status');
+    Route::get(
+        '/administrator/report_account',
+        [AdminController::class, 'report_account_submission']
+    )->name('admin.report_account');
 
+    Route::get(
+        '/administrator/report_status',
+        [AdminController::class, 'report_count_status']
+    )->name('admin.report_status');
+
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -768,42 +751,38 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-Route::resource(
-    '/document/file',
-    ArchiveFileController::class
-);
+Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 
-Route::resource(
-    '/account',
-    AccountManageController::class
-);
+    Route::resource(
+        '/account',
+        AccountManageController::class
+    );
 
-Route::resource(
-    '/payment',
-    PaymentMethodController::class
-);
+    Route::resource(
+        '/payment',
+        PaymentMethodController::class
+    );
 
-Route::resource(
-    '/funding',
-    FundingSourceController::class
-);
+    Route::resource(
+        '/funding',
+        FundingSourceController::class
+    );
 
-Route::resource(
-    '/pengajuan',
-    BudgetSubmissionController::class
-);
+});
 
+Route::middleware(['auth', 'verified'])->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| REGISTER
-|--------------------------------------------------------------------------
-*/
+    Route::resource(
+        '/document/file',
+        ArchiveFileController::class
+    );
 
-Route::get(
-    'register',
-    [RegisteredUserController::class, 'create']
-)->name('register');
+    Route::resource(
+        '/pengajuan',
+        BudgetSubmissionController::class
+    );
+
+});
 
 
 /*

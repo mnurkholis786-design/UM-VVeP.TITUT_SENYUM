@@ -57,19 +57,14 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Nama Folder Arsip
                         </label>
-                        <input type="text" name="name"
-                            class="w-full rounded-xl border-2 border-gray-200 focus:border-emerald-500
+                        <input type="text" name="name" value="{{ old('name') }}"
+                            class="w-full rounded-xl border-2 @error('name') border-red-500 @else border-gray-200 @enderror focus:border-emerald-500
                             focus:ring-4 focus:ring-emerald-100 px-4 py-2 transition"
                             placeholder="Masukkan nama folder arsip" required>
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    {{-- <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Kode Folder Arsip
-                        </label>
-                        <input type="text" name="kode_folder" id="name"
-                            class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
-                            placeholder="Masukkan kode folder arsip" required>
-                    </div> --}}
 
                     {{-- Deskripsi --}}
                     <div>
@@ -77,9 +72,12 @@
                             Deskripsi
                         </label>
                         <textarea name="deskripsi" rows="3"
-                            class="w-full rounded-xl border-2 border-gray-200 focus:border-blue-500
+                            class="w-full rounded-xl border-2 @error('deskripsi') border-red-500 @else border-gray-200 @enderror focus:border-blue-500
                             focus:ring-4 focus:ring-blue-100 px-4 py-2 resize-none transition"
-                            placeholder="Keterangan rentang tanggal dan bulan" required></textarea>
+                            placeholder="Keterangan rentang tanggal dan bulan" required>{{ old('deskripsi') }}</textarea>
+                        @error('deskripsi')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Tombol Aksi --}}

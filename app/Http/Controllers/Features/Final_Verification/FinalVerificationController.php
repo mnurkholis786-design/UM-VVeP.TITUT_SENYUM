@@ -19,6 +19,7 @@ use Illuminate\Validation\Rule;
 use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\User;
 
 class FinalVerificationController extends Controller
 {
@@ -202,6 +203,17 @@ class FinalVerificationController extends Controller
             'no_spby' => $request->no_spby,
             'no_sp2d' => $request->no_sp2d,
         ]);
+
+        $adminUsers = User::where('role', 'Admin')->get();
+foreach ($adminUsers as $admin) {
+    Notification::create([
+        'user_id' => $admin->id,
+        'title'   => 'Arsip Digital Baru Tersimpan',
+        'message' => 'Pengajuan <span class="font-semibold text-green-600">' . e($pengajuan->budget_submission_name) . '</span> dari divisi ' . e($pengajuan->user->role) . ' telah selesai diverifikasi dan diarsipkan.',
+        'type'    => 'success',
+        'url'     => route('digital.show', $digital->id),
+    ]);
+}
 
         // === UPDATE DB ===
         $pengajuan->update([

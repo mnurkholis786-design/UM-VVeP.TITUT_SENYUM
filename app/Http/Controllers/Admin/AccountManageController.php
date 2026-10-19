@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AccountManageController extends Controller
 {
@@ -39,9 +40,16 @@ class AccountManageController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string',
             'role' => 'required|string',
+        ], [
+            'email.unique' => 'Alamat email ini sudah terdaftar di sistem. Silakan gunakan email lain.',
+            'email.email' => 'Format email tidak valid.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'role.required' => 'Role wajib dipilih.',
         ]);
 
         User::create([
@@ -81,7 +89,11 @@ class AccountManageController extends Controller
 
         $rules = [
             'name' => 'required|string',
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
             'role' => 'required|string',
             'sub_role' => 'required|string',
             'izin_akses_arsip' => 'required|string',
@@ -92,7 +104,15 @@ class AccountManageController extends Controller
             $rules['password'] = 'string';
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'email.unique' => 'Alamat email ini sudah digunakan oleh akun lain. Silakan gunakan email lain.',
+            'email.email' => 'Format email tidak valid.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'role.required' => 'Role / Divisi wajib dipilih.',
+            'sub_role.required' => 'Sub Divisi wajib dipilih.',
+            'izin_akses_arsip.required' => 'Izin akses arsip digital wajib dipilih.',
+        ]);
 
         $data = [
             'name' => $request->name,

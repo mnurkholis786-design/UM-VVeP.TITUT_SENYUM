@@ -117,8 +117,18 @@
 
             <div class="mb-6">
 
+                @php
+                    if (!empty($category->sub_category)) {
+                        $backUrl = route('subcategory.show', $category->id);
+                        $backText = 'Kembali ke Sub Kategori';
+                    } else {
+                        $backUrl = route('cabinet.show', $category->cabinet_id);
+                        $backText = 'Kembali ke Kabinet';
+                    }
+                @endphp
+
                 <a
-                    href="{{ route('cabinet.show', $category->cabinet_id) }}"
+                    href="{{ $backUrl }}"
                     class="inline-flex items-center gap-2 px-4 py-2.5
                            bg-white text-gray-700 rounded-xl
                            border border-gray-200 shadow-sm
@@ -131,7 +141,7 @@
                     </svg>
 
                     <span class="font-medium">
-                        Kembali ke Kategori
+                        {{ $backText }}
                     </span>
                 </a>
 

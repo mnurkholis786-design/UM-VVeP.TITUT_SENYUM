@@ -35,74 +35,7 @@ class DigitalArchiveController extends Controller
         );
     }
 
-    /**
-     * Helper internal untuk menampilkan arsip berdasarkan kategori.
-     */
-    private function listByKategori(
-        string $kategori,
-        string $judul
-    ) {
-        $archives = DigitalArchive::where(
-            'kategori',
-            $kategori
-        )
-            ->latest()
-            ->paginate(10);
-
-        return view(
-            'features.arsip.digital_archive.digital_archive_list',
-            [
-                'archives' => $archives,
-                'kategoriAktif' => $kategori,
-                'judul' => $judul,
-            ]
-        );
-    }
-
-    /**
-     * Perjalanan Dinas.
-     */
-    public function perjalananDinas()
-    {
-        return $this->listByKategori(
-            'PERJALANAN DINAS',
-            'Perjalanan Dinas'
-        );
-    }
-
-    /**
-     * Produksi.
-     */
-    public function produksi()
-    {
-        return $this->listByKategori(
-            'PRODUKSI',
-            'Produksi'
-        );
-    }
-
-    /**
-     * Pengadaan Barang dan Jasa.
-     */
-    public function pengadaanBarangJasa()
-    {
-        return $this->listByKategori(
-            'PENGADAAN BARANG DAN JASA',
-            'Pengadaan Barang dan Jasa'
-        );
-    }
-
-    /**
-     * Belanja Pegawai.
-     */
-    public function belanjaPegawai()
-    {
-        return $this->listByKategori(
-            'BELANJA PEGAWAI',
-            'Belanja Pegawai'
-        );
-    }
-
+    
     /**
      * Form create.
      */
@@ -499,8 +432,8 @@ class DigitalArchiveController extends Controller
         
         $periodeMulai = $request->filled('tanggal_mulai') ? \Carbon\Carbon::parse($request->tanggal_mulai)->format('d/m/Y') : 'Awal';
         $periodeSelesai = $request->filled('tanggal_selesai') ? \Carbon\Carbon::parse($request->tanggal_selesai)->format('d/m/Y') : 'Sekarang';
-        $judulLaporan = 'LAPORAN UP BENDAHARA';
-        $subKategoriNama = '-';
+        $judulLaporan = 'LAPORAN ' . strtoupper($category->category_name ?? 'UP BENDAHARA');
+        $subKategoriNama = $category->sub_category ?? '-';
 
         // Menggunakan view laporan-arsip yang sudah ada di folder resources/views/features/arsip/pdf/
         $pdf = Pdf::loadView('features.arsip.pdf.laporan-arsip', compact('archives', 'category', 'periodeMulai', 'periodeSelesai', 'judulLaporan', 'subKategoriNama'));

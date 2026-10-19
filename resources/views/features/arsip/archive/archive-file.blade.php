@@ -39,7 +39,7 @@
                                 Kelola File Arsip
                             </h3>
 
-                            <p class="text-sm font-semibold text-gray-500">Total Arsip : {{ $archives->count() }}</p>
+                            <p class="text-sm font-semibold text-gray-500">Total Arsip : {{ $archives->total() }}</p>
                         </div>
                     </div>
 
@@ -57,7 +57,7 @@
                 {{-- Daftar File --}}
                 @if ($archives->count() > 0)
                     <div class="mt-10 space-y-4">
-                        @php $no = 1; @endphp
+                        @php $no = $archives->firstItem() ?? 1; @endphp
 
                         @foreach ($archives as $archive)
                             <div
@@ -105,8 +105,13 @@
                                         </button>
                                     </form>
                                 </div>
-                            </div>
+                                      </div>
                         @endforeach
+                    </div>
+
+                    {{-- NAVIGASI PAGINASI (HALAMAN 1, 2, 3...) --}}
+                    <div class="mt-8 pt-4 border-t border-gray-100">
+                        {{ $archives->links() }}
                     </div>
                 @else
                     <div class="mt-16 text-center text-gray-500">

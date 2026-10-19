@@ -149,10 +149,9 @@
                                 </p>
 
                                 <p class="text-2xl font-extrabold text-white">
-                                    {{ $notifications->count() }}
+                                    {{ $notifications->total() }}
                                 </p>
                             </div>
-
                             <div class="w-px h-10 bg-white/20"></div>
 
                             <div class="text-right">
@@ -172,178 +171,154 @@
 
 
             {{-- ========================================================= --}}
-            {{-- FILTER & ACTIONS --}}
+            {{-- FILTER & ACTIONS (KARTU KONTROL LENGKAP) --}}
             {{-- ========================================================= --}}
             <div
-                class="bg-white/90 backdrop-blur-sm
+                class="bg-white/95 backdrop-blur-sm
                        rounded-3xl
                        border border-gray-100
                        shadow-xl shadow-gray-200/50
-                       p-4 sm:p-5 mb-7">
+                       p-5 sm:p-6 mb-7">
 
-                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                <div class="flex flex-col gap-5">
 
-                    {{-- Filter --}}
-                    <div
-                        class="flex flex-wrap gap-1.5
-                               bg-gray-100/80
-                               p-1.5 rounded-2xl
-                               border border-gray-200">
+                    {{-- Baris 1: Status Tab (Kiri) & Tombol Aksi Massal (Kanan) --}}
+                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
 
-                        {{-- Semua --}}
-                        <a href="{{ route('notifications.index') }}"
-                            class="group inline-flex items-center gap-2
-                                   px-4 py-2.5 rounded-xl
-                                   text-sm font-semibold
-                                   transition-all duration-200
-                                   {{ request('filter') === null
-                                        ? 'bg-white text-blue-600 shadow-md shadow-gray-200'
-                                        : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
+                        {{-- Tab Status Baca --}}
+                        <div class="flex flex-wrap gap-1.5 bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200">
 
-                            <svg class="w-4 h-4 transition-transform group-hover:scale-110"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            {{-- Semua --}}
+                            <a href="{{ route('notifications.index', array_merge(request()->except('filter', 'page'))) }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
+                                {{ request('filter') === null ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                                Semua
+                            </a>
 
-                                <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16">
-                                </path>
-                            </svg>
+                            {{-- Belum Dibaca --}}
+                            <a href="{{ route('notifications.index', array_merge(request()->except('page'), ['filter' => 'unread'])) }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
+                                {{ request('filter') === 'unread' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                Belum Dibaca
+                            </a>
 
-                            Semua
-                        </a>
+                            {{-- Sudah Dibaca --}}
+                            <a href="{{ route('notifications.index', array_merge(request()->except('page'), ['filter' => 'read'])) }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
+                                {{ request('filter') === 'read' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Sudah Dibaca
+                            </a>
+                        </div>
 
+                        {{-- Tombol Tindakan (Tandai Semua & Hapus Dibaca) --}}
+                        <div class="flex flex-wrap items-center gap-2">
+                            <form method="POST" action="{{ route('notifications.readAll') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-bold shadow-md hover:shadow-lg transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Tandai Semua
+                                </button>
+                            </form>
 
-                        {{-- Belum Dibaca --}}
-                        <a href="{{ route('notifications.index', ['filter' => 'unread']) }}"
-                            class="group inline-flex items-center gap-2
-                                   px-4 py-2.5 rounded-xl
-                                   text-sm font-semibold
-                                   transition-all duration-200
-                                   {{ request('filter') === 'unread'
-                                        ? 'bg-white text-blue-600 shadow-md shadow-gray-200'
-                                        : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
+                            <form method="POST" action="{{ route('notifications.deleteRead') }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-bold shadow-md hover:shadow-lg transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Hapus Dibaca
+                                </button>
+                            </form>
+                        </div>
 
-                            <svg class="w-4 h-4 transition-transform group-hover:scale-110"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                            </svg>
-
-                            Belum Dibaca
-                        </a>
-
-
-                        {{-- Sudah Dibaca --}}
-                        <a href="{{ route('notifications.index', ['filter' => 'read']) }}"
-                            class="group inline-flex items-center gap-2
-                                   px-4 py-2.5 rounded-xl
-                                   text-sm font-semibold
-                                   transition-all duration-200
-                                   {{ request('filter') === 'read'
-                                        ? 'bg-white text-blue-600 shadow-md shadow-gray-200'
-                                        : 'text-gray-500 hover:text-blue-600 hover:bg-white/70' }}">
-
-                            <svg class="w-4 h-4 transition-transform group-hover:scale-110"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                </path>
-                            </svg>
-
-                            Sudah Dibaca
-                        </a>
                     </div>
 
+                     {{-- Baris 2: Filter Kategori + Input Pencarian Panjang + Tombol Cari Normal --}}
+                    <form method="GET" action="{{ route('notifications.index') }}"
+                          class="pt-4 border-t border-gray-100 flex flex-wrap md:flex-nowrap items-center gap-3">
 
-                    {{-- Actions --}}
-                    <div class="flex flex-wrap gap-2">
+                        {{-- Pertahankan filter status baca saat ini --}}
+                        @if (request('filter'))
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
+                        @endif
 
-                        {{-- Tandai semua --}}
-                        <form method="POST" action="{{ route('notifications.readAll') }}">
-                            @csrf
+                                     {{-- 1. Dropdown Kategori (Ukuran Pas & Terkunci di Kiri) --}}
+                        <div style="width: 240px; min-width: 210px; flex-shrink: 0;">
+                            <select name="category" onchange="this.form.submit()"
+                                class="w-full text-sm font-semibold rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 py-2.5 pl-3 pr-8 cursor-pointer shadow-sm transition">
+                                <option value="">Semua Kategori Aktivitas</option>
 
-                            <button type="submit"
-                                class="group inline-flex items-center justify-center gap-2
-                                       px-4 py-2.5
-                                       rounded-xl
-                                       bg-gradient-to-r from-blue-500 to-indigo-600
-                                       text-white
-                                       text-sm font-bold
-                                       shadow-lg shadow-blue-200
-                                       hover:shadow-xl hover:shadow-blue-300
-                                       hover:-translate-y-0.5
-                                       active:translate-y-0
-                                       transition-all duration-200">
-
-                                <svg class="w-4 h-4 transition-transform group-hover:scale-110"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M5 13l4 4L19 7">
-                                    </path>
+                                @if (Auth::user()->role === 'Admin')
+                                    {{-- Opsi Khusus Administrator --}}
+                                    <option value="register" {{ request('category') === 'register' ? 'selected' : '' }}>
+                                        👤 Registrasi Pengguna Baru
+                                    </option>
+                                    <option value="archive" {{ request('category') === 'archive' ? 'selected' : '' }}>
+                                        📁 Arsip Digital Baru
+                                    </option>
+                                @else
+                                    {{-- Opsi Khusus Pegawai / Pengaju / Verifikator --}}
+                                    <option value="submission" {{ request('category') === 'submission' ? 'selected' : '' }}>
+                                        📋 Pengajuan Masuk & Revisi
+                                    </option>
+                                    <option value="verification" {{ request('category') === 'verification' ? 'selected' : '' }}>
+                                        ✅ Verifikasi & Persetujuan
+                                    </option>
+                                    <option value="return" {{ request('category') === 'return' ? 'selected' : '' }}>
+                                        ⚠️ Pengembalian Dokumen
+                                    </option>
+                                    <option value="archive" {{ request('category') === 'archive' ? 'selected' : '' }}>
+                                        📁 Arsip Digital Baru
+                                    </option>
+                                @endif
+                            </select>
+                        </div>
+                        
+                        {{-- 2. Input Pencarian (MEMANJANG PENUH MEMENUHI SISA BARIS) --}}
+                        <div class="relative" style="flex: 1; min-width: 220px;">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Cari nama pengaju, email, divisi, atau kegiatan..."
+                                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 placeholder-gray-400 shadow-sm transition">
+                        </div>
 
-                                Tandai Semua
-                            </button>
-                        </form>
+                        {{-- 3. Tombol Cari (UKURAN NORMAL & RAMPING) --}}
+                        <button type="submit" style="flex-shrink: 0; white-space: nowrap;"
+                            class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md shadow-blue-200 hover:shadow-lg transition">
+                            Cari
+                        </button>
 
+                        {{-- 4. Tombol Reset (Hanya muncul jika ada filter aktif) --}}
+                        @if (request('search') || request('category') || request('filter'))
+                            <a href="{{ route('notifications.index') }}" style="flex-shrink: 0; white-space: nowrap;"
+                                class="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold border border-gray-200 shadow-sm transition">
+                                Reset
+                            </a>
+                        @endif
 
-                        {{-- Hapus dibaca --}}
-                        <form method="POST" action="{{ route('notifications.deleteRead') }}">
-                            @csrf
-                            @method('DELETE')
+                    </form>
 
-                            <button type="submit"
-                                class="group inline-flex items-center justify-center gap-2
-                                       px-4 py-2.5
-                                       rounded-xl
-                                       bg-gradient-to-r from-red-500 to-rose-600
-                                       text-white
-                                       text-sm font-bold
-                                       shadow-lg shadow-red-200
-                                       hover:shadow-xl hover:shadow-red-300
-                                       hover:-translate-y-0.5
-                                       active:translate-y-0
-                                       transition-all duration-200">
-
-                                <svg class="w-4 h-4 transition-transform group-hover:scale-110"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
-                                </svg>
-
-                                Hapus Dibaca
-                            </button>
-                        </form>
-
-                    </div>
                 </div>
-            </div>
 
+            </div>
 
             {{-- ========================================================= --}}
             {{-- NOTIFICATION LIST --}}
@@ -703,8 +678,16 @@
 
             </div>
 
+            {{-- PAGINATION (10 Notifikasi per halaman) --}}
+            @if ($notifications->hasPages())
+                <div class="mt-6">
+                    {{ $notifications->links() }}
+                </div>
+            @endif
+
         </div>
     </div>
+
 
 
     {{-- ========================================================= --}}

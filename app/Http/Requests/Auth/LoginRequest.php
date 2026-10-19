@@ -48,7 +48,13 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
-
+        // Cegah login jika role masih 'kosong' (belum diatur oleh Admin)
+        if (Auth::user()->role === 'kosong' || empty(Auth::user()->role)) {
+            Auth::guard('web')->logout();
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda belum aktif. Silakan tunggu Administrator menetapkan Role/Divisi Anda.',
+            ]);
+        }
         RateLimiter::clear($this->throttleKey());
     }
 

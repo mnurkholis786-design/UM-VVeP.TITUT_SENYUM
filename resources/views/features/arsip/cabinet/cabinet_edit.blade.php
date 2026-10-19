@@ -450,6 +450,12 @@
                                 Kode digunakan sebagai identitas singkat kabinet.
                             </p>
 
+                            @error('code')
+                                <p class="mt-2 text-xs text-red-600 font-semibold ml-1">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+
                         </div>
 
 

@@ -319,12 +319,14 @@ class VerificationController extends Controller
                 continue;
             }
 
+             /*
             if (
                 strtolower($namaDokumen) ===
                 'routing slip'
             ) {
                 continue;
             }
+            */
 
             $valueD =
                 trim(
@@ -2615,6 +2617,7 @@ class VerificationController extends Controller
                         ->getValue()
                 );
 
+                       /*
             if (
                 strtolower(
                     $namaDokumen
@@ -2622,7 +2625,7 @@ class VerificationController extends Controller
             ) {
                 continue;
             }
-
+            */
             if (
                 $namaDokumen !== ''
             ) {

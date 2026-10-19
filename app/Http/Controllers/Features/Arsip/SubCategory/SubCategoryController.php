@@ -10,6 +10,7 @@ use App\Models\FundingSource;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class SubCategoryController extends Controller
 {
@@ -39,9 +40,20 @@ class SubCategoryController extends Controller
     {
         $category = Category::findOrFail($request->category_id); // category saat ini
         $request->validate([
-            'name' => 'required|string',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'sub_category')->where(function ($query) use ($category) {
+                    return $query->where('cabinet_id', $category->cabinet_id)
+                                 ->where('category_name', $category->category_name);
+                }),
+            ],
             'payment_method' => 'nullable',
             'funding_source' => 'nullable',
+        ], [
+            'name.unique'   => 'Nama sub kategori sudah digunakan pada kategori ini.',
+            'name.required' => 'Nama sub kategori wajib diisi.',
         ]);
 
         if (isset($category->sub_category)) { // jika categori saat ini sudah memiliki sub kategori maka buat yang baru
@@ -90,12 +102,6 @@ class SubCategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'payment_method' => 'nullable',
-            'funding_source' => 'nullable',
-        ]);
-
         $category = Category::findOrFail($request->category_id);
         $subcategory = Category::findOrFail($id);
         $cabinetId = $subcategory->cabinet_id;
@@ -103,17 +109,24 @@ class SubCategoryController extends Controller
         $oldSubCategory = $subcategory->sub_category;
         $newSubCategory = $request->name;
 
-        // Cek duplikat
-        // $exists = Category::where('cabinet_id', $subcategory->cabinet_id)
-        //     ->where('category_name', $subcategory->category_name)
-        //     ->where('sub_category', $newSubCategory)
-        //     ->exists();
-
-        // if ($exists) {
-        //     return redirect()
-        //         ->route('cabinet.show', ['cabinet' => $cabinetId])
-        //         ->with('error', 'Sub Category dengan nama ini sudah ada di Category yang sama');
-        // }
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'sub_category')
+                    ->where(function ($query) use ($subcategory, $oldSubCategory) {
+                        return $query->where('cabinet_id', $subcategory->cabinet_id)
+                                     ->where('category_name', $subcategory->category_name)
+                                     ->where('sub_category', '!=', $oldSubCategory);
+                    }),
+            ],
+            'payment_method' => 'nullable',
+            'funding_source' => 'nullable',
+        ], [
+            'name.unique'   => 'Nama sub kategori sudah digunakan pada kategori ini.',
+            'name.required' => 'Nama sub kategori wajib diisi.',
+        ]);
 
         // UPDATE
         Category::where('cabinet_id', $subcategory->cabinet_id)

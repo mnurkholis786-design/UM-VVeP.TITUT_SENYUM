@@ -7,6 +7,7 @@ use App\Models\ArchiveFile;
 use App\Models\DocumentFolder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class FolderController extends Controller
 {
@@ -33,6 +34,25 @@ class FolderController extends Controller
     public function store(Request $request)
     {
         $folder = DocumentFolder::findOrFail($request->rack_id); // ambil id folder dari rak saat ini
+
+        // Validasi agar nama folder tidak boleh kosong dan tidak boleh duplikat di rak & kategori yang sama
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('document_folders', 'folder_name')->where(function ($query) use ($folder) {
+                    return $query->where('category_id', $folder->category_id)
+                                 ->where('rack_name', $folder->rack_name);
+                }),
+            ],
+            'deskripsi' => 'required|string',
+        ], [
+            'name.unique'        => 'Nama folder sudah digunakan pada rak arsip ini.',
+            'name.required'      => 'Nama folder arsip wajib diisi.',
+            'deskripsi.required' => 'Deskripsi folder wajib diisi.',
+        ]);
+
         if (isset($folder->folder_name)) { // jika rak saat ini sudah memiliki folder buat yang baru
             DocumentFolder::create([
                 'category_id' => $folder->category_id,
@@ -53,12 +73,15 @@ class FolderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+      public function show(string $id)
     {
         $folder = DocumentFolder::findOrFail($id);
         
-        // Diubah menggunakan ->latest() agar arsip fisik yang baru di-upload muncul di urutan paling atas
-        $archives = ArchiveFile::where('folder_id', $folder->id)->latest()->get();
+        // Batasi 10 file per halaman dengan pagination
+        $archives = ArchiveFile::where('folder_id', $folder->id)
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
         
         return view('features.arsip.archive.archive-file', compact('archives', 'folder'));
     }
@@ -78,16 +101,33 @@ class FolderController extends Controller
     public function update(Request $request, string $id)
     {
         $folder = DocumentFolder::findOrFail($id);
+
+        // Validasi keunikan dengan mengabaikan ID folder yang sedang diedit
         $request->validate([
-            'name' => 'required|string',
-            'deskripsi' => 'required|string'
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('document_folders', 'folder_name')
+                    ->where(function ($query) use ($folder) {
+                        return $query->where('category_id', $folder->category_id)
+                                     ->where('rack_name', $folder->rack_name);
+                    })
+                    ->ignore($folder->id),
+            ],
+            'deskripsi' => 'required|string',
+        ], [
+            'name.unique'        => 'Nama folder sudah digunakan pada rak arsip ini.',
+            'name.required'      => 'Nama folder arsip wajib diisi.',
+            'deskripsi.required' => 'Deskripsi folder wajib diisi.',
         ]);
 
         $folder->update([
             'folder_name' => $request->name,
             'description' => $request->deskripsi,
         ]);
-        return redirect()->route('rack.show', ['rack' => $folder->id])->with('success', 'Berhasil Menambahkan Folder');
+
+        return redirect()->route('rack.show', ['rack' => $folder->id])->with('success', 'Berhasil Memperbarui Folder');
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CabinetController extends Controller
 {
@@ -40,15 +41,17 @@ class CabinetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string',
-            'deskripsi' => 'required|string',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'code' => 'required|string|max:255|unique:cabinets,cabinet_code',
+        'deskripsi' => 'required|string',
+    ], [
+        'code.unique' => 'Kode kabinet sudah digunakan, silakan gunakan kode lain.',
+    ]);
 
-        Cabinet::create([
+    Cabinet::create([
             'cabinet_name' => $request->name,
             'cabinet_code' => $request->code,
             'total_racks' => 0,
@@ -211,17 +214,24 @@ class CabinetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(
-        Request $request,
-        string $id
-    ) {
-        $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string',
-            'deskripsi' => 'required|string',
-        ]);
+public function update(
+    Request $request,
+    string $id
+) {
+    $cabinet = Cabinet::findOrFail($id);
 
-        $cabinet = Cabinet::findOrFail($id);
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'code' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('cabinets', 'cabinet_code')->ignore($cabinet->id),
+        ],
+        'deskripsi' => 'required|string',
+    ], [
+        'code.unique' => 'Kode kabinet sudah digunakan, silakan gunakan kode lain.',
+    ]);
 
         $cabinet->update([
             'cabinet_name' => $request->name,

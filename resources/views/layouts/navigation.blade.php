@@ -26,10 +26,7 @@
             @auth
 
                 @php
-                    $unreadCount = Auth::user()
-                        ->notifications()
-                        ->where('is_read', false)
-                        ->count();
+                    $unreadCount = Auth::user()->notifications()->where('is_read', false)->count();
                 @endphp
 
                 <a

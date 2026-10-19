@@ -208,41 +208,49 @@
             */
             $menuItems = [];
 
-            if ($role === 'Admin') {
+if ($role === 'Admin') {
 
-                $menuItems = [
+    $menuItems = [
 
-                    [
-                        'label' => 'Dashboard',
-                        'href' => $roleDashboard,
-                        'icon' => $icons['Dashboard']
-                    ],
+        [
+            'label' => 'Dashboard',
+            'href' => $roleDashboard,
+            'icon' => $icons['Dashboard']
+        ],
 
-                    [
-                        'label' => 'Setting Environment',
-                        'href' => $roleEnvironment,
-                        'icon' => $icons['Setting Environment']
-                    ],
+        [
+            'label' => 'Setting Environment',
+            'href' => $roleEnvironment,
+            'icon' => $icons['Setting Environment']
+        ],
 
-                    [
-                        'label' => 'Arsip',
-                        'href' => $roleInputArsip,
-                        'icon' => $icons['Input Arsip']
-                    ],
+        [
+            'label' => 'Arsip',
+            'href' => $roleInputArsip,
+            'icon' => $icons['Input Arsip']
+        ],
 
-                    [
-                        'label' => 'Kelola User',
-                        'href' => $roleKelolaUser,
-                        'icon' => $icons['Kelola User']
-                    ],
+        [
+            'label' => 'Kelola User',
+            'href' => $roleKelolaUser,
+            'icon' => $icons['Kelola User']
+        ],
 
-                    [
-                        'label' => 'Report',
-                        'href' => $roleReport,
-                        'icon' => $icons['Report']
-                    ],
-                ];
+        // TAMBAHKAN BLOK INI:
+        [
+            'label' => 'Notifikasi',
+            'href' => $notificationRoute,
+            'icon' => $icons['Notifikasi'],
+            'badge' => $unreadCount
+        ],
 
+        [
+            'label' => 'Report',
+            'href' => $roleReport,
+            'icon' => $icons['Report']
+        ],
+    ];
+    
             } elseif ($role === 'Keuangan') {
 
                 $menuItems = [

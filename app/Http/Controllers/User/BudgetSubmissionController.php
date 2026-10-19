@@ -157,846 +157,244 @@ class BudgetSubmissionController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | TAMBAH DOKUMEN
+            | TAMBAH DOKUMEN (LOKAL ATAU DENGAN TEMPLATE MASTER)
             |--------------------------------------------------------------------------
             */
-
             if ($aksi === 'tambah_dokumen') {
                 $request->validate([
-                    'nama_dokumen' =>
-                        'required|string|max:255',
+                    'nama_dokumen' => 'required|string|max:255',
+                    'lingkup'      => 'nullable|in:lokal,global',
                 ]);
 
-                $namaDokumenBaru = trim(
-                    $request->nama_dokumen
-                );
+                $namaDokumenBaru = trim($request->nama_dokumen);
+                $lingkup = $request->input('lingkup', 'lokal');
 
-                /*
-                 * Update master checklist.
-                 */
-                $templatePath =
-                    $this->getChecklistTemplatePath();
+                // 1. Tambah pada berkas pengajuan ini
+                $catatanRow = $this->findCatatanRow($worksheet);
+                $existingRow = $this->findRowByDocumentName($worksheet, $namaDokumenBaru, $catatanRow);
 
-                if ($templatePath) {
-                    $templateFullPath =
-                        Storage::disk('private')
-                            ->path($templatePath);
+                if ($existingRow !== null) {
+                    return redirect()
+                        ->route('verification.show', ['verification' => $pengajuan->id])
+                        ->with('error', 'Dokumen dengan nama tersebut sudah ada pada pengajuan ini.');
+                }
 
-                    $templateSpreadsheet =
-                        IOFactory::load(
-                            $templateFullPath
-                        );
+                $insertRow = null;
+                for ($row = 7; $row < $catatanRow; $row++) {
+                    $nama = trim((string) $worksheet->getCell("C{$row}")->getValue());
+                    if ($nama === '') {
+                        $insertRow = $row;
+                        break;
+                    }
+                }
 
-                    $templateWorksheet =
-                        $templateSpreadsheet
-                            ->getActiveSheet();
+                if ($insertRow === null) {
+                    $insertRow = $catatanRow;
+                    $worksheet->insertNewRowBefore($insertRow, 1);
+                } else {
+                    $this->ensureDocumentRowStyle($worksheet, $insertRow);
+                }
 
-                    $templateCatatanRow =
-                        $this->findCatatanRow(
-                            $templateWorksheet
-                        );
+                foreach (range('B', 'I') as $column) {
+                    $worksheet->setCellValue("{$column}{$insertRow}", '');
+                }
 
-                    $templateExistingRow =
-                        $this->findRowByDocumentName(
-                            $templateWorksheet,
-                            $namaDokumenBaru,
-                            $templateCatatanRow
-                        );
+                $worksheet->setCellValue("C{$insertRow}", $namaDokumenBaru);
+                $worksheet->setCellValue("F{$insertRow}", 'Y'); // Tidak Diperlukan
+                $worksheet->setCellValue("G{$insertRow}", 'Y'); // Lengkap
 
-                    /*
-                     * Jangan tambahkan jika sudah ada.
-                     */
-                    if ($templateExistingRow === null) {
-                        $insertRow = null;
+                $this->normalizeDocumentRowStyles($worksheet);
+                $this->renumberDocumentRows($worksheet);
 
-                        for (
-                            $row = 7;
-                            $row < $templateCatatanRow;
-                            $row++
-                        ) {
-                            $nama = trim(
-                                (string) $templateWorksheet
-                                    ->getCell("C{$row}")
-                                    ->getValue()
-                            );
+                $writer = new Xlsx($spreadsheet);
+                $writer->save($filePathMetadata);
 
-                            if ($nama === '') {
-                                $insertRow = $row;
-                                break;
+                // 2. Jika dipilih 'global', perbarui juga file master template
+                if ($lingkup === 'global') {
+                    $templatePath = $this->getChecklistTemplatePath();
+                    if ($templatePath) {
+                        $templateFullPath = Storage::disk('private')->path($templatePath);
+                        $templateSpreadsheet = IOFactory::load($templateFullPath);
+                        $templateWorksheet = $templateSpreadsheet->getActiveSheet();
+                        $templateCatatanRow = $this->findCatatanRow($templateWorksheet);
+                        $templateExisting = $this->findRowByDocumentName($templateWorksheet, $namaDokumenBaru, $templateCatatanRow);
+
+                        if ($templateExisting === null) {
+                            $templateInsertRow = null;
+                            for ($r = 7; $r < $templateCatatanRow; $r++) {
+                                $nama = trim((string) $templateWorksheet->getCell("C{$r}")->getValue());
+                                if ($nama === '') {
+                                    $templateInsertRow = $r;
+                                    break;
+                                }
                             }
+
+                            if ($templateInsertRow === null) {
+                                $templateInsertRow = $templateCatatanRow;
+                                $templateWorksheet->insertNewRowBefore($templateInsertRow, 1);
+                            } else {
+                                $this->ensureDocumentRowStyle($templateWorksheet, $templateInsertRow);
+                            }
+
+                            foreach (range('B', 'I') as $col) {
+                                $templateWorksheet->setCellValue("{$col}{$templateInsertRow}", '');
+                            }
+
+                            $templateWorksheet->setCellValue("C{$templateInsertRow}", $namaDokumenBaru);
+                            $this->normalizeDocumentRowStyles($templateWorksheet);
+                            $this->renumberDocumentRows($templateWorksheet);
+
+                            $templateWriter = new Xlsx($templateSpreadsheet);
+                            $templateWriter->save($templateFullPath);
                         }
-
-                        /*
-                         * Jika tidak ada baris kosong,
-                         * tambahkan baris baru sebelum Catatan.
-                         */
-                        if ($insertRow === null) {
-                            $insertRow =
-                                $templateCatatanRow;
-
-                            $templateWorksheet
-                                ->insertNewRowBefore(
-                                    $insertRow,
-                                    1
-                                );
-                        } else {
-                            $this->ensureDocumentRowStyle(
-                                $templateWorksheet,
-                                $insertRow
-                            );
-                        }
-
-                        /*
-                         * Bersihkan kolom B-I.
-                         */
-                        foreach (
-                            range('B', 'I') as $column
-                        ) {
-                            $templateWorksheet
-                                ->setCellValue(
-                                    "{$column}{$insertRow}",
-                                    ''
-                                );
-                        }
-
-                        /*
-                         * Nama dokumen.
-                         */
-                        $templateWorksheet
-                            ->setCellValue(
-                                "C{$insertRow}",
-                                $namaDokumenBaru
-                            );
-
-                        /*
-                         * Default master:
-                         * Ada + Lengkap.
-                         */
-                        $templateWorksheet
-                            ->setCellValue(
-                                "D{$insertRow}",
-                                'Y'
-                            );
-
-                        $templateWorksheet
-                            ->setCellValue(
-                                "E{$insertRow}",
-                                ''
-                            );
-
-                        $templateWorksheet
-                            ->setCellValue(
-                                "F{$insertRow}",
-                                ''
-                            );
-
-                        $templateWorksheet
-                            ->setCellValue(
-                                "G{$insertRow}",
-                                'Y'
-                            );
-
-                        $templateWorksheet
-                            ->setCellValue(
-                                "H{$insertRow}",
-                                ''
-                            );
-
-                        $templateWorksheet
-                            ->setCellValue(
-                                "I{$insertRow}",
-                                ''
-                            );
-
-                        $this->normalizeDocumentRowStyles(
-                            $templateWorksheet
-                        );
-
-                        $this->renumberDocumentRows(
-                            $templateWorksheet
-                        );
-
-                        $templateWriter =
-                            new Xlsx(
-                                $templateSpreadsheet
-                            );
-
-                        $templateWriter->save(
-                            $templateFullPath
-                        );
                     }
                 }
 
-                /*
-                 * Update semua pengajuan yang belum diarsipkan.
-                 */
-                $targetSubmissions =
-                    BudgetSubmission::where(
-                        'is_archive',
-                        0
-                    )
-                        ->whereNotNull(
-                            'path_file_requirements_status'
-                        )
-                        ->get();
-
-                foreach (
-                    $targetSubmissions as $target
-                ) {
-                    if (
-                        !Storage::disk('private')->exists(
-                            $target
-                                ->path_file_requirements_status
-                        )
-                    ) {
-                        continue;
-                    }
-
-                    $targetPath =
-                        Storage::disk('private')
-                            ->path(
-                                $target
-                                    ->path_file_requirements_status
-                            );
-
-                    $targetSpreadsheet =
-                        IOFactory::load(
-                            $targetPath
-                        );
-
-                    $targetWorksheet =
-                        $targetSpreadsheet
-                            ->getActiveSheet();
-
-                    $targetCatatanRow =
-                        $this->findCatatanRow(
-                            $targetWorksheet
-                        );
-
-                    $existingRow =
-                        $this->findRowByDocumentName(
-                            $targetWorksheet,
-                            $namaDokumenBaru,
-                            $targetCatatanRow
-                        );
-
-                    /*
-                     * Kalau sudah ada, jangan buat duplikat.
-                     */
-                    if ($existingRow !== null) {
-                        $this->ensureDocumentRowStyle(
-                            $targetWorksheet,
-                            $existingRow
-                        );
-
-                        $this->normalizeDocumentRowStyles(
-                            $targetWorksheet
-                        );
-
-                        $targetWriter =
-                            new Xlsx(
-                                $targetSpreadsheet
-                            );
-
-                        $targetWriter->save(
-                            $targetPath
-                        );
-
-                        continue;
-                    }
-
-                    $insertRow = null;
-
-                    for (
-                        $row = 7;
-                        $row < $targetCatatanRow;
-                        $row++
-                    ) {
-                        $nama = trim(
-                            (string) $targetWorksheet
-                                ->getCell("C{$row}")
-                                ->getValue()
-                        );
-
-                        if ($nama === '') {
-                            $insertRow = $row;
-                            break;
-                        }
-                    }
-
-                    if ($insertRow === null) {
-                        $insertRow =
-                            $targetCatatanRow;
-
-                        $targetWorksheet
-                            ->insertNewRowBefore(
-                                $insertRow,
-                                1
-                            );
-                    } else {
-                        $this->ensureDocumentRowStyle(
-                            $targetWorksheet,
-                            $insertRow
-                        );
-                    }
-
-                    foreach (
-                        range('B', 'I') as $column
-                    ) {
-                        $targetWorksheet
-                            ->setCellValue(
-                                "{$column}{$insertRow}",
-                                ''
-                            );
-                    }
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "C{$insertRow}",
-                            $namaDokumenBaru
-                        );
-
-                    /*
-                     * Dokumen baru untuk pengajuan aktif:
-                     * default belum ada dan belum lengkap.
-                     */
-                    $targetWorksheet
-                        ->setCellValue(
-                            "D{$insertRow}",
-                            ''
-                        );
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "E{$insertRow}",
-                            ''
-                        );
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "F{$insertRow}",
-                            'Y'
-                        );
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "G{$insertRow}",
-                            'Y'
-                        );
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "H{$insertRow}",
-                            ''
-                        );
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "I{$insertRow}",
-                            ''
-                        );
-
-                    $this->normalizeDocumentRowStyles(
-                        $targetWorksheet
-                    );
-
-                    $this->renumberDocumentRows(
-                        $targetWorksheet
-                    );
-
-                    $targetWriter =
-                        new Xlsx(
-                            $targetSpreadsheet
-                        );
-
-                    $targetWriter->save(
-                        $targetPath
-                    );
-                }
+                $pesan = ($lingkup === 'global')
+                    ? 'Dokumen berhasil ditambahkan ke pengajuan ini dan dijadikan template pengajuan baru berikutnya.'
+                    : 'Dokumen berhasil ditambahkan ke pengajuan ini.';
 
                 return redirect()
-                    ->route(
-                        'verification.show',
-                        [
-                            'verification' =>
-                                $pengajuan->id,
-                        ]
-                    )
-                    ->with(
-                        'success',
-                        'Dokumen berhasil ditambahkan.'
-                    );
+                    ->route('verification.show', ['verification' => $pengajuan->id])
+                    ->with('success', $pesan);
             }
-
             /*
             |--------------------------------------------------------------------------
-            | EDIT DOKUMEN
+            | EDIT DOKUMEN (LOKAL ATAU DENGAN TEMPLATE MASTER)
             |--------------------------------------------------------------------------
             */
-
             if ($aksi === 'edit_dokumen') {
                 $request->validate([
-                    'row' =>
-                        'required|integer|min:7',
-
-                    'nama_dokumen' =>
-                        'required|string|max:255',
+                    'row'          => 'required|integer|min:7',
+                    'nama_dokumen' => 'required|string|max:255',
+                    'lingkup'      => 'nullable|in:lokal,global',
                 ]);
 
-                $row =
-                    (int) $request->row;
+                $row = (int) $request->row;
+                $namaDokumenBaru = trim($request->nama_dokumen);
+                $lingkup = $request->input('lingkup', 'lokal');
+                $currentCatatanRow = $this->findCatatanRow($worksheet);
 
-                $namaDokumenBaru =
-                    trim(
-                        $request->nama_dokumen
-                    );
-
-                $currentCatatanRow =
-                    $this->findCatatanRow(
-                        $worksheet
-                    );
-
-                if (
-                    $row < 7 ||
-                    $row >= $currentCatatanRow
-                ) {
+                if ($row < 7 || $row >= $currentCatatanRow) {
                     return redirect()
-                        ->route(
-                            'verification.show',
-                            [
-                                'verification' =>
-                                    $pengajuan->id,
-                            ]
-                        )
-                        ->with(
-                            'error',
-                            'Baris dokumen tidak valid.'
-                        );
+                        ->route('verification.show', ['verification' => $pengajuan->id])
+                        ->with('error', 'Baris dokumen tidak valid.');
                 }
 
-                $namaLama =
-                    trim(
-                        (string) $worksheet
-                            ->getCell("C{$row}")
-                            ->getValue()
-                    );
+                $namaLama = trim((string) $worksheet->getCell("C{$row}")->getValue());
 
-                /*
-                 * Routing Slip tidak boleh diedit.
-                 */
-                if (
-                    strtolower($namaLama) ===
-                    'routing slip'
-                ) {
-                    return redirect()
-                        ->route(
-                            'verification.show',
-                            [
-                                'verification' =>
-                                    $pengajuan->id,
-                            ]
-                        )
-                        ->with(
-                            'error',
-                            'Routing Slip tidak dapat diedit.'
-                        );
-                }
+                // 1. Ubah nama dokumen pada berkas pengajuan ini
+                $worksheet->setCellValue("C{$row}", $namaDokumenBaru);
+                $this->ensureDocumentRowStyle($worksheet, $row);
+                $this->normalizeDocumentRowStyles($worksheet);
 
-                /*
-                 * Update semua pengajuan aktif.
-                 */
-                $targetSubmissions =
-                    BudgetSubmission::where(
-                        'is_archive',
-                        0
-                    )
-                        ->whereNotNull(
-                            'path_file_requirements_status'
-                        )
-                        ->get();
+                $writer = new Xlsx($spreadsheet);
+                $writer->save($filePathMetadata);
 
-                foreach (
-                    $targetSubmissions as $target
-                ) {
-                    if (
-                        !Storage::disk('private')->exists(
-                            $target
-                                ->path_file_requirements_status
-                        )
-                    ) {
-                        continue;
-                    }
+                // 2. Jika dipilih 'global', ubah juga namanya di file master template
+                if ($lingkup === 'global') {
+                    $templatePath = $this->getChecklistTemplatePath();
+                    if ($templatePath) {
+                        $templateFullPath = Storage::disk('private')->path($templatePath);
+                        $templateSpreadsheet = IOFactory::load($templateFullPath);
+                        $templateWorksheet = $templateSpreadsheet->getActiveSheet();
+                        $templateCatatanRow = $this->findCatatanRow($templateWorksheet);
 
-                    $targetPath =
-                        Storage::disk('private')
-                            ->path(
-                                $target
-                                    ->path_file_requirements_status
-                            );
+                        // Cari posisi baris nama dokumen lama di file template
+                        $templateRow = $this->findRowByDocumentName($templateWorksheet, $namaLama, $templateCatatanRow);
 
-                    $targetSpreadsheet =
-                        IOFactory::load(
-                            $targetPath
-                        );
+                        if ($templateRow !== null) {
+                            $templateWorksheet->setCellValue("C{$templateRow}", $namaDokumenBaru);
+                            $this->ensureDocumentRowStyle($templateWorksheet, $templateRow);
+                            $this->normalizeDocumentRowStyles($templateWorksheet);
 
-                    $targetWorksheet =
-                        $targetSpreadsheet
-                            ->getActiveSheet();
-
-                    $targetCatatanRow =
-                        $this->findCatatanRow(
-                            $targetWorksheet
-                        );
-
-                    $targetRow =
-                        $this->findRowByDocumentName(
-                            $targetWorksheet,
-                            $namaLama,
-                            $targetCatatanRow
-                        );
-
-                    if ($targetRow === null) {
-                        continue;
-                    }
-
-                    $targetWorksheet
-                        ->setCellValue(
-                            "C{$targetRow}",
-                            $namaDokumenBaru
-                        );
-
-                    $this->ensureDocumentRowStyle(
-                        $targetWorksheet,
-                        $targetRow
-                    );
-
-                    $this->normalizeDocumentRowStyles(
-                        $targetWorksheet
-                    );
-
-                    $targetWriter =
-                        new Xlsx(
-                            $targetSpreadsheet
-                        );
-
-                    $targetWriter->save(
-                        $targetPath
-                    );
-                }
-
-                /*
-                 * Update master checklist.
-                 */
-                $templatePath =
-                    $this->getChecklistTemplatePath();
-
-                if ($templatePath) {
-                    $templateFullPath =
-                        Storage::disk('private')
-                            ->path(
-                                $templatePath
-                            );
-
-                    $templateSpreadsheet =
-                        IOFactory::load(
-                            $templateFullPath
-                        );
-
-                    $templateWorksheet =
-                        $templateSpreadsheet
-                            ->getActiveSheet();
-
-                    $templateCatatanRow =
-                        $this->findCatatanRow(
-                            $templateWorksheet
-                        );
-
-                    $templateRow =
-                        $this->findRowByDocumentName(
-                            $templateWorksheet,
-                            $namaLama,
-                            $templateCatatanRow
-                        );
-
-                    if ($templateRow !== null) {
-                        $templateWorksheet
-                            ->setCellValue(
-                                "C{$templateRow}",
-                                $namaDokumenBaru
-                            );
-
-                        $this->ensureDocumentRowStyle(
-                            $templateWorksheet,
-                            $templateRow
-                        );
-
-                        $this->normalizeDocumentRowStyles(
-                            $templateWorksheet
-                        );
-
-                        $templateWriter =
-                            new Xlsx(
-                                $templateSpreadsheet
-                            );
-
-                        $templateWriter->save(
-                            $templateFullPath
-                        );
+                            $templateWriter = new Xlsx($templateSpreadsheet);
+                            $templateWriter->save($templateFullPath);
+                        }
                     }
                 }
+
+                $pesan = ($lingkup === 'global')
+                    ? 'Nama dokumen berhasil diubah pada pengajuan ini dan template pengajuan baru berikutnya.'
+                    : 'Nama dokumen berhasil diubah.';
 
                 return redirect()
-                    ->route(
-                        'verification.show',
-                        [
-                            'verification' =>
-                                $pengajuan->id,
-                        ]
-                    )
-                    ->with(
-                        'success',
-                        'Nama dokumen berhasil diubah.'
-                    );
+                    ->route('verification.show', ['verification' => $pengajuan->id])
+                    ->with('success', $pesan);
             }
 
-            /*
+             /*
             |--------------------------------------------------------------------------
-            | HAPUS DOKUMEN
+            | HAPUS DOKUMEN (LOKAL ATAU DARI TEMPLATE MASTER)
             |--------------------------------------------------------------------------
             */
-
             if ($aksi === 'hapus_dokumen') {
                 $request->validate([
-                    'row' =>
-                        'required|integer|min:7',
+                    'row'     => 'required|integer|min:7',
+                    'lingkup' => 'nullable|in:lokal,global',
                 ]);
 
-                $row =
-                    (int) $request->row;
+                $row = (int) $request->row;
+                $lingkup = $request->input('lingkup', 'lokal');
+                $currentCatatanRow = $this->findCatatanRow($worksheet);
 
-                $currentCatatanRow =
-                    $this->findCatatanRow(
-                        $worksheet
-                    );
-
-                if (
-                    $row < 7 ||
-                    $row >= $currentCatatanRow
-                ) {
+                if ($row < 7 || $row >= $currentCatatanRow) {
                     return redirect()
-                        ->route(
-                            'verification.show',
-                            [
-                                'verification' =>
-                                    $pengajuan->id,
-                            ]
-                        )
-                        ->with(
-                            'error',
-                            'Baris dokumen tidak valid.'
-                        );
+                        ->route('verification.show', ['verification' => $pengajuan->id])
+                        ->with('error', 'Baris dokumen tidak valid.');
                 }
 
-                $namaDokumen =
-                    trim(
-                        (string) $worksheet
-                            ->getCell("C{$row}")
-                            ->getValue()
-                    );
+                $namaDokumen = trim((string) $worksheet->getCell("C{$row}")->getValue());
 
                 if ($namaDokumen === '') {
                     return redirect()
-                        ->route(
-                            'verification.show',
-                            [
-                                'verification' =>
-                                    $pengajuan->id,
-                            ]
-                        )
-                        ->with(
-                            'error',
-                            'Dokumen tidak ditemukan.'
-                        );
+                        ->route('verification.show', ['verification' => $pengajuan->id])
+                        ->with('error', 'Dokumen tidak ditemukan.');
                 }
 
-                /*
-                 * Routing Slip tidak boleh dihapus.
-                 */
-                if (
-                    strtolower($namaDokumen) ===
-                    'routing slip'
-                ) {
+                if (strtolower($namaDokumen) === 'routing slip') {
                     return redirect()
-                        ->route(
-                            'verification.show',
-                            [
-                                'verification' =>
-                                    $pengajuan->id,
-                            ]
-                        )
-                        ->with(
-                            'error',
-                            'Routing Slip tidak dapat dihapus.'
-                        );
+                        ->route('verification.show', ['verification' => $pengajuan->id])
+                        ->with('error', 'Routing Slip tidak dapat dihapus.');
                 }
 
-                /*
-                 * Hapus dari master.
-                 */
-                $templatePath =
-                    $this->getChecklistTemplatePath();
+                // 1. Hapus dari berkas pengajuan ini
+                $worksheet->removeRow($row, 1);
+                $this->normalizeDocumentRowStyles($worksheet);
+                $this->renumberDocumentRows($worksheet);
 
-                if ($templatePath) {
-                    $templateFullPath =
-                        Storage::disk('private')
-                            ->path(
-                                $templatePath
-                            );
+                $writer = new Xlsx($spreadsheet);
+                $writer->save($filePathMetadata);
 
-                    $templateSpreadsheet =
-                        IOFactory::load(
-                            $templateFullPath
-                        );
+                // 2. Jika dipilih 'global', hapus juga dari template master
+                if ($lingkup === 'global') {
+                    $templatePath = $this->getChecklistTemplatePath();
+                    if ($templatePath) {
+                        $templateFullPath = Storage::disk('private')->path($templatePath);
+                        $templateSpreadsheet = IOFactory::load($templateFullPath);
+                        $templateWorksheet = $templateSpreadsheet->getActiveSheet();
+                        $templateCatatanRow = $this->findCatatanRow($templateWorksheet);
+                        $templateRow = $this->findRowByDocumentName($templateWorksheet, $namaDokumen, $templateCatatanRow);
 
-                    $templateWorksheet =
-                        $templateSpreadsheet
-                            ->getActiveSheet();
+                        if ($templateRow !== null) {
+                            $templateWorksheet->removeRow($templateRow, 1);
+                            $this->normalizeDocumentRowStyles($templateWorksheet);
+                            $this->renumberDocumentRows($templateWorksheet);
 
-                    $templateCatatanRow =
-                        $this->findCatatanRow(
-                            $templateWorksheet
-                        );
-
-                    $templateRow =
-                        $this->findRowByDocumentName(
-                            $templateWorksheet,
-                            $namaDokumen,
-                            $templateCatatanRow
-                        );
-
-                    if ($templateRow !== null) {
-                        $templateWorksheet
-                            ->removeRow(
-                                $templateRow,
-                                1
-                            );
-
-                        $this->normalizeDocumentRowStyles(
-                            $templateWorksheet
-                        );
-
-                        $this->renumberDocumentRows(
-                            $templateWorksheet
-                        );
-
-                        $templateWriter =
-                            new Xlsx(
-                                $templateSpreadsheet
-                            );
-
-                        $templateWriter->save(
-                            $templateFullPath
-                        );
+                            $templateWriter = new Xlsx($templateSpreadsheet);
+                            $templateWriter->save($templateFullPath);
+                        }
                     }
                 }
 
-                /*
-                 * Hapus dari semua pengajuan
-                 * yang belum diarsipkan.
-                 */
-                $targetSubmissions =
-                    BudgetSubmission::where(
-                        'is_archive',
-                        0
-                    )
-                        ->whereNotNull(
-                            'path_file_requirements_status'
-                        )
-                        ->get();
-
-                foreach (
-                    $targetSubmissions as $target
-                ) {
-                    if (
-                        !Storage::disk('private')->exists(
-                            $target
-                                ->path_file_requirements_status
-                        )
-                    ) {
-                        continue;
-                    }
-
-                    $targetPath =
-                        Storage::disk('private')
-                            ->path(
-                                $target
-                                    ->path_file_requirements_status
-                            );
-
-                    $targetSpreadsheet =
-                        IOFactory::load(
-                            $targetPath
-                        );
-
-                    $targetWorksheet =
-                        $targetSpreadsheet
-                            ->getActiveSheet();
-
-                    $targetCatatanRow =
-                        $this->findCatatanRow(
-                            $targetWorksheet
-                        );
-
-                    $targetRow =
-                        $this->findRowByDocumentName(
-                            $targetWorksheet,
-                            $namaDokumen,
-                            $targetCatatanRow
-                        );
-
-                    if ($targetRow === null) {
-                        continue;
-                    }
-
-                    $targetWorksheet
-                        ->removeRow(
-                            $targetRow,
-                            1
-                        );
-
-                    $this->normalizeDocumentRowStyles(
-                        $targetWorksheet
-                    );
-
-                    $this->renumberDocumentRows(
-                        $targetWorksheet
-                    );
-
-                    $targetWriter =
-                        new Xlsx(
-                            $targetSpreadsheet
-                        );
-
-                    $targetWriter->save(
-                        $targetPath
-                    );
-                }
+                $pesan = ($lingkup === 'global')
+                    ? 'Dokumen berhasil dihapus dari pengajuan ini dan template pengajuan baru berikutnya.'
+                    : 'Dokumen berhasil dihapus dari pengajuan ini.';
 
                 return redirect()
-                    ->route(
-                        'verification.show',
-                        [
-                            'verification' =>
-                                $pengajuan->id,
-                        ]
-                    )
-                    ->with(
-                        'success',
-                        'Dokumen berhasil dihapus dari pengajuan yang belum diarsipkan.'
-                    );
+                    ->route('verification.show', ['verification' => $pengajuan->id])
+                    ->with('success', $pesan);
             }
-        }
-
         /*
         |--------------------------------------------------------------------------
         | SIMPAN CHECKLIST
@@ -1505,6 +903,7 @@ class BudgetSubmissionController extends Controller
                 'success',
                 'Pemeriksaan pengajuan berhasil diselesaikan.'
             );
+    }
     }
 
     /*

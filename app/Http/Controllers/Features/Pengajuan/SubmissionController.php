@@ -170,6 +170,28 @@ class SubmissionController extends Controller
             ]);
         }
 
+        foreach ($keuanganUsers as $user) {
+    Notification::create([
+        'user_id' => $user->id,
+        'title' => 'Pengajuan Baru',
+        'message' => $message,
+        'type' => 'info',
+        'url' => route('verification.show', $pengajuan->id),
+    ]);
+}
+
+// TAMBAHKAN KODE INI (Notifikasi Monitoring ke Admin):
+$adminUsers = User::where('role', 'Admin')->get();
+foreach ($adminUsers as $admin) {
+    Notification::create([
+        'user_id' => $admin->id,
+        'title'   => 'Pengajuan Anggaran Baru',
+        'message' => 'Divisi <span class="text-blue-600 font-bold">' . e($pengajuan->user->role) . '</span> (' . e($pengajuan->user->name) . ') mengajukan berkas baru: <b>' . e($pengajuan->budget_submission_name) . '</b>.',
+        'type'    => 'info',
+        'url'     => route('admin.dashboard'),
+    ]);
+}
+
         if (
             $pengajuan->path_file_requirements_status &&
             Storage::disk('private')->exists($pengajuan->path_file_requirements_status)

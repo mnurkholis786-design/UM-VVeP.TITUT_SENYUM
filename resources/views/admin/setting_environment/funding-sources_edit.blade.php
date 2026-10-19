@@ -292,7 +292,9 @@
 
                                 <span>
                                     Sub Kategori
-                                    <span class="text-red-500">*</span>
+                                </span>
+                                <span class="text-xs text-gray-400 font-normal">
+                                    (Opsional)
                                 </span>
 
                             </label>
@@ -303,7 +305,6 @@
                                 name="sub_category"
                                 id="sub_category"
                                 value="{{ old('sub_category', $fundingSource->sub_category) }}"
-                                required
                                 class="w-full rounded-2xl border-2 border-gray-200
                                 bg-gray-50/70 px-4 py-3.5
                                 text-gray-800 font-medium
