@@ -67,6 +67,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         [CategoryController::class, 'manageArsipFisik']
     )->name('category.manageArsipFisik');
 
+    Route::get(
+    '/category/{id}/arsip-fisik-files/{tahun}',
+    [CategoryController::class, 'arsipFisikFiles']
+)->name('category.arsipFisikFiles');
+
     // Upload / Replace Arsip Fisik
     Route::post(
         '/category/{id}/upload-arsip-fisik',

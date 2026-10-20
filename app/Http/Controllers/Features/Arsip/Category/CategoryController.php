@@ -12,6 +12,8 @@ use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -88,11 +90,26 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        $category = Category::findOrFail($id);
+public function show(string $id)
+{
+    $category = Category::findOrFail($id);
 
-        $file2024 = null;
+    // ================= CEK OTORISASI BENDAHARA =================
+    $user = Auth::user();
+    if ($user && strtolower(trim($user->role ?? '')) === 'bendahara') {
+        $hasAccess = DB::table('category_user')
+            ->join('categories', 'category_user.category_id', '=', 'categories.id')
+            ->where('category_user.user_id', $user->id)
+            ->where('categories.category_name', $category->category_name)
+            ->exists();
+
+        if (!$hasAccess) {
+            abort(403, 'Anda tidak memiliki hak akses ke kategori arsip ini.');
+        }
+    }
+    // ===========================================================
+
+    $file2024 = null;
         $file2025 = null;
 
         $files2024 = Storage::disk('private')->files('arsip_fisik/2024');
@@ -237,8 +254,13 @@ class CategoryController extends Controller
                 }
             }
 
-            $arsipList[$tahun] = $fileName;
+              // HANYA tampilkan kartu jika kategori ini memang memiliki berkas excel di tahun tersebut
+            if ($fileName) {
+                $arsipList[$tahun] = $fileName;
+            }
         }
+
+        ksort($arsipList);
 
         ksort($arsipList);
 
@@ -246,14 +268,16 @@ class CategoryController extends Controller
     }
 
     /**
-     * Upload / Replace Arsip Fisik Excel.
+     * Upload / Replace Arsip Fisik Excel & Otomatis Import ke Database.
      */
     public function uploadArsipFisik(Request $request, $id)
     {
         $request->validate([
             'tahun'      => 'required|string|max:10',
-            'file_excel' => 'required|mimes:xlsx,xls|max:10240',
+            'file_excel' => 'required|mimes:xlsx,xls|max:20480',
         ]);
+
+        $category = Category::findOrFail($id);
 
         if ($request->hasFile('file_excel')) {
             $tahun = trim($request->tahun);
@@ -263,6 +287,7 @@ class CategoryController extends Controller
                 Storage::disk('private')->makeDirectory('arsip_fisik/' . $tahun);
             }
 
+            // Hapus file lama jika ada
             $existingFiles = Storage::disk('private')->files('arsip_fisik/' . $tahun);
             foreach ($existingFiles as $ef) {
                 if (str_contains($ef, 'arsip_fisik_' . $tahun . '_category_' . $id . '_')) {
@@ -272,11 +297,60 @@ class CategoryController extends Controller
 
             $fileName = 'arsip_fisik_' . $tahun . '_category_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('arsip_fisik/' . $tahun, $fileName, 'private');
+                 $fullPath = Storage::disk('private')->path('arsip_fisik/' . $tahun . '/' . $fileName);
 
-            return redirect()->back()->with('success', "Berhasil menyimpan file Arsip Fisik Excel Tahun $tahun!");
+            // Bersihkan data lama di database untuk tahun ini sebelum import baru
+            $relatedCategoryIds = Category::where('category_name', $category->category_name)
+                ->where('year', $tahun)
+                ->pluck('id')
+                ->push($category->id)
+                ->unique();
+
+            $folderIds = DocumentFolder::whereIn('category_id', $relatedCategoryIds)->pluck('id');
+            ArchiveFile::whereIn('folder_id', $folderIds)->delete();
+
+            // JALANKAN IMPORT OTOMATIS KE DATABASE
+            $importService = new \App\Services\ArsipImportService();
+            $totalImported = $importService->importFromExcel($fullPath, $category, $tahun);
+
+            return redirect()->back()->with('success', "Berhasil menyimpan Excel dan mengimpor {$totalImported} berkas arsip ke database!");
         }
 
         return redirect()->back()->with('error', 'Gagal mengunggah file.');
+    }
+
+    /**
+     * Menampilkan daftar berkas arsip hasil import dari Excel untuk tahun tertentu.
+     */
+    public function arsipFisikFiles(Request $request, $id, $tahun)
+    {
+        $category = Category::findOrFail($id);
+        $search = $request->input('search');
+
+        // Ambil semua category terkait (termasuk sub kategori yang dibuat otomatis untuk tahun ini)
+        $relatedCategoryIds = Category::where('category_name', $category->category_name)
+            ->where('year', $tahun)
+            ->pluck('id')
+            ->push($category->id)
+            ->unique();
+
+        $folderIds = \App\Models\DocumentFolder::whereIn('category_id', $relatedCategoryIds)->pluck('id');
+
+        $query = ArchiveFile::whereIn('folder_id', $folderIds);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('file_name', 'like', "%{$search}%")
+                  ->orWhere('uraian', 'like', "%{$search}%")
+                  ->orWhere('no_sp2d', 'like', "%{$search}%")
+                  ->orWhere('no_item', 'like', "%{$search}%")
+                  ->orWhere('kode_klasifikasi', 'like', "%{$search}%");
+            });
+        }
+
+        $archives = $query->latest()->paginate(15)->appends($request->query());
+
+        return view('features.arsip.category.arsip_fisik_files', compact('category', 'tahun', 'archives', 'search'));
     }
 
     /**
@@ -387,6 +461,7 @@ class CategoryController extends Controller
      */
     public function deleteArsipFisik($id, $tahun)
     {
+        $category = Category::findOrFail($id);
         $directoryPath = 'arsip_fisik/' . $tahun;
 
         if (Storage::disk('private')->exists($directoryPath)) {
@@ -397,15 +472,23 @@ class CategoryController extends Controller
                 }
             }
 
-            $remainingFiles = Storage::disk('private')->files($directoryPath);
+               $remainingFiles = Storage::disk('private')->files($directoryPath);
             if (empty($remainingFiles)) {
                 Storage::disk('private')->deleteDirectory($directoryPath);
             }
-
-            return redirect()->back()->with('success', "Berhasil menghapus kartu dan berkas Arsip Fisik Tahun $tahun!");
         }
 
-        return redirect()->back()->with('error', 'Data tidak ditemukan.');
+        // Hapus juga data arsip kuitansi di database yang terkait kategori & tahun ini
+        $relatedCategoryIds = Category::where('category_name', $category->category_name)
+            ->where('year', $tahun)
+            ->pluck('id')
+            ->push($category->id)
+            ->unique();
+
+        $folderIds = \App\Models\DocumentFolder::whereIn('category_id', $relatedCategoryIds)->pluck('id');
+        \App\Models\ArchiveFile::whereIn('folder_id', $folderIds)->delete();
+
+        return redirect()->back()->with('success', "Berhasil menghapus kartu dan berkas Arsip Fisik Tahun $tahun!");
     }
 
     private function deleteRelatedFiles($categoryIds)

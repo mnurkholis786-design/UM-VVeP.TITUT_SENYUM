@@ -18,7 +18,7 @@ class DigitalArchiveController extends Controller
     /**
      * Halaman utama Digital Archive.
      */
-    public function index()
+    public function index(Request $request)
     {
         $kategoriList = DigitalArchive::KATEGORI_LIST;
 
@@ -29,12 +29,26 @@ class DigitalArchiveController extends Controller
             ->groupBy('kategori')
             ->pluck('total', 'kategori');
 
+        // Tangkap kategori yang dipilih saat kartu diklik
+        $selectedKategori = $request->input('kategori');
+        $archives = null;
+
+        if ($selectedKategori && in_array($selectedKategori, $kategoriList)) {
+            $query = DigitalArchive::where('kategori', $selectedKategori);
+
+            // Fitur pencarian dokumen dalam kategori
+            if ($request->filled('search')) {
+                $query->where('archive_name', 'like', '%' . $request->search . '%');
+            }
+
+            $archives = $query->latest()->paginate(10)->appends($request->query());
+        }
+
         return view(
             'features.arsip.digital_archive.digital_archive_dashboard',
-            compact('kategoriList', 'counts')
+            compact('kategoriList', 'counts', 'selectedKategori', 'archives')
         );
     }
-
     
     /**
      * Form create.

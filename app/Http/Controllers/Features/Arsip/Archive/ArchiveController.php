@@ -267,29 +267,77 @@ class ArchiveController extends Controller
         return redirect()->route('folder.show', ['folder' => $archive->folder_id])->with('success', 'File berhasil Dihapus!');
     }
 
+    /**
+     * Helper untuk menemukan lokasi file Excel yang valid (mendukung path relatif, absolut, dan file re-upload).
+     */
+    private function resolveExcelPath(ArchiveFile $archive): ?string
+    {
+        if (empty($archive->excel_path)) {
+            return null;
+        }
+
+        $path = $archive->excel_path;
+
+        // 1. Cek path relatif di disk private
+        if (Storage::disk('private')->exists($path)) {
+            return Storage::disk('private')->path($path);
+        }
+
+        // 2. Cek jika tersimpan path absolut langsung
+        if (file_exists($path)) {
+            return $path;
+        }
+
+        // 3. Jika path absolut Windows, ambil bagian relatifnya
+        if (str_contains($path, 'arsip_fisik')) {
+            $parts = explode('arsip_fisik', $path);
+            $relPath = 'arsip_fisik' . end($parts);
+            $relPath = ltrim(str_replace('\\', '/', $relPath), '/');
+
+            if (Storage::disk('private')->exists($relPath)) {
+                return Storage::disk('private')->path($relPath);
+            }
+
+            // Fallback: cari file excel terbaru di folder tahun tersebut jika file lama ter-replace
+            if (preg_match('/arsip_fisik[\/\\\\](\d{4})/', $path, $mYear)) {
+                $year = $mYear[1];
+                $files = Storage::disk('private')->files('arsip_fisik/' . $year);
+                if (!empty($files)) {
+                    $categoryFiles = array_filter($files, function ($f) use ($archive) {
+                        return str_contains($f, 'category_' . ($archive->folder->category_id ?? ''));
+                    });
+                    $chosenFile = !empty($categoryFiles) ? end($categoryFiles) : end($files);
+                    return Storage::disk('private')->path($chosenFile);
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function downloadExcel(string $id)
     {
         $archive = ArchiveFile::findOrFail($id);
+        $fullPath = $this->resolveExcelPath($archive);
 
-        if (!$archive->excel_path || !Storage::disk('private')->exists($archive->excel_path)) {
+        if (!$fullPath || !file_exists($fullPath)) {
             return back()->with('error', 'File Excel tidak ditemukan.');
         }
 
-        return Storage::disk('private')->download($archive->excel_path);
+        return response()->download($fullPath, basename($fullPath));
     }
 
     public function viewExcel(string $id)
     {
         $archive = ArchiveFile::findOrFail($id);
+        $fullPath = $this->resolveExcelPath($archive);
 
-        if (!$archive->excel_path || !Storage::disk('private')->exists($archive->excel_path)) {
+        if (!$fullPath || !file_exists($fullPath)) {
             return back()->with('error', 'File Excel tidak ditemukan.');
         }
 
-        $filePath = Storage::disk('private')->path($archive->excel_path);
-
         try {
-            $spreadsheet = IOFactory::load($filePath);
+            $spreadsheet = IOFactory::load($fullPath);
             $writer = new Html($spreadsheet);
 
             return response()->stream(function () use ($writer) {

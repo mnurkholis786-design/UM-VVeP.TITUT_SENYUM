@@ -72,7 +72,7 @@
                 {{-- GRID DAFTAR TAHUN SECARA DINAMIS --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    @foreach($arsipList as $tahun => $fileName)
+                    @forelse($arsipList as $tahun => $fileName)
                         <div class="p-5 border border-gray-200 rounded-2xl bg-gray-50/50" x-data="{ showEdit: false, showEditTahun: false }">
                             
                             {{-- HEADER TAHUN & TOMBOL EDIT TAHUN --}}
@@ -107,15 +107,24 @@
                                 </div>
 
                                 {{-- AKSI READ, DOWNLOAD, EDIT FILE, DELETE (HAPUS KARTU/FOLDER) --}}
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    <a href="{{ route('category.previewArsipFisik', [$category->id, $tahun]) }}" target="_blank" class="px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Lihat</a>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                                    <a href="{{ route('category.previewArsipFisik', [$category->id, $tahun]) }}" target="_blank" class="px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Lihat Excel</a>
                                     <a href="{{ route('category.downloadArsipFisik', [$category->id, $tahun]) }}" class="px-2 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Unduh</a>
                                     <button type="button" @click="showEdit = !showEdit" class="px-2 py-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Edit File</button>
-                                    <form action="{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus seluruh kartu dan berkas Arsip Fisik Tahun {{ $tahun }} ini?')">
+                                    <form action="{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus berkas Tahun {{ $tahun }} ini?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="w-full px-2 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Hapus</button>
                                     </form>
                                 </div>
+
+                                {{-- TOMBOL LIHAT DAFTAR BERKAS TERINPUT --}}
+                                <a href="{{ route('category.arsipFisikFiles', [$category->id, $tahun]) }}" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-xs rounded-xl shadow transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    <span>Buka Berkas Arsip Terinput</span>
+                                </a>
+
 
                                 {{-- FORM EDIT / REPLACE FILE --}}
                                 <div x-show="showEdit" x-transition class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
@@ -142,7 +151,16 @@
                                 </form>
                             @endif
                         </div>
-                    @endforeach
+                        @empty
+                        <div class="col-span-1 md:col-span-2 text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-sm font-semibold text-gray-700">Belum ada berkas Arsip Fisik untuk kategori ini</p>
+                            <p class="text-xs text-gray-500 mt-1">Silakan klik tombol <strong class="text-blue-600">+ Create Arsip</strong> di pojok kanan atas untuk mengunggah berkas.</p>
+                        </div>
+                     
+                    @endforelse
 
                 </div>
             </div>

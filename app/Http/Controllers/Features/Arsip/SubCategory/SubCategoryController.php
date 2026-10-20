@@ -81,7 +81,12 @@ class SubCategoryController extends Controller
     public function show(string $id)
     {
         $category = Category::findOrFail($id); // ambil category dari sub category saat ini
-        $years = Category::where('sub_category', $category->sub_category)->get();
+        
+        // Hanya ambil tahun yang sub_category DAN category_name nya sama persis
+        $years = Category::where('category_name', $category->category_name)
+            ->where('sub_category', $category->sub_category)
+            ->get();
+
         return view('features.arsip.year.year', compact('years', 'category'));
     }
 

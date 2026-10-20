@@ -10,6 +10,7 @@ use App\Models\DocumentFolder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class YearController extends Controller
 {
@@ -94,21 +95,26 @@ class YearController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $id)
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | CATEGORY / YEAR
-        |--------------------------------------------------------------------------
-        */
-        $category = Category::findOrFail($id);
+public function show(Request $request, string $id)
+{
+    $category = Category::findOrFail($id);
 
-        /*
-        |--------------------------------------------------------------------------
-        | INPUT FILTER
-        |--------------------------------------------------------------------------
-        */
-        $searchFisik = $request->input('search_fisik');
+    // ================= CEK OTORISASI BENDAHARA =================
+    $user = Auth::user();
+    if ($user && strtolower(trim($user->role ?? '')) === 'bendahara') {
+        $hasAccess = DB::table('category_user')
+            ->join('categories', 'category_user.category_id', '=', 'categories.id')
+            ->where('category_user.user_id', $user->id)
+            ->where('categories.category_name', $category->category_name)
+            ->exists();
+
+        if (!$hasAccess) {
+            abort(403, 'Anda tidak memiliki hak akses ke arsip ini.');
+        }
+    }
+    // ===========================================================
+
+    $searchFisik = $request->input('search_fisik');
         $searchDigital = $request->input('search_digital');
         $selectedCategory = $request->input('category');
         $selectedSubCategory = $request->input('sub_category');

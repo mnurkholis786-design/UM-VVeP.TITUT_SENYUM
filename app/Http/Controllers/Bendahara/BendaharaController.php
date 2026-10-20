@@ -17,30 +17,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BendaharaController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // ================= QUERY DASAR LIST =================
-        $query = BudgetSubmission::with('user')
-            ->where('requirements_status', 'Lengkap')
-            ->where('verification_status', 1);
-
-        // ================= FILTER SEARCH =================
-        if ($request->filled('search')) {
-            $query->where('budget_submission_name', 'like', '%' . $request->search . '%');
-        }
-
-        // ================= FILTER STATUS ARSIP =================
-        if ($request->status === 'sudah_diarsipkan') {
-            $query->where('is_archive', 1);
-        }
-
-        if ($request->status === 'belum_diarsipkan') {
-            $query->where('is_archive', 0);
-        }
-
-        // ================= DATA LIST =================
-        $pengajuans = $query->orderBy('created_at', 'desc')->get();
-
+ 
         // ================= STATISTIK =================
         $total_terverifikasi = BudgetSubmission::where('requirements_status', 'Lengkap')
             ->where('verification_status', 1)
@@ -65,9 +44,7 @@ class BendaharaController extends Controller
             );
         }
 
-        // ================= RETURN VIEW =================
         return view('bendahara.dashboard', compact(
-            'pengajuans',
             'total_terverifikasi',
             'menunggu_verifikasi',
             'sudah_diarsipkan',

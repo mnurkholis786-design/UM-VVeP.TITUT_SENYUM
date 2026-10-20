@@ -68,12 +68,12 @@
                                 <a href="{{ route('archive.show', $archive->id) }}"
                                     class="flex items-center gap-4 flex-1 min-w-0">
 
-                                    <div
-                                        class="w-8 h-8 flex items-center justify-center rounded-full
-                                        bg-gradient-to-b from-[#003A8F] to-[#002766]
-                                        text-white font-semibold">
-                                        {{ $no++ }}
-                                    </div>
+                             <div
+                                class="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl
+                                bg-gradient-to-br from-[#003A8F] to-indigo-700
+                                text-white font-bold text-sm shadow-md shadow-blue-900/20">
+                                {{ $no++ }}
+                            </div>
 
                                     <div class="min-w-0">
                                         <p class="font-semibold text-gray-900 truncate">

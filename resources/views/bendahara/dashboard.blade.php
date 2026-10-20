@@ -709,64 +709,45 @@
                         </a>
 
 
-                       {{-- DIGITAL ARSIP --}}
-                            <a href="{{ url('/cabinet') }}"
-                                class="quick-action group flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-100/50 border border-cyan-200">
+                        {{-- DIGITAL ARSIP --}}
+                        <a href="{{ route('digital.index') }}"
+                            class="quick-action group flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-100/50 border border-cyan-200">
 
-                                <div
-                                    class="quick-action-icon w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
+                            <div
+                                class="quick-action-icon w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
 
-                                    <svg class="w-6 h-6 text-white" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-white" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
 
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
-                                        </path>
-
-                                    </svg>
-
-                                </div>
-
-                                <div class="min-w-0">
-                                    <p class="font-bold text-gray-800">
-                                        Digital Arsip
-                                    </p>
-                                    <p class="text-xs text-gray-600 mt-1">
-                                        Lihat arsip dokumen digital
-                                    </p>
-                                </div>
-
-                                <svg class="w-5 h-5 ml-auto text-cyan-400 group-hover:text-cyan-600 transition"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
                                     </path>
+
                                 </svg>
-                            </a>
 
+                            </div>
 
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-800">
+                                    Digital Arsip
+                                </p>
+                                <p class="text-xs text-gray-600 mt-1">
+                                    Lihat arsip dokumen digital
+                                </p>
+                            </div>
 
-
-
-
-
-                                <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
+                            <svg class="w-5 h-5 ml-auto text-cyan-400 group-hover:text-cyan-600 transition"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7">
                                 </path>
-
                             </svg>
-
                         </a>
-
-                    </div>
-
+                    
                 </div>
-
-
+            </div>
                 {{-- =====================================================
                     INFO BENDahara
                 ====================================================== --}}
