@@ -167,10 +167,19 @@ public function show(Request $request, string $id)
 
         /*
         |--------------------------------------------------------------------------
-        | QUERY ARSIP DIGITAL
+        | QUERY ARSIP DIGITAL (MENDUKUNG SEMUA SUB KATEGORI / 1 SUB KATEGORI)
         |--------------------------------------------------------------------------
         */
-        $digitalQuery = DigitalArchive::where('category_id', $category->id);
+        if ($request->input('sub_category_id') === 'all') {
+            $allCategoryIds = Category::where('category_name', $category->category_name)
+                ->where('year', $category->year)
+                ->pluck('id');
+            $digitalQuery = DigitalArchive::whereIn('category_id', $allCategoryIds);
+        } elseif ($request->filled('sub_category_id')) {
+            $digitalQuery = DigitalArchive::where('category_id', $request->sub_category_id);
+        } else {
+            $digitalQuery = DigitalArchive::where('category_id', $category->id);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -245,12 +254,22 @@ public function show(Request $request, string $id)
 
         /*
         |--------------------------------------------------------------------------
+        | AMBIL DAFTAR SUB KATEGORI UNTUK DROPDOWN FILTER
+        |--------------------------------------------------------------------------
+        */
+        $subcategories = Category::where('category_name', $category->category_name)
+            ->where('year', $category->year)
+            ->whereNotNull('sub_category')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
         | RETURN VIEW
         |--------------------------------------------------------------------------
         */
         return view(
             'features.arsip.rack.archive-rack',
-            compact('racks', 'category', 'digitalarchive')
+            compact('racks', 'category', 'digitalarchive', 'subcategories')
         );
     }
 

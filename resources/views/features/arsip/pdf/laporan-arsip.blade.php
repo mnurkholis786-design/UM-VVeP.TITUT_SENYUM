@@ -44,6 +44,8 @@
             margin-top: 4px;
         }
 
+
+        
         .sub-kategori-container {
             width: 100%;
             margin-bottom: 5px;
@@ -69,7 +71,6 @@
         table.main-table th {
             text-align: center;
             font-weight: bold;
-            background-color: #c1e5fa;
         }
 
         table.main-table td {

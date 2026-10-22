@@ -317,14 +317,14 @@
 
 
 
-                        {{-- EDIT KATEGORI --}}
+                        {{-- EDIT KATEGORI HANYA ADMIN & BENDAHARA --}}
+                        @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                         <form action="{{ route('category.index') }}"
                             method="GET">
 
                             <input type="hidden"
-                                name="id_cabinet"
+                                name="cabinet_id"
                                 value="{{ $cabinet->id }}">
-
 
                             <button type="submit"
                                 class="edit-button inline-flex items-center justify-center gap-2 px-5 py-3 text-white font-bold rounded-xl">
@@ -337,12 +337,7 @@
                                     <path stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19.5 7.125L16.875 4.5" />
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 
                                 </svg>
 
@@ -351,6 +346,7 @@
                             </button>
 
                         </form>
+                        @endif
 
                     </div>
 

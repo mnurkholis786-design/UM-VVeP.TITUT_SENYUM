@@ -443,7 +443,32 @@
                         </div>
 
                     </div>
+                    {{-- FILTER TIPE METODE PEMBAYARAN (HANYA MUNCUL UNTUK BENDAHARA UTAMA) --}}
+            @if(empty($isBendaharaUP) && empty($isBendaharaLS))
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-1">Metode Bayar:</span>
+                
+                {{-- Semua --}}
+                <a href="{{ request()->fullUrlWithQuery(['tipe' => null]) }}" 
+                   class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition {{ empty($tipe) ? 'bg-[#003A8F] text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    Semua Pengajuan
+                </a>
 
+                {{-- Khusus UP Bendahara --}}
+                <a href="{{ request()->fullUrlWithQuery(['tipe' => 'up']) }}" 
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition {{ $tipe === 'up' ? 'bg-emerald-700 text-white shadow-sm' : 'bg-white text-emerald-700 hover:bg-emerald-50 border border-emerald-200' }}">
+                    <span class="w-2 h-2 rounded-full {{ $tipe === 'up' ? 'bg-white' : 'bg-emerald-500' }}"></span>
+                    Khusus UP Bendahara
+                </a>
+
+                {{-- Khusus LS SPM --}}
+                <a href="{{ request()->fullUrlWithQuery(['tipe' => 'ls']) }}" 
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition {{ $tipe === 'ls' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-700 hover:bg-blue-50 border border-blue-200' }}">
+                    <span class="w-2 h-2 rounded-full {{ $tipe === 'ls' ? 'bg-white' : 'bg-blue-500' }}"></span>
+                    Khusus LS SPM
+                </a>
+            </div>
+            @endif
                 </form>
             </div>
 
@@ -542,6 +567,20 @@
                                         </div>
 
                                         <div class="flex flex-wrap items-center gap-2 mt-3">
+
+                                            {{-- BADGE METODE PEMBAYARAN --}}
+                                            @php
+                                                $isLS = $sign->payment_method && str_contains(strtoupper($sign->payment_method->payment_method_name), 'LS');
+                                            @endphp
+                                            @if ($isLS)
+                                                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold border border-blue-200 inline-flex items-center gap-1">
+                                                    📄 LS SPM (Disahkan PPSPM)
+                                                </span>
+                                            @else
+                                                <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 inline-flex items-center gap-1">
+                                                    💵 UP Bendahara
+                                                </span>
+                                            @endif
 
                                             <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold">
                                                 ✓ Lengkap
@@ -705,6 +744,20 @@
 
 
                                         <div class="flex flex-wrap items-center gap-2 mt-3">
+
+                                            {{-- BADGE METODE PEMBAYARAN --}}
+                                            @php
+                                                $isLS = $pengajuan->payment_method && str_contains(strtoupper($pengajuan->payment_method->payment_method_name), 'LS');
+                                            @endphp
+                                            @if ($isLS)
+                                                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold border border-blue-200 inline-flex items-center gap-1">
+                                                    📄 LS SPM
+                                                </span>
+                                            @else
+                                                <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 inline-flex items-center gap-1">
+                                                    💵 UP Bendahara
+                                                </span>
+                                            @endif
 
                                             @if ($pengajuan->is_archive == 1)
                                                 <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold">

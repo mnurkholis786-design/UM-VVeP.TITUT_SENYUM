@@ -304,6 +304,7 @@
                     </div>
 
 
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                     {{-- TAMBAH RAK --}}
                     <form action="{{ route('rack.create') }}">
 
@@ -330,6 +331,7 @@
                         </button>
 
                     </form>
+                    @endif
 
                 </div>
 
@@ -521,6 +523,7 @@
                                     </a>
 
 
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- TOMBOL EDIT RAK (ICON PENSIL) --}}
                                     <a
                                         href="{{ route('rack.edit', $rak->id) }}"
@@ -573,6 +576,7 @@
                                         </button>
 
                                     </form>
+                                    @endif
 
                                 </div>
 
@@ -662,6 +666,7 @@
                     </div>
 
 
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                     {{-- TAMBAH DIGITAL --}}
                     <form action="{{ route('digital.create') }}" method="GET">
 
@@ -688,6 +693,7 @@
                         </button>
 
                     </form>
+                    @endif
 
                 </div>
 
@@ -1305,55 +1311,60 @@
                             <input type="hidden" name="category" value="{{ request('category') }}">
                         @endif
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
+                            {{-- 1. PILIH SUB KATEGORI (SEMUA ATAU 1 SUB KATEGORI) --}}
                             <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Sub Kategori Arsip
+                                </label>
+                                <select
+                                    id="filter_sub_category"
+                                    name="sub_category_id"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 cursor-pointer"
+                                >
+                                    <option value="all" {{ request('sub_category_id') === 'all' ? 'selected' : '' }}>
+                                        📑 Semua Sub Kategori (Gabungan)
+                                    </option>
+                                    @if(isset($subcategories))
+                                        @foreach($subcategories as $sub)
+                                            <option value="{{ $sub->id }}" {{ (request('sub_category_id') == $sub->id) || (!request('sub_category_id') && $sub->id == $category->id) ? 'selected' : '' }}>
+                                                {{ $sub->sub_category }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
 
+                            {{-- 2. MULAI TANGGAL --}}
+                            <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Mulai Tanggal
                                 </label>
-
                                 <input
                                     type="date"
                                     id="input_tanggal_mulai"
                                     name="tanggal_mulai"
                                     value="{{ request('tanggal_mulai') }}"
-                                    class="w-full px-4 py-3
-                                           border border-gray-200
-                                           rounded-xl text-sm
-                                           bg-white shadow-sm
-                                           focus:outline-none
-                                           focus:ring-2 focus:ring-blue-500/30
-                                           focus:border-blue-500"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                                 >
-
                             </div>
 
-
+                            {{-- 3. SAMPAI TANGGAL --}}
                             <div>
-
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Sampai Tanggal
                                 </label>
-
                                 <input
                                     type="date"
                                     id="input_tanggal_selesai"
                                     name="tanggal_selesai"
                                     value="{{ request('tanggal_selesai') }}"
-                                    class="w-full px-4 py-3
-                                           border border-gray-200
-                                           rounded-xl text-sm
-                                           bg-white shadow-sm
-                                           focus:outline-none
-                                           focus:ring-2 focus:ring-blue-500/30
-                                           focus:border-blue-500"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                                 >
-
                             </div>
 
                         </div>
-
 
                         <div class="flex flex-wrap items-center gap-2 mt-5 pt-5 border-t border-gray-200">
 
@@ -1589,6 +1600,7 @@
                                     </a>
 
 
+                                     @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- TOMBOL EDIT ARSIP DIGITAL (ICON PENSIL) --}}
                                     <a
                                         href="{{ route('digital.edit', $archive->id) }}"
@@ -1636,82 +1648,53 @@
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
-                                            </svg>
+                                             </svg>
 
-                                        </button>
+                                         </button>
 
-                                    </form>
+                                     </form>
+                                     @endif
 
-                                </div>
+                                 </div>
 
-                            </div>
+                             </div>
 
-                        @endforeach
+                         @endforeach
 
+                     </div>
 
-                        {{-- PAGINATION --}}
-                        <div class="pt-5">
-                            {{ $digitalarchive->withQueryString()->links() }}
-                        </div>
+                     {{-- TOMBOL HALAMAN SELANJUTNYA (PAGINASI) --}}
+                     @if (method_exists($digitalarchive, 'links'))
+                         <div class="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between">
+                             {{ $digitalarchive->withQueryString()->links() }}
+                         </div>
+                     @endif
 
-                    </div>
+                 @endif
 
-                @else
+             </div>
 
-                    {{-- EMPTY DIGITAL --}}
-                    <div
-                        class="text-center py-12 px-5
-                               rounded-2xl
-                               bg-gradient-to-br from-slate-50 to-blue-50/40
-                               border border-dashed border-gray-300"
-                    >
+         </div>
 
-                        <div class="mx-auto w-20 h-20 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-5">
-
-                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
-                                      d="M4 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M8 13h8"/>
-                            </svg>
-
-                        </div>
+     </div>
 
 
-                        <h4 class="text-lg font-bold text-gray-700">
-                            Belum Ada Arsip Digital
-                        </h4>
-
-
-                        <p class="text-sm text-gray-500 mt-2 max-w-md mx-auto">
-                            Belum terdapat arsip digital pada kategori ini.
-                            Silakan tambahkan arsip digital untuk mulai menyimpan dokumen.
-                        </p>
-
-                    </div>
-
-                @endif
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- ========================================================= --}}
-    {{-- SCRIPT JAVASCRIPT --}}
-    {{-- ========================================================= --}}
+     {{-- ========================================================= --}}
+     {{-- SCRIPT JAVASCRIPT --}}
+     {{-- ========================================================= --}}
 
     <script>
-        // Fungsi untuk Export PDF / Excel dengan membawa filter tanggal
+        // Fungsi untuk Export PDF / Excel dengan membawa filter tanggal dan pilihan sub kategori
         function exportReport(baseUrl) {
-            const tMulai = document.getElementById('input_tanggal_mulai').value;
-            const tSelesai = document.getElementById('input_tanggal_selesai').value;
+            const tMulai = document.getElementById('input_tanggal_mulai')?.value;
+            const tSelesai = document.getElementById('input_tanggal_selesai')?.value;
+            const subKategoriId = document.getElementById('filter_sub_category')?.value;
             let url = baseUrl;
 
             const params = new URLSearchParams();
             if (tMulai) params.append('tanggal_mulai', tMulai);
             if (tSelesai) params.append('tanggal_selesai', tSelesai);
+            if (subKategoriId) params.append('sub_category_id', subKategoriId);
 
             const queryString = params.toString();
             if (queryString) {

@@ -43,6 +43,7 @@
                         </div>
                     </div>
 
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                     <form action="{{ route('archive.create') }}" method="GET">
                         @csrf
                         <input type="text" name="folder_id" value="{{ $folder->id }}" class="hidden">
@@ -52,6 +53,7 @@
                             Tambah File Arsip
                         </button>
                     </form>
+                    @endif
                 </div>
 
                 {{-- Daftar File --}}
@@ -89,6 +91,7 @@
                                     </div>
                                 </a>
 
+                                @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                 {{-- Aksi --}}
                                 <div class="flex gap-2 ml-4">
                                     <a href="{{ route('archive.edit', $archive->id) }}"
@@ -105,6 +108,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                @endif
                                       </div>
                         @endforeach
                     </div>

@@ -395,6 +395,7 @@ class BudgetSubmissionController extends Controller
                     ->route('verification.show', ['verification' => $pengajuan->id])
                     ->with('success', $pesan);
             }
+        }
         /*
         |--------------------------------------------------------------------------
         | SIMPAN CHECKLIST
@@ -650,11 +651,9 @@ class BudgetSubmissionController extends Controller
                 $worksheetCheck
             );
 
-        $status_lengkap =
-            'Lengkap';
-
-        $status_verifikasi =
-            true;
+$status_lengkap = 'Lengkap';
+// Tetap 0 / false karena verifikasi pengesahan SPM adalah wewenang PPSPM
+$status_verifikasi = false;
 
         /*
          * Jika tidak ada dokumen.
@@ -750,8 +749,7 @@ class BudgetSubmissionController extends Controller
             Storage::disk('private')->exists(
                 $pengajuan->path_file_submission
             ) &&
-            $status_lengkap === 'Lengkap' &&
-            $status_verifikasi === true
+            $status_lengkap === 'Lengkap'
         ) {
             $this->addWatermarkToPdf(
                 $pengajuan->path_file_submission
@@ -764,34 +762,28 @@ class BudgetSubmissionController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        // Cek apakah metode pembayaran adalah LS SPM atau UP
+        $isLS = false;
+        if ($pengajuan->payment_method) {
+            $isLS = str_contains(strtoupper($pengajuan->payment_method->payment_method_name), 'LS');
+        }
+
+        // ATURAN ALUR:
+        // - Jika LS SPM: verification_status = 0 (harus ditandatangani PPSPM)
+        // - Jika UP Bendahara: verification_status = 1 (TIDAK PERLU PPSPM, langsung siap dicairkan Bendahara)
+        if ($status_lengkap === 'Lengkap') {
+            $status_verifikasi = $isLS ? 0 : 1;
+        } else {
+            $status_verifikasi = 0;
+        }
+
         $pengajuan->update([
-            'finance_officers_id' =>
-                Auth::id(),
-
-            'message' =>
-                $requestCatatan,
-
-            'requirements_status' =>
-                $status_lengkap,
-
-            'verification_status' =>
-                $status_verifikasi,
-
-            'is_marked' =>
-                (
-                    $status_lengkap === 'Lengkap' &&
-                    $status_verifikasi === true
-                )
-                    ? 1
-                    : 0,
-
-            'is_return' =>
-                (
-                    $status_lengkap === 'Lengkap' &&
-                    $status_verifikasi === true
-                )
-                    ? 0
-                    : 1,
+            'finance_officers_id' => Auth::id(),
+            'message'             => $requestCatatan,
+            'requirements_status' => $status_lengkap,
+            'verification_status' => $status_verifikasi,
+            'is_marked'           => ($status_lengkap === 'Lengkap') ? 1 : 0,
+            'is_return'           => ($status_lengkap === 'Lengkap') ? 0 : 1,
         ]);
 
         /*
@@ -800,101 +792,56 @@ class BudgetSubmissionController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (
-            $status_verifikasi === false
-        ) {
-            /*
-             * Dikembalikan ke pengaju.
-             */
+        if ($status_lengkap !== 'Lengkap') {
+            // Berkas belum lengkap -> kembalikan ke pengaju
             Notification::create([
-                'user_id' =>
-                    $pengajuan->user_id,
-
-                'title' =>
-                    'Pengajuan Dikembalikan',
-
-                'message' =>
-                    'Pengajuan Anda perlu perbaikan dokumen.',
-
-                'type' =>
-                    'warning',
-
-                'url' =>
-                    route(
-                        'pengajuan.show',
-                        $pengajuan->id
-                    ),
+                'user_id' => $pengajuan->user_id,
+                'title'   => 'Pengajuan Dikembalikan',
+                'message' => 'Pengajuan Anda perlu perbaikan dokumen.',
+                'type'    => 'warning',
+                'url'     => route('pengajuan.show', $pengajuan->id),
             ]);
         } else {
-            /*
-             * Berhasil diverifikasi Keuangan.
-             */
+            // Berkas Lengkap -> Notifikasi ke Pengaju
+            $pesanPengaju = $isLS 
+                ? 'Berkas telah diverifikasi Keuangan dan sedang diteruskan ke PPSPM untuk pengesahan SPM.'
+                : 'Berkas telah diverifikasi Keuangan dan langsung diteruskan ke Bendahara untuk pencairan.';
+
             Notification::create([
-                'user_id' =>
-                    $pengajuan->user_id,
-
-                'title' =>
-                    'Berkas Diverifikasi Keuangan',
-
-                'message' =>
-                    'Berkas pengajuan Anda telah ' .
-                    '<span class="font-semibold text-blue-600">' .
-                    'diverifikasi oleh Keuangan' .
-                    '</span> dan siap ke tahap berikutnya.',
-
-                'type' =>
-                    'success',
-
-                'url' =>
-                    route(
-                        'pengajuan.show',
-                        $pengajuan->id
-                    ),
+                'user_id' => $pengajuan->user_id,
+                'title'   => 'Berkas Diverifikasi Keuangan',
+                'message' => $pesanPengaju,
+                'type'    => 'success',
+                'url'     => route('pengajuan.show', $pengajuan->id),
             ]);
 
-            /*
-             * Notifikasi Bendahara.
-             */
-            $bendaharaUsers =
-                User::where(
-                    'role',
-                    'Bendahara'
-                )->get();
-
-            foreach (
-                $bendaharaUsers as $user
-            ) {
-                Notification::create([
-                    'user_id' =>
-                        $user->id,
-
-                    'title' =>
-                        'Pengajuan Siap Diverifikasi',
-
-                    /*
-                     * PERBAIKAN:
-                     * sebelumnya menggunakan pengajuan_name.
-                     * Kolom yang benar adalah
-                     * budget_submission_name.
-                     */
-                    'message' =>
-                        'Pengajuan "' .
-                        $pengajuan
-                            ->budget_submission_name .
-                        '" siap ditandatangani.',
-
-                    'type' =>
-                        'success',
-
-                    'url' =>
-                        route(
-                            'bendahara.sign',
-                            $pengajuan->id
-                        ),
-                ]);
+            if ($isLS) {
+                // JIKA LS SPM -> Teruskan notifikasi ke PPSPM
+                $ppspmUsers = User::where('role', 'PPSPM')->get();
+                foreach ($ppspmUsers as $user) {
+                    Notification::create([
+                        'user_id' => $user->id,
+                        'title'   => 'Pengajuan LS SPM Siap Divalidasi',
+                        'message' => 'Pengajuan LS "' . e($pengajuan->budget_submission_name) . '" telah disetujui Keuangan dan siap diterbitkan SPM.',
+                        'type'    => 'info',
+                        'url'     => route('validation.show', $pengajuan->id),
+                    ]);
+                }
+            } else {
+                // JIKA UP BENDAHARA -> Bypass PPSPM, langsung kirim notifikasi ke Bendahara
+                $bendaharaUsers = User::where('role', 'Bendahara')->get();
+                foreach ($bendaharaUsers as $bendahara) {
+                    Notification::create([
+                        'user_id' => $bendahara->id,
+                        'title'   => 'Pengajuan UP Siap Dicairkan',
+                        'message' => 'Pengajuan UP "' . e($pengajuan->budget_submission_name) . '" telah diverifikasi Keuangan dan siap diproses pencairan.',
+                        'type'    => 'info',
+                        'url'     => route('final.show', $pengajuan->id),
+                    ]);
+                }
             }
         }
-
+            
         return redirect()
             ->route(
                 'keuangan.dashboard'
@@ -904,7 +851,8 @@ class BudgetSubmissionController extends Controller
                 'Pemeriksaan pengajuan berhasil diselesaikan.'
             );
     }
-    }
+    
+    
 
     /*
     |--------------------------------------------------------------------------

@@ -334,6 +334,8 @@
                         </div>
 
 
+                        {{-- Tombol Tambah hanya untuk Admin & Bendahara --}}
+                        @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                         <a href="{{ route('cabinet.create') }}"
                             class="add-button inline-flex items-center justify-center gap-2 text-white font-bold px-6 py-3 rounded-xl group">
 
@@ -352,6 +354,7 @@
                             Tambah Kabinet
 
                         </a>
+                        @endif
 
                     </div>
 
@@ -366,204 +369,104 @@
             ========================================================== --}}
             @if ($cabinets->count() > 0)
 
-                <div class="cabinet-card rounded-3xl overflow-hidden animate-cabinet-list">
+                <div class="space-y-4 animate-cabinet-list">
 
                     @php
                         $no = 1;
                     @endphp
 
-
                     @foreach ($cabinets as $cabinet)
 
-                        <div class="cabinet-item group relative flex flex-col lg:flex-row lg:items-center lg:justify-between p-5 md:p-6 gap-5 {{ !$loop->last ? 'border-b border-gray-200' : '' }}">
+                        <div class="group relative bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 p-5 md:p-6 shadow-[0_8px_25px_-5px_rgba(0,58,143,0.08),0_4px_10px_-4px_rgba(0,58,143,0.04)] hover:shadow-[0_20px_35px_-5px_rgba(0,58,143,0.16)] hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
 
+                            {{-- AKSEN GLOW 3D DI KIRI --}}
+                            <div class="absolute left-0 top-3 bottom-3 w-1.5 bg-gradient-to-b from-[#003A8F] via-blue-500 to-indigo-600 rounded-r-full opacity-80 group-hover:opacity-100 group-hover:scale-y-105 transition-all duration-300"></div>
 
-                            {{-- =================================================
-                                LINK UTAMA
-                            ================================================== --}}
+                            {{-- LINK UTAMA --}}
                             <a href="{{ route('cabinet.show', $cabinet->id) }}"
-                                class="flex items-center gap-4 md:gap-5 flex-1 min-w-0">
+                                class="flex items-center gap-4 md:gap-5 flex-1 min-w-0 pl-1">
 
-
-                                {{-- NUMBER --}}
-                                <div class="relative flex-shrink-0">
-
-                                    <div class="number-box w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-2xl text-white font-extrabold text-lg md:text-xl transition-transform duration-200">
-
+                                {{-- NOMOR 3D CUBE GLOSSY --}}
+                                <div class="relative shrink-0">
+                                    <div class="w-13 h-13 md:w-14 md:h-14 flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#003A8F] via-[#0056C7] to-indigo-700 text-white font-black text-lg md:text-xl shadow-[0_8px_16px_rgba(0,58,143,0.3),inset_0_1px_1px_rgba(255,255,255,0.4)] group-hover:scale-105 group-hover:rotate-1 transition-all duration-300">
                                         {{ $no++ }}
-
                                     </div>
-
-
-                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm"></div>
-
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm ring-2 ring-emerald-400/20"></div>
                                 </div>
 
-
-
-                                {{-- INFO --}}
+                                {{-- INFORMASI KABINET --}}
                                 <div class="min-w-0 flex-1">
-
-                                    <div class="flex items-center gap-2">
-
-                                        <p class="text-gray-900 font-extrabold text-base md:text-lg group-hover:text-[#003A8F] transition-colors duration-200 truncate">
-
-                                            {{ $cabinet->cabinet_name }}
-
-                                        </p>
-
-                                    </div>
-
+                                    <h4 class="text-gray-900 font-extrabold text-base md:text-lg tracking-tight group-hover:text-[#003A8F] transition-colors duration-200 truncate">
+                                        {{ $cabinet->cabinet_name }}
+                                    </h4>
 
                                     <div class="flex flex-wrap items-center gap-2 mt-2">
-
-
-                                        {{-- CODE --}}
-                                        <span class="code-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold text-blue-800">
-
-                                            <svg class="w-4 h-4"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 6.414V19a2 2 0 01-2 2z" />
-
+                                        {{-- KODE KABINET --}}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50/80 border border-blue-200/80 text-xs md:text-sm font-bold text-blue-800 shadow-sm">
+                                            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 6.414V19a2 2 0 01-2 2z" />
                                             </svg>
-
-                                            {{ $cabinet->cabinet_code ?? 'Tidak ada kode' }}
-
+                                            {{ $cabinet->cabinet_code ?? 'Tanpa Kode' }}
                                         </span>
 
-
-
-                                        {{-- STATUS --}}
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold">
-
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-
+                                        {{-- STATUS AKTIF --}}
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-bold shadow-sm">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                             Aktif
-
                                         </span>
 
-
-                                        {{-- ACCESS --}}
-                                        <span class="inline-flex items-center gap-1.5 text-xs text-gray-400 font-medium">
-
-                                            <svg class="w-3.5 h-3.5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-
+                                        {{-- TERAKHIR DIAKSES --}}
+                                        <span class="hidden md:inline-flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-
                                             Terakhir diakses: Hari ini
-
                                         </span>
-
                                     </div>
-
                                 </div>
 
-
-
-                                {{-- ARROW --}}
-                                <div class="hidden sm:flex w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-blue-100 items-center justify-center flex-shrink-0 transition-all duration-200">
-
-                                    <svg class="w-5 h-5 text-gray-400 group-hover:text-[#003A8F] group-hover:translate-x-1 transition-all duration-200"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24">
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 5l7 7-7 7" />
-
+                                {{-- ARROW INTERAKTIF --}}
+                                <div class="hidden sm:flex w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-blue-600 items-center justify-center shrink-0 border border-slate-100 group-hover:border-blue-600 shadow-sm transition-all duration-300">
+                                    <svg class="w-5 h-5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
                                     </svg>
-
                                 </div>
-
                             </a>
 
-
-
-                            {{-- =================================================
-                                ACTION BUTTON
-                            ================================================== --}}
-                            <div class="flex items-center gap-2 ml-16 lg:ml-4">
-
-
+                            {{-- TOMBOL AKSI SEPERTI GAMBAR 2 --}}
+                            @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                            <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
                                 {{-- EDIT --}}
                                 <a href="{{ route('cabinet.edit', $cabinet->id) }}"
-                                    class="action-button flex items-center justify-center w-11 h-11 bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 rounded-xl shadow-md hover:shadow-lg"
+                                    class="w-10 h-10 inline-flex items-center justify-center bg-amber-50/70 border border-amber-300 text-amber-500 hover:bg-amber-500 hover:text-white hover:border-amber-500 rounded-xl transition duration-200 shadow-sm active:scale-95"
                                     title="Edit Kabinet">
-
-                                    <svg class="w-5 h-5 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24">
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M19.5 7.125L16.875 4.5" />
-
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
-
                                 </a>
-
-
 
                                 {{-- DELETE --}}
                                 <form action="{{ route('cabinet.destroy', $cabinet->id) }}"
                                     method="POST"
                                     onsubmit="return confirm('Yakin ingin menghapus kabinet ini?')">
-
                                     @csrf
                                     @method('DELETE')
-
                                     <button type="submit"
-                                        class="action-button flex items-center justify-center w-11 h-11 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-md hover:shadow-lg"
+                                        class="w-10 h-10 inline-flex items-center justify-center bg-red-50/70 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl transition duration-200 shadow-sm active:scale-95"
                                         title="Hapus Kabinet">
-
-                                        <svg class="w-5 h-5 text-white"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
-
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M6 7h12M9 7V4h6v3m-7 4v5m4-5v5m4-5v5M7 7l1 13h8l1-13" />
-
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
                                         </svg>
-
                                     </button>
-
                                 </form>
-
                             </div>
+                            @endif
 
-                        </div>
+                        </div>{{-- PENUTUP TAG cabinet-item --}}
 
                     @endforeach
 
                 </div>
-
-
 
                 {{-- =========================================================
                     PAGINATION
@@ -612,6 +515,7 @@
                     </p>
 
 
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                     <a href="{{ route('cabinet.create') }}"
                         class="add-button inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl">
 
@@ -630,6 +534,7 @@
                         Tambah Kabinet
 
                     </a>
+                    @endif
 
                 </div>
 

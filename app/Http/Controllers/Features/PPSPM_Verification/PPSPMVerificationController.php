@@ -25,13 +25,35 @@ class PPSPMVerificationController extends Controller
      */
     public function index()
     {
-        // $submit_sign = BudgetSubmission::where('is_archive', 0)->paginate(10, ['*'], 'submit_no_sign');
-        $my_proses = BudgetSubmission::where('requirements_status', 'Belum Lengkap')
+     // Tab 0: Semua Pengajuan (tanpa filter status)
+     $semua = BudgetSubmission::with(['user', 'payment_method'])
+         ->latest()
+         ->paginate(10, ['*'], 'semua');
+
+        // 1. Tab 1: Dokumen Menunggu Validasi PPSPM (HANYA jenis LS SPM)
+        $pengajuans = BudgetSubmission::where('requirements_status', 'Lengkap')
             ->where('verification_status', 0)
-            ->where('finance_officers_id', Auth::id())->latest()
-            ->paginate(5, ['*'], 'my_proses');
-        $pengajuans = BudgetSubmission::latest()->paginate(10, ['*'], 'all_submit');
-        return view('features.verifikasi_ppspm.list_verifikasi_ppspm', compact('pengajuans', 'my_proses'));
+            ->whereHas('payment_method', function ($q) {
+                $q->where('payment_method_name', 'LIKE', '%LS%');
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'all_submit');
+
+        // 2. Tab 2: Dokumen Telah Disahkan (HANYA riwayat LS SPM yang disahkan PPSPM)
+        $my_proses = BudgetSubmission::where('verification_status', 1)
+            ->where('is_archive', 0)
+            ->whereHas('payment_method', function ($q) {
+                $q->where('payment_method_name', 'LIKE', '%LS%');
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'my_proses');
+
+        // 3. Tab 3: Dokumen Sudah Selesai & Diarsipkan
+        $diarsipkan = BudgetSubmission::where('is_archive', 1)
+            ->latest()
+            ->paginate(10, ['*'], 'diarsipkan');
+
+        return view('features.verifikasi_ppspm.list_verifikasi_ppspm', compact('semua', 'pengajuans', 'my_proses', 'diarsipkan'));
     }
 
     /**
@@ -55,7 +77,7 @@ class PPSPMVerificationController extends Controller
      */
     public function show(string $id)
     {
-        $doc = BudgetSubmission::with('user')->findOrFail($id);
+        $doc = BudgetSubmission::with(['user', 'finance_officer', 'revenue_officer', 'payment_method', 'funding_source'])->findOrFail($id);
         $payment_method = PaymentMethod::all();
         $funding_source = FundingSource::all();
         $cabinets = Cabinet::all();
@@ -73,152 +95,100 @@ class PPSPMVerificationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) // untuk bagian verifikasi
+    public function update(Request $request, string $id) // untuk pengesahan SPM oleh PPSPM
     {
-        $doc = BudgetSubmission::findOrFail($id);
-        // $payment = PaymentMethod::findOrFail($request->payment_method);
-        // $funding = FundingSource::findOrFail($request->funding_source);
+        $doc = BudgetSubmission::with('payment_method')->findOrFail($id);
 
+        // Blokir: Hanya dokumen LS SPM yang boleh disahkan oleh PPSPM
+        $isLS = $doc->payment_method && str_contains(strtoupper($doc->payment_method->payment_method_name), 'LS');
+        if (!$isLS) {
+            return redirect()
+                ->route('validation.index')
+                ->with('error', 'Pengajuan dengan metode pembayaran UP tidak memerlukan pengesahan PPSPM dan sudah langsung diteruskan ke Bendahara.');
+        }
+
+        // Simpan file baru jika PPSPM mengunggah file bertanda tangan
         if ($request->hasFile('file_pengajuan')) {
             $request->validate([
                 'file_pengajuan' => 'mimes:pdf|max:51200|nullable',
             ]);
 
             if ($doc->path_file_submission && Storage::disk('private')->exists($doc->path_file_submission)) {
-
                 Storage::disk('private')->delete($doc->path_file_submission);
-
-                $file = $request->file('file_pengajuan');
-                $fileName = time() . ' ' . $file->getClientOriginalName();
-                $path = $file->storeAs('pengajuan', $fileName, 'private');
             }
+
+            $file = $request->file('file_pengajuan');
+            $fileName = time() . ' ' . $file->getClientOriginalName();
+            $path = $file->storeAs('pengajuan', $fileName, 'private');
         } else {
             $path = $doc->path_file_submission;
         }
 
-        // === TAMBAH WATERMARK DENGAN NOMOR KUITANSI ===
-        if (Storage::disk('private')->exists($path)) {
-            $noKuitansi = $doc->user->role . ' ' . $request->kuitansi;
-            $this->addWatermarkWithKuitansiToPdf($path, $noKuitansi);
-        }
+        // 1. Fitur Stempel TTE & QR dinonaktifkan (menggunakan QR bawaan dokumen Simkeu)
+        // if ($path && Storage::disk('private')->exists($path)) {
+        //     $this->addQrCodeSignatureToPdf($path, $doc, Auth::user()->name);
+        // }
 
-        $payment = PaymentMethod::findOrFail($request->payment_method);
-        $funding = FundingSource::findOrFail($request->funding_source);
-        $year = now()->year;
-        // ========== CARI CATEGORY ==========
-        $category = Category::with('payment_method')->with('funding_source')
-            ->where('cabinet_id', $request->cabinet_id)
-            ->where('year', $year)
-            ->whereRelation('payment_method', 'id', $payment->id)
-            ->whereRelation('funding_source', 'id', $funding->id)
-            ->first();
+        // 2. Update status: Pengesahan SPM resmi oleh PPSPM (verification_status = 1)
+        $doc->update([
+            'path_file_submission'    => $path,
+            'assigned_payment_method' => $request->payment_method ?? $doc->assigned_payment_method,
+            'assigned_funding_source' => $request->funding_source ?? $doc->assigned_funding_source,
+            'nominal'                 => $request->biaya ?? $doc->nominal,
+            'verification_status'     => 1, // DISAHKAN OLEH PPSPM
+        ]);
 
-        $idcategory = $category?->id;
-
-        // ========== VALIDASI ==========
-        if (!$idcategory) {
-            return redirect()->back()->with(
-                'error',
-                'Gagal mengarsipkan. Kategori arsip tidak ditemukan untuk Payment atau Funding.'
-            );
-        }
-
-        // === COPY FILE KE FOLDER ARCHIVE ===
-        if (Storage::disk('private')->exists($path)) {
-            $newPath = 'archive/' . basename($path);
-            Storage::disk('private')->copy($path, $newPath);
-        } else {
-            return redirect()->back()->with('error', 'File pengajuan tidak ditemukan');
-        }
-
-        //Notifikasi
+        // 1. Notifikasi ke Pengaju bahwa SPM telah disahkan
         Notification::create([
             'user_id' => $doc->user_id,
-            'title' => 'Pengajuan Disetujui',
-            'message' => 'Pengajuan Anda telah <span class="font-semibold text-green-600">lengkap dan ditandatangani Bendahara</span>.',
-            'type' => 'success',
-            'url' => route('submit.show', $doc->id),
+            'title'   => 'SPM Disahkan PPSPM',
+            'message' => 'Pengajuan Anda telah <span class="font-semibold text-green-600">disahkan oleh PPSPM</span> dan siap dicairkan oleh Bendahara.',
+            'type'    => 'success',
+            'url'     => route('submit.show', $doc->id),
         ]);
 
-        // digital arsip
-        // create digital archive
-        $digital = DigitalArchive::create([
-            'category_id' => $idcategory,
-            'archive_name' => $doc->budget_submission_name,
-            'from_division' => $doc->user->role,
-            'submiter_name' => $doc->user->name,
-            'finance_officer_name' => Auth::user()->name,
-            'revenue_officer_name' => Auth::user()->name,
-            'file_path_archive' => $newPath,
-            'archive_code' => $request->kuitansi,
-            'nominal' => $request->biaya,
-            'archive_by' => Auth::user()->name,
-            'disposal_date' => Carbon::now()->addYear(5),
-            'no_spby' => $request->no_spby,
-        ]);
+        // 2. Notifikasi ke Bendahara untuk Pencairan Dana
+        $bendaharaUsers = User::where('role', 'Bendahara')->get();
+        foreach ($bendaharaUsers as $bendahara) {
+            Notification::create([
+                'user_id' => $bendahara->id,
+                'title'   => 'Pengajuan Siap Dicairkan',
+                'message' => 'Pengajuan "' . e($doc->budget_submission_name) . '" telah disahkan PPSPM dan siap diproses.',
+                'type'    => 'info',
+                'url'     => route('final.show', $doc->id),
+            ]);
+        }
 
-        $adminUsers = User::where('role', 'Admin')->get();
-foreach ($adminUsers as $admin) {
-    Notification::create([
-        'user_id' => $admin->id,
-        'title'   => 'Arsip Digital Baru Tersimpan',
-        'message' => 'Pengajuan <span class="font-semibold text-green-600">' . e($doc->budget_submission_name) . '</span> telah divalidasi PPSPM dan masuk ke Arsip Digital.',
-        'type'    => 'success',
-        'url'     => route('digital.show', $digital->id),
-    ]);
-}
-
-        $doc->update([
-            'revenue_officer_id' => Auth::id(),
-            'path_file_submission' => $path,
-            'assigned_payment_method' => $request->payment_method,
-            'assigned_funding_source' => $request->funding_source,
-            'verification_status' => 1,
-            'requirements_status' => 'Lengkap',
-            'nominal' => $request->biaya,
-            'is_archive' => 1,
-            'digital_archive_id' => $digital->id,
-        ]);
-
-        return redirect()->route('validation.index')->with('success', 'Berhasil kirim tanggapan');
+        return redirect()->route('validation.index')->with('success', 'Dokumen berhasil disahkan dan SPM diteruskan ke Bendahara.');
     }
 
-    public function return(string $id) // kembalikan dokumen
+    public function return(Request $request, string $id) // kembalikan dokumen dengan catatan
     {
-        $affected = BudgetSubmission::where('id', $id)
-            ->where(function ($q) {
-                $q->whereNull('finance_officers_id')
-                    ->orWhere('finance_officers_id', Auth::id());
-            })
-            ->update([
-                'finance_officers_id' => Auth::id(),
-            ]);
-
-        if ($affected === 0) {
-            return redirect()
-                ->route('keuangan.dashboard')
-                ->with('error', 'Pengajuan ini sedang diperiksa oleh petugas keuangan lain');
-        }
+        $request->validate([
+            'catatan' => 'required|string|max:500',
+        ]);
 
         $doc = BudgetSubmission::findOrFail($id);
+
+        // Update status pengembalian berkas revisi oleh PPSPM
         $doc->update([
-            'finance_officers_id' => Auth::user()->id,
-            // 'message' => $request->catatan,
+            'message'             => $request->catatan, // Simpan catatan revisi dari PPSPM
             'requirements_status' => 'Belum Lengkap',
             'verification_status' => 0,
-            'is_marked' => 0,
-            'is_return' => 1,
+            'is_marked'           => 0,
+            'is_return'           => 1,                 // Tandai sebagai status revisi/dikembalikan
         ]);
 
+        // Kirim notifikasi ke Unit Pengaju
         Notification::create([
             'user_id' => $doc->user_id,
-            'title' => 'Dokumen Dikembalikan',
-            'message' => 'Dokumen Anda perlu perbaikan dokumen.',
-            'type' => 'warning',
-            'url' => route('submit.show', $doc->id),
+            'title'   => 'Dokumen Perlu Revisi dari PPSPM',
+            'message' => 'Catatan dari PPSPM: "' . e($request->catatan) . '"',
+            'type'    => 'warning',
+            'url'     => route('submit.show', $doc->id),
         ]);
 
-        return redirect()->route('validation.index')->with('success', 'Berhasil kirim tanggapan');
+        return redirect()->route('validation.index')->with('success', 'Dokumen berhasil dikembalikan ke pengaju dengan catatan revisi.');
     }
 
 
@@ -361,5 +331,111 @@ foreach ($adminUsers as $admin) {
         $mpdf->Output($fullPath, 'F');
 
         Log::info('Watermark dengan kuitansi PDF berhasil: ' . $filePath . ' | Kuitansi: ' . $kuitansi);
+    }
+        /**
+     * Menampilkan halaman publik info keaslian dokumen saat QR Code di-scan kamera HP
+     */
+    public function verify_public(string $id)
+    {
+        $doc = BudgetSubmission::with(['user', 'finance_officer'])->findOrFail($id);
+        return view('features.verifikasi_ppspm.verify_public', compact('doc'));
+    }
+
+    /**
+     * Menempelkan Stempel TTE Digital & QR Code resmi di sudut kanan bawah halaman terakhir PDF
+     */
+    private function addQrCodeSignatureToPdf(string $filePath, BudgetSubmission $doc, string $ppspmName): void
+    {
+        $fullPath = Storage::disk('private')->path($filePath);
+        $tempFixedPath = $fullPath . '_fixed.pdf';
+
+        // Ratakan layer PDF dengan Ghostscript agar kompatibel dengan mPDF
+        $gsBinary = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'gswin64c' : 'gs';
+        $command = "{$gsBinary} -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -dPreserveAnnots=false -dShowAnnots=true -dPDFSETTINGS=/prepress -sOutputFile=" . escapeshellarg($tempFixedPath) . " " . escapeshellarg($fullPath) . " 2>&1";
+        shell_exec($command);
+
+        if (file_exists($tempFixedPath)) {
+            rename($tempFixedPath, $fullPath);
+        }
+
+        // Dapatkan gambar QR Code dari URL verifikasi
+        $verifyUrl = route('spm.verify', $doc->id);
+        $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($verifyUrl);
+
+        $ch = curl_init($qrApiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        $qrBinary = curl_exec($ch);
+        curl_close($ch);
+
+        $tempQrPath = sys_get_temp_dir() . '/qr_' . $doc->id . '.png';
+        if ($qrBinary) {
+            file_put_contents($tempQrPath, $qrBinary);
+        }
+
+        // Buka PDF dan tempelkan stempel TTE
+        $mpdf = new Mpdf([
+            'tempDir' => storage_path('app/mpdf'),
+        ]);
+
+        $pageCount = $mpdf->SetSourceFile($fullPath);
+
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $tplId = $mpdf->ImportPage($pageNo);
+            $size = $mpdf->GetTemplateSize($tplId);
+
+            $mpdf->AddPageByArray([
+                'orientation' => $size['orientation'],
+                'width'       => $size['width'],
+                'height'      => $size['height'],
+            ]);
+            $mpdf->UseTemplate($tplId);
+
+            // Tempelkan kotak stempel TTE HANYA di halaman terakhir
+            if ($pageNo === $pageCount && file_exists($tempQrPath)) {
+                $stampWidth = 65;
+                $stampHeight = 22;
+                $x = $size['width'] - $stampWidth - 10;
+                $y = $size['height'] - $stampHeight - 12;
+
+                // Box Border Biru Navy TVRI
+                $mpdf->SetDrawColor(0, 58, 143);
+                $mpdf->SetLineWidth(0.3);
+                $mpdf->Rect($x, $y, $stampWidth, $stampHeight, 'D');
+
+                // Gambar QR Code
+                $qrSize = 18;
+                $mpdf->Image($tempQrPath, $x + 2, $y + 2, $qrSize, $qrSize, 'png');
+
+                // Teks Pengesahan Digital
+                $mpdf->SetFont('Arial', 'B', 6);
+                $mpdf->SetTextColor(0, 58, 143);
+                $mpdf->SetXY($x + $qrSize + 4, $y + 3);
+                $mpdf->Cell($stampWidth - $qrSize - 5, 3, 'DIVERIFIKASI ELEKTRONIK', 0, 1, 'L');
+
+                $mpdf->SetFont('Arial', '', 5);
+                $mpdf->SetTextColor(50, 50, 50);
+                $mpdf->SetX($x + $qrSize + 4);
+                $mpdf->Cell($stampWidth - $qrSize - 5, 3, 'PPSPM TVRI KALSEL', 0, 1, 'L');
+
+                $mpdf->SetX($x + $qrSize + 4);
+                $mpdf->Cell($stampWidth - $qrSize - 5, 3, 'Oleh: ' . substr($ppspmName, 0, 22), 0, 1, 'L');
+
+                $mpdf->SetX($x + $qrSize + 4);
+                $mpdf->Cell($stampWidth - $qrSize - 5, 3, 'Tgl: ' . now()->translatedFormat('d/m/Y H:i') . ' WITA', 0, 1, 'L');
+
+                $mpdf->SetFont('Arial', 'I', 4.5);
+                $mpdf->SetTextColor(120, 120, 120);
+                $mpdf->SetX($x + $qrSize + 4);
+                $mpdf->Cell($stampWidth - $qrSize - 5, 3, 'Scan QR cek keaslian berkas', 0, 1, 'L');
+            }
+        }
+
+        $mpdf->Output($fullPath, 'F');
+
+        if (file_exists($tempQrPath)) {
+            @unlink($tempQrPath);
+        }
     }
 }

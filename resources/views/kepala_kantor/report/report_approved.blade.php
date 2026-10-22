@@ -124,11 +124,16 @@
             Kepala Kantor
         </p>
 
-        <br><br>
+        @php
+            $ttdPath = storage_path('app/public/images/ttd_kepala.png');
+        @endphp
 
-        <img src="{{ storage_path('app/public/images/ttd_kepala.png') }}" width="120">
-
-        <br><br>
+        @if(file_exists($ttdPath))
+            <img src="{{ $ttdPath }}" width="120" style="margin: 10px auto;">
+        @else
+            {{-- Spasi kosong rapi jika belum ada gambar tanda tangan --}}
+            <br><br><br><br>
+        @endif
 
         <strong>{{ Auth::user()->name }}</strong><br>
         {{ Auth::user()->role }}

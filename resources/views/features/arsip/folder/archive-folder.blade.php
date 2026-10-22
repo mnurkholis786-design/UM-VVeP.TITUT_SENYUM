@@ -84,6 +84,7 @@
                         </div>
                     </div>
 
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                     <form action="{{route('folder.create')}}">
                         <input type="text" name="rack_id" value="{{$rack->id}}" class="hidden">
                         <button type="submit" class="inline-flex items-center gap-2 px-4 py-2
@@ -100,6 +101,7 @@
                         Tambah Folder Arsip
                         </button>
                     </form>
+                    @endif
 
                     {{-- TOMBOL TAMBAH --}}
                     {{-- <a href="{{ route('folder.create', $rack->id) }}"
@@ -183,6 +185,7 @@
                                         </div>
                                     </a>
 
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- AKSI --}}
                                     <div class="flex items-center gap-2 ml-4">
                                         <a href="{{ route('folder.edit', $folder->id) }}"
@@ -206,6 +209,7 @@
                                             </button>
                                         </form>
                                     </div>
+                                    @endif
                                 </div>
                             @endif
                         @endforeach

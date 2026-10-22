@@ -22,7 +22,7 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $id = $request->id_cabinet;
+        $id = $request->id_cabinet ?? $request->cabinet_id;
         $cabinet = Cabinet::findOrFail($id);
         $result = Category::where('cabinet_id', $cabinet->id)->get();
 

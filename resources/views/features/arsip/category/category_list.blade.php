@@ -512,8 +512,8 @@
                         </div>
 
 
-                        {{-- TAMBAH CATEGORY --}}
-
+                        {{-- TAMBAH CATEGORY HANYA ADMIN & BENDAHARA --}}
+                        @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                         <form action="{{ route('category.create') }}"
                             method="GET">
 
@@ -522,12 +522,12 @@
                                 value="{{ $cabinet->id }}">
 
                             <button type="submit"
-                                class="add-button inline-flex items-center
-                                justify-center gap-2
-                                px-5 py-3 rounded-xl
-                                text-white font-bold text-sm">
+                                class="add-button
+                                    inline-flex items-center justify-center gap-2
+                                    text-white font-bold px-6 py-3 rounded-xl
+                                    shadow-md group">
 
-                                <svg class="w-5 h-5"
+                                <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -544,6 +544,7 @@
                             </button>
 
                         </form>
+                        @endif
 
                     </div>
 
@@ -689,8 +690,8 @@
                             </a>
 
 
-                            {{-- AKSI --}}
-
+                            {{-- AKSI (HANYA MUNCUL UNTUK ADMIN & BENDAHARA) --}}
+                            @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                             <div class="category-actions
                                 flex items-center gap-2 md:justify-center
                                 ml-0 md:ml-0">
@@ -740,10 +741,10 @@
                                             stroke="currentColor"
                                             viewBox="0 0 24 24">
 
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M6 7h12M9 7V5.5A1.5 1.5 0 0110.5 4h3A1.5 1.5 0 0115 5.5V7m-7 0l.7 12a1.5 1.5 0 001.5 1.5h3.6a1.5 1.5 0 001.5-1.5L16 7M10 11v5M14 11v5" />
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M6 7h12M9 7V5.5A1.5 1.5 0 0110.5 4h3A1.5 1.5 0 0115 5.5V7m-7 0l.7 12a1.5 1.5 0 001.5 1.5h3.6a1.5 1.5 0 001.5-1.5L16 7M10 11v5M14 11v5" />
 
                                         </svg>
 
@@ -752,7 +753,7 @@
                                 </form>
 
                             </div>
-
+                            @endif
                         </div>
 
                     @endforeach
@@ -806,6 +807,7 @@
                         </p>
 
 
+                        @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                         <form action="{{ route('category.create') }}"
                             method="GET"
                             class="mt-6">
@@ -836,6 +838,7 @@
                             </button>
 
                         </form>
+                        @endif
 
                     </div>
 

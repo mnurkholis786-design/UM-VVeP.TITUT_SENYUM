@@ -209,6 +209,12 @@ class DigitalArchiveController extends Controller
      */
     public function edit(string $id)
     {
+        // Blokir: Hanya Kepala Kantor TVRI yang dilarang mengedit arsip digital
+        if (Auth::user()->role === 'Kepala Kantor TVRI') {
+            return redirect()->route('digital.show', $id)
+                ->with('error', 'Akses ditolak: Anda hanya memiliki hak membaca (read-only) arsip.');
+        }
+
         $digital = DigitalArchive::findOrFail($id);
         $kategoriList = DigitalArchive::KATEGORI_LIST;
 
@@ -424,7 +430,29 @@ class DigitalArchiveController extends Controller
     public function exportReportPdf(Request $request, string $id)
     {
         $category = Category::findOrFail($id);
-        $query = DigitalArchive::where('category_id', $category->id);
+
+        // ================= LOGIKA PILIH SEMUA ATAU 1 SUB KATEGORI =================
+        if ($request->input('sub_category_id') === 'all') {
+            // Ambil semua ID sub kategori yang ada di bawah kategori dan tahun ini
+            $allCategoryIds = Category::where('category_name', $category->category_name)
+                ->where('year', $category->year)
+                ->pluck('id');
+
+            $query = DigitalArchive::whereIn('category_id', $allCategoryIds);
+            $subKategoriNama = 'Semua Sub Kategori (' . ($category->category_name ?? 'UP Bendahara') . ')';
+        } elseif ($request->filled('sub_category_id')) {
+            // Ambil 1 sub kategori spesifik yang dipilih dari dropdown (KKP RM / TUP RM / dll)
+            $selectedSub = Category::find($request->sub_category_id);
+            $targetId = $selectedSub ? $selectedSub->id : $category->id;
+
+            $query = DigitalArchive::where('category_id', $targetId);
+            $subKategoriNama = $selectedSub ? $selectedSub->sub_category : ($category->sub_category ?? '-');
+        } else {
+            // Default (hanya sub kategori aktif saat ini)
+            $query = DigitalArchive::where('category_id', $category->id);
+            $subKategoriNama = $category->sub_category ?? '-';
+        }
+        // ===========================================================================
 
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('created_at', '>=', $request->tanggal_mulai);
@@ -447,7 +475,6 @@ class DigitalArchiveController extends Controller
         $periodeMulai = $request->filled('tanggal_mulai') ? \Carbon\Carbon::parse($request->tanggal_mulai)->format('d/m/Y') : 'Awal';
         $periodeSelesai = $request->filled('tanggal_selesai') ? \Carbon\Carbon::parse($request->tanggal_selesai)->format('d/m/Y') : 'Sekarang';
         $judulLaporan = 'LAPORAN ' . strtoupper($category->category_name ?? 'UP BENDAHARA');
-        $subKategoriNama = $category->sub_category ?? '-';
 
         // Menggunakan view laporan-arsip yang sudah ada di folder resources/views/features/arsip/pdf/
         $pdf = Pdf::loadView('features.arsip.pdf.laporan-arsip', compact('archives', 'category', 'periodeMulai', 'periodeSelesai', 'judulLaporan', 'subKategoriNama'));
@@ -466,7 +493,20 @@ class DigitalArchiveController extends Controller
     public function exportReportExcel(Request $request, string $id)
     {
         $category = Category::findOrFail($id);
-        $query = DigitalArchive::where('category_id', $category->id);
+
+        // Dukung export Semua Sub Kategori pada Excel
+        if ($request->input('sub_category_id') === 'all') {
+            $allCategoryIds = Category::where('category_name', $category->category_name)
+                ->where('year', $category->year)
+                ->pluck('id');
+            $query = DigitalArchive::whereIn('category_id', $allCategoryIds);
+        } elseif ($request->filled('sub_category_id')) {
+            $selectedSub = Category::find($request->sub_category_id);
+            $targetId = $selectedSub ? $selectedSub->id : $category->id;
+            $query = DigitalArchive::where('category_id', $targetId);
+        } else {
+            $query = DigitalArchive::where('category_id', $category->id);
+        }
 
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('created_at', '>=', $request->tanggal_mulai);
@@ -483,6 +523,29 @@ class DigitalArchiveController extends Controller
         if ($request->filled('divisi')) {
             $query->where('submiter_name', 'like', '%' . $request->divisi . '%');
         }
+
+        // --- TAMBAHKAN KODE INI DI SINI ---
+        $categoryChildren = [
+            'AEC'    => ['AEC.001'],
+            'BAH'    => ['BAH.001', 'BAH.002', 'BAH.003'],
+            'CBR'    => ['CBR.001'],
+            'CBT'    => ['CBT.002'],
+            'CDS OP' => ['CDS.001', 'CDS.002', 'CDS.003'],
+            'EBA'    => ['EBA.994'],
+            'WA'     => ['WA.4376'],
+        ];
+
+        if ($request->filled('sub_category')) {
+            $query->where('kategori', $request->sub_category);
+        } elseif ($request->filled('category')) {
+            $selectedCat = $request->category;
+            if (isset($categoryChildren[$selectedCat])) {
+                $query->whereIn('kategori', $categoryChildren[$selectedCat]);
+            } else {
+                $query->where('kategori', $selectedCat);
+            }
+        }
+        // ----------------------------------
 
         $archives = $query->orderBy('kategori')->orderBy('created_at')->get();
 
@@ -635,6 +698,85 @@ class DigitalArchiveController extends Controller
         $categoryName = $category->category_name ?? $category->name ?? 'arsip';
         $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . '.xlsx';
 
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(
+            function () use ($writer) {
+                $writer->save('php://output');
+            },
+            $fileName,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
+    }
+
+    /**
+     * Export detail arsip digital satuan ke Excel.
+     */
+    public function export(string $id)
+    {
+        $archive = DigitalArchive::findOrFail($id);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Detail Arsip Digital');
+
+        $rows = [
+            ['Nama Archive', $archive->archive_name ?? '-'],
+            ['Kode Arsip', $archive->archive_code ?? '-'],
+            ['Divisi Asal', $archive->from_division ?? '-'],
+            ['Kode Klasifikasi', $archive->kode_klasifikasi ?? '-'],
+            ['Indeks 1', $archive->indeks1 ?? '-'],
+            ['Indeks 2', $archive->indeks2 ?? '-'],
+            ['No Item', $archive->no_item ?? '-'],
+            ['Nominal', $archive->nominal ? 'Rp ' . number_format($archive->nominal, 0, ',', '.') : '-'],
+            ['Uraian', $archive->uraian ?? '-'],
+            ['No SPBy', $archive->no_spby ?? '-'],
+            ['No SPM', $archive->no_spm ?? '-'],
+            ['Jenis SPM', $archive->jenis_spm ?? '-'],
+            ['No SP2D', $archive->no_sp2d ?? '-'],
+            ['Nilai SP2D', $archive->nilai_sp2d ? 'Rp ' . number_format($archive->nilai_sp2d, 0, ',', '.') : '-'],
+            ['Jenis SP2D', $archive->jenis_sp2d ?? '-'],
+            ['Tanggal SP2D', $archive->tgl_sp2d ? \Carbon\Carbon::parse($archive->tgl_sp2d)->format('d F Y') : '-'],
+            ['Tanggal Selesai SP2D', $archive->tgl_selesai_sp2d ? \Carbon\Carbon::parse($archive->tgl_selesai_sp2d)->format('d F Y') : '-'],
+            ['No Invoice', $archive->no_invoice ?? '-'],
+            ['Tanggal Invoice', $archive->tgl_invoice ? \Carbon\Carbon::parse($archive->tgl_invoice)->format('d F Y') : '-'],
+            ['Tanggal Terima', $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->format('d F Y') : '-'],
+            ['Tingkat Pertimbangan', $archive->tingkat_pertimbangan ?? '-'],
+            ['Jumlah Halaman', $archive->jumlah_halaman ? $archive->jumlah_halaman . ' lembar' : '-'],
+            ['Retensi Arsip Aktif', $archive->retensi_arsip_aktif ? $archive->retensi_arsip_aktif . ' tahun' : '-'],
+            ['Retensi Arsip Inaktif', $archive->retensi_arsip_inaktif ? $archive->retensi_arsip_inaktif . ' tahun' : '-'],
+            ['Nasib Akhir Arsip', $archive->nasib_akhir_arsip ?? '-'],
+            ['Klasifikasi Keamanan', $archive->klasifikasi_keamanan ?? '-'],
+            ['Status', $archive->status ?? '-'],
+            ['Tanggal Pembuangan', $archive->disposal_date ? \Carbon\Carbon::parse($archive->disposal_date)->format('d F Y') : '-'],
+            ['Pengaju', $archive->submiter_name ?? '-'],
+            ['Divisi Keuangan', $archive->finance_officer_name ?? '-'],
+            ['Bendahara', $archive->revenue_officer_name ?? '-'],
+            ['Keterangan', $archive->keterangan ?? '-'],
+            ['Lokasi Simpan Server', $archive->lokasi_simpan_server ?? '-'],
+        ];
+
+        $sheet->setCellValue('A1', 'Field');
+        $sheet->setCellValue('B1', 'Nilai');
+        $sheet->getStyle('A1:B1')->getFont()->setBold(true);
+
+        $rowNumber = 2;
+        foreach ($rows as $row) {
+            $sheet->setCellValue('A' . $rowNumber, $row[0]);
+            $sheet->setCellValue('B' . $rowNumber, $row[1]);
+            $rowNumber++;
+        }
+
+        $sheet->getColumnDimension('A')->setWidth(25);
+        $sheet->getColumnDimension('B')->setWidth(40);
+
+        $safeCode = $archive->archive_code
+            ? str_replace(['/', '\\'], '-', $archive->archive_code)
+            : $archive->id;
+
+        $fileName = 'arsip-digital-' . $safeCode . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(

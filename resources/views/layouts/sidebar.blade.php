@@ -344,13 +344,13 @@ if ($role === 'Admin') {
                         'href' => $roleInputArsip,
                         'icon' => $icons['Input Arsip']
                     ],
-
                     [
                         'label' => 'Notifikasi',
                         'href' => $notificationRoute,
                         'icon' => $icons['Notifikasi'],
                         'badge' => $unreadCount
                     ],
+
                 ];
 
             } elseif ($role === 'Kepala Kantor TVRI') {
@@ -367,6 +367,13 @@ if ($role === 'Admin') {
                         'label' => 'Arsip',
                         'href' => $roleInputArsip,
                         'icon' => $icons['Input Arsip']
+                    ],
+
+                    [
+                        'label' => 'Notifikasi',
+                        'href' => $notificationRoute,
+                        'icon' => $icons['Notifikasi'],
+                        'badge' => $unreadCount
                     ],
 
                     [

@@ -170,16 +170,6 @@ class SubmissionController extends Controller
             ]);
         }
 
-        foreach ($keuanganUsers as $user) {
-    Notification::create([
-        'user_id' => $user->id,
-        'title' => 'Pengajuan Baru',
-        'message' => $message,
-        'type' => 'info',
-        'url' => route('verification.show', $pengajuan->id),
-    ]);
-}
-
 // TAMBAHKAN KODE INI (Notifikasi Monitoring ke Admin):
 $adminUsers = User::where('role', 'Admin')->get();
 foreach ($adminUsers as $admin) {
@@ -256,10 +246,6 @@ foreach ($adminUsers as $admin) {
             $documentRows = [];
             for ($row = 7; $row < $catatanRow; $row++) {
                 $namaDokumen = trim((string) $worksheet->getCell("C{$row}")->getValue());
-
-                if (strtolower($namaDokumen) === 'routing slip') {
-                    continue;
-                }
 
                 if ($namaDokumen !== '') {
                     $documentRows[] = $row;

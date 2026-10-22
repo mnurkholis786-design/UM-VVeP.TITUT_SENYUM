@@ -31,9 +31,19 @@ class KepalaController extends Controller
 
     public function report_aktif(Request $request)
     {
-        $arsip = DigitalArchive::where('status', 'Aktif')
-            ->whereBetween('updated_at', [$request->from_date, $request->target_date])
-            ->get();
+        $query = DigitalArchive::where(function ($q) {
+            $q->where('status', 'Aktif')
+              ->orWhereNull('status');
+        });
+
+        if ($request->filled('from_date') && $request->filled('target_date')) {
+            $query->whereBetween('created_at', [
+                $request->from_date . ' 00:00:00',
+                $request->target_date . ' 23:59:59'
+            ]);
+        }
+
+        $arsip = $query->get();
 
         $data = [
             'title' => 'Laporan Arsip Aktif',

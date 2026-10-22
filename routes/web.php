@@ -229,7 +229,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         [PPSPMController::class, 'index']
     )->name('PPSPM.dashboard');
 
-
     /*
     |--------------------------------------------------------------------------
     | USER DASHBOARD
@@ -414,7 +413,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         PPSPMVerificationController::class
     );
 
-
+    // Halaman Verifikasi Publik saat QR Code di-scan kamera HP
+    Route::get(
+        '/verifikasi/spm/{id}',
+        [PPSPMVerificationController::class, 'verify_public']
+    )->name('spm.verify');
+    
     /*
     |--------------------------------------------------------------------------
     | FILE ACCESS
@@ -638,26 +642,29 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get(
-    '/user/monitor',
-    [SubmissionController::class, 'monitor']
-)->name('user.monitoring');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::get(
-    '/user/report',
-    [UserController::class, 'report']
-)->name('user.report');
+    Route::get(
+        '/user/monitor',
+        [SubmissionController::class, 'monitor']
+    )->name('user.monitoring');
 
-Route::get(
-    '/user/report/laporan_pengajuan',
-    [UserController::class, 'report_submission']
-)->name('laporan.user.pengajuan');
+    Route::get(
+        '/user/report',
+        [UserController::class, 'report']
+    )->name('user.report');
 
-Route::get(
-    '/user/report/laporan_pengajuan_nominal',
-    [UserController::class, 'report_submit_nominal']
-)->name('laporan.user.pengajuan_nominal');
+    Route::get(
+        '/user/report/laporan_pengajuan',
+        [UserController::class, 'report_submission']
+    )->name('laporan.user.pengajuan');
 
+    Route::get(
+        '/user/report/laporan_pengajuan_nominal',
+        [UserController::class, 'report_submit_nominal']
+    )->name('laporan.user.pengajuan_nominal');
+
+});
 
 /*
 |--------------------------------------------------------------------------

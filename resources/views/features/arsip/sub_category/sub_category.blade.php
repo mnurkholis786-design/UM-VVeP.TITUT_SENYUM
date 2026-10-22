@@ -218,25 +218,22 @@
                         </div>
 
 
-                        {{-- ADD BUTTON --}}
-                        <form action="{{ route('subcategory.create') }}" method="GET">
-
-                            @csrf
+                        {{-- TAMBAH SUB CATEGORY (HANYA MUNCUL UNTUK ADMIN & BENDAHARA) --}}
+                        @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                        <form action="{{ route('subcategory.create') }}"
+                            method="GET">
 
                             <input type="hidden"
                                 name="category_id"
                                 value="{{ $category->id }}">
 
                             <button type="submit"
-                                class="group inline-flex items-center justify-center gap-2
+                                class="group relative inline-flex items-center gap-2
                                        px-5 py-2.5
-                                       bg-gradient-to-r from-emerald-500 to-teal-600
-                                       hover:from-emerald-600 hover:to-teal-700
-                                       text-white font-semibold
-                                       rounded-xl
-                                       shadow-lg shadow-emerald-500/20
-                                       hover:shadow-xl hover:shadow-emerald-500/30
-                                       hover:-translate-y-0.5
+                                       bg-emerald-600 hover:bg-emerald-700
+                                       text-white text-sm font-semibold
+                                       rounded-xl shadow-md shadow-emerald-600/20
+                                       hover:shadow-lg hover:shadow-emerald-600/30
                                        active:scale-95
                                        transition-all duration-200">
 
@@ -259,6 +256,7 @@
                             </button>
 
                         </form>
+                        @endif
 
                     </div>
 
@@ -280,161 +278,67 @@
 
                                 @continue(is_null($subcategory->sub_category))
 
-                                <div class="group relative overflow-hidden
-                                            bg-white
-                                            border border-gray-200
-                                            rounded-2xl
-                                            shadow-sm
-                                            hover:shadow-xl hover:shadow-blue-100/60
-                                            hover:border-blue-200
-                                            hover:-translate-y-0.5
-                                            transition-all duration-300">
+                                <div class="group relative overflow-hidden bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-[0_8px_20px_-4px_rgba(0,58,143,0.06),0_4px_8px_-4px_rgba(0,58,143,0.03)] hover:shadow-[0_16px_30px_-4px_rgba(0,58,143,0.14)] hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-                                    {{-- Hover Accent --}}
-                                    <div class="absolute left-0 top-0 bottom-0
-                                                w-1
-                                                bg-gradient-to-b from-blue-600 to-indigo-600
-                                                opacity-0 group-hover:opacity-100
-                                                transition-opacity duration-300">
-                                    </div>
+                                    {{-- AKSEN GLOW 3D DI KIRI --}}
+                                    <div class="absolute left-0 top-3 bottom-3 w-1.5 bg-gradient-to-b from-[#003A8F] via-blue-500 to-indigo-600 rounded-r-full opacity-70 group-hover:opacity-100 group-hover:scale-y-105 transition-all duration-300"></div>
 
+                                    {{-- LINK UTAMA --}}
+                                    <a href="{{ route('subcategory.show', $subcategory->id) }}"
+                                        class="flex items-center gap-4 min-w-0 flex-1 pl-1">
 
-                                    <div class="flex flex-col sm:flex-row
-                                                sm:items-center
-                                                justify-between
-                                                gap-4 p-4 sm:p-5">
-
-                                        {{-- MAIN LINK --}}
-                                        <a href="{{ route('subcategory.show', $subcategory->id) }}"
-                                            class="flex items-center gap-4 min-w-0 flex-1">
-
-                                            {{-- NUMBER --}}
-                                            <div class="w-11 h-11 shrink-0
-                                                        flex items-center justify-center
-                                                        rounded-xl
-                                                        bg-gradient-to-br from-[#003A8F] to-indigo-700
-                                                        text-white
-                                                        font-bold
-                                                        shadow-md shadow-blue-900/20
-                                                        group-hover:scale-105
-                                                        transition-transform duration-200">
-
-                                                {{ $no++ }}
-
-                                            </div>
-
-
-                                            {{-- NAME --}}
-                                            <div class="min-w-0">
-
-                                                <div class="flex items-center gap-2">
-
-                                                    <p class="text-base sm:text-lg
-                                                              text-gray-800
-                                                              font-bold
-                                                              truncate
-                                                              group-hover:text-blue-700
-                                                              transition-colors duration-200">
-
-                                                        {{ $subcategory->sub_category }}
-
-                                                    </p>
-
-                                                </div>
-
-                                                <p class="text-xs text-gray-400 mt-1">
-                                                    Klik untuk melihat detail arsip
-                                                </p>
-
-                                            </div>
-
-                                        </a>
-
-
-                                        {{-- ACTION BUTTONS --}}
-                                        <div class="flex items-center gap-2 sm:ml-4">
-
-                                            {{-- EDIT --}}
-                                            <form action="{{ route('subcategory.edit', $subcategory->id) }}">
-
-                                                <input type="hidden"
-                                                    name="category_id"
-                                                    value="{{ $category->id }}">
-
-                                                <button type="submit"
-                                                    title="Edit Sub Kategori"
-                                                    class="w-10 h-10
-                                                           inline-flex items-center justify-center
-                                                           bg-amber-50
-                                                           border border-amber-200
-                                                           text-amber-600
-                                                           rounded-xl
-                                                           hover:bg-amber-500
-                                                           hover:text-white
-                                                           hover:border-amber-500
-                                                           hover:shadow-lg hover:shadow-amber-500/20
-                                                           active:scale-95
-                                                           transition-all duration-200">
-
-                                                    <svg class="w-5 h-5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-
-                                                        <path stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-
-                                                    </svg>
-
-                                                </button>
-
-                                            </form>
-
-
-                                            {{-- DELETE --}}
-                                            <form action="{{ route('subcategory.destroy', $subcategory->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus sub kategori ini?')">
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit"
-                                                    title="Hapus Sub Kategori"
-                                                    class="w-10 h-10
-                                                           inline-flex items-center justify-center
-                                                           bg-red-50
-                                                           border border-red-200
-                                                           text-red-500
-                                                           rounded-xl
-                                                           hover:bg-red-500
-                                                           hover:text-white
-                                                           hover:border-red-500
-                                                           hover:shadow-lg hover:shadow-red-500/20
-                                                           active:scale-95
-                                                           transition-all duration-200">
-
-                                                    <svg class="w-5 h-5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-
-                                                        <path stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
-
-                                                    </svg>
-
-                                                </button>
-
-                                            </form>
-
+                                        {{-- NOMOR 3D CUBE GLOSSY --}}
+                                        <div class="w-12 h-12 shrink-0 flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#003A8F] via-blue-700 to-indigo-800 text-white font-black text-base shadow-[0_6px_14px_rgba(0,58,143,0.28),inset_0_1px_1px_rgba(255,255,255,0.4)] group-hover:scale-105 transition-all duration-300">
+                                            {{ $no++ }}
                                         </div>
 
-                                    </div>
+                                        {{-- INFORMASI SUB KATEGORI --}}
+                                        <div class="min-w-0">
+                                            <p class="text-base sm:text-lg text-gray-900 font-extrabold tracking-tight truncate group-hover:text-[#003A8F] transition-colors duration-200">
+                                                {{ $subcategory->sub_category }}
+                                            </p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-xs text-slate-400 font-medium">Klik untuk membuka daftar tahun & arsip</span>
+                                                <svg class="w-3.5 h-3.5 text-blue-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    {{-- TOMBOL AKSI SEPERTI GAMBAR 2 --}}
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                                    <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+
+                                         {{-- EDIT OUTLINE --}}
+                                         <form action="{{ route('subcategory.edit', $subcategory->id) }}" method="GET">
+                                             <input type="hidden" name="category_id" value="{{ $category->id }}">
+                                             <button type="submit"
+                                                 title="Edit Sub Kategori"
+                                                 class="w-10 h-10 inline-flex items-center justify-center bg-amber-50/70 border border-amber-300 text-amber-500 hover:bg-amber-500 hover:text-white hover:border-amber-500 rounded-xl transition duration-200 shadow-sm active:scale-95">
+                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                 </svg>
+                                             </button>
+                                         </form>
+
+                                         {{-- DELETE OUTLINE --}}
+                                         <form action="{{ route('subcategory.destroy', $subcategory->id) }}"
+                                             method="POST"
+                                             onsubmit="return confirm('Yakin ingin menghapus sub kategori ini?')">
+                                             @csrf
+                                             @method('DELETE')
+                                             <button type="submit"
+                                                 title="Hapus Sub Kategori"
+                                                 class="w-10 h-10 inline-flex items-center justify-center bg-red-50/70 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl transition duration-200 shadow-sm active:scale-95">
+                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-7 0h10" />
+                                                 </svg>
+                                             </button>
+                                         </form>
+
+                                     </div>
+                                     @endif
 
                                 </div>
 

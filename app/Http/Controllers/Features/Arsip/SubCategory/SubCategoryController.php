@@ -96,7 +96,9 @@ class SubCategoryController extends Controller
     public function edit(Request $request, string $id)
     {
         $subcategory = Category::findOrFail($id);
-        $category = Category::findOrFail($request->category_id);
+        $category = $request->filled('category_id') 
+            ? Category::findOrFail($request->category_id) 
+            : $subcategory;
         $payment = PaymentMethod::all();
         $funding = FundingSource::all();
         return view('features.arsip.sub_category.sub_category_edit', compact('subcategory', 'payment', 'funding', 'category'));

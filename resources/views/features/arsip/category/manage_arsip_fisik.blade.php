@@ -60,12 +60,13 @@
                         <p class="text-xs text-gray-500 mt-1">Lakukan operasi Tambah, Lihat, Unduh, Edit (Replace), dan Hapus berkas rekapitulasi.</p>
                     </div>
                     <div>
-                        <button type="button" @click="showCreateModal = true" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-md hover:bg-blue-700 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Create Arsip
-                        </button>
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                    <button type="button" @click="showCreateModal = true" 
+                            class="px-4 py-2.5 bg-gradient-to-r from-[#003A8F] to-[#0066CC] hover:from-[#002b6b] hover:to-[#0052a3] text-white rounded-xl shadow-md text-xs font-semibold flex items-center gap-2 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah Arsip Fisik
+                    </button>
+                    @endif
                     </div>
                 </div>
 
@@ -110,11 +111,13 @@
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                                     <a href="{{ route('category.previewArsipFisik', [$category->id, $tahun]) }}" target="_blank" class="px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Lihat Excel</a>
                                     <a href="{{ route('category.downloadArsipFisik', [$category->id, $tahun]) }}" class="px-2 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Unduh</a>
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     <button type="button" @click="showEdit = !showEdit" class="px-2 py-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Edit File</button>
                                     <form action="{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus berkas Tahun {{ $tahun }} ini?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="w-full px-2 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Hapus</button>
                                     </form>
+                                    @endif
                                 </div>
 
                                 {{-- TOMBOL LIHAT DAFTAR BERKAS TERINPUT --}}

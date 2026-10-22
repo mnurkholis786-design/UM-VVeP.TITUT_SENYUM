@@ -28,26 +28,73 @@ class FinalVerificationController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Tab "Belum Ditandatangani": Hanya yang belum diarsip (is_archive = 0)
-        $submit_sign = BudgetSubmission::where('is_archive', 0)
-            ->latest()
+        $userEmail = strtolower(trim(Auth::user()->email));
+
+        // Deteksi hak akses berdasarkan akun Bendahara:
+        // - Bendahara 1 / BendaharaUP: Khusus UP
+        // - Bendahara 2: Khusus LS SPM
+        // - Lainnya (misal: bendahara@gmail.com): Akses Semua
+        $isBendaharaUP = in_array($userEmail, ['bendahara1@gmail.com', 'bendaharaup@gmail.com']);
+        $isBendaharaLS = in_array($userEmail, ['bendahara2@gmail.com']);
+
+        $tipe = $request->get('tipe');
+        if ($isBendaharaUP) {
+            $tipe = 'up'; // Kunci paksa ke UP
+        } elseif ($isBendaharaLS) {
+            $tipe = 'ls'; // Kunci paksa ke LS
+        }
+
+        // Helper filter query berdasarkan tipe pembayaran
+        $applyTypeFilter = function ($query) use ($tipe) {
+            if ($tipe === 'ls') {
+                $query->whereHas('payment_method', function ($q) {
+                    $q->where('payment_method_name', 'LIKE', '%LS%');
+                });
+            } elseif ($tipe === 'up') {
+                $query->where(function ($sub) {
+                    $sub->whereDoesntHave('payment_method')
+                        ->orWhereHas('payment_method', function ($q) {
+                            $q->where('payment_method_name', 'NOT LIKE', '%LS%');
+                        });
+                });
+            }
+        };
+
+        // 1. Tab "Belum Ditandatangani"
+        $submit_sign_query = BudgetSubmission::with(['user', 'payment_method'])
+            ->where('requirements_status', 'Lengkap')
+            ->where('verification_status', 1)
+            ->where('is_archive', 0);
+        $applyTypeFilter($submit_sign_query);
+        $submit_sign = $submit_sign_query->latest()
             ->paginate(10, ['*'], 'submit_no_sign')
             ->appends($request->query());
-
-        // 2. Tab "Pengajuan Terverifikasi": Semua pengajuan yang statusnya lengkap & diverifikasi
-        $pengajuans = BudgetSubmission::where('requirements_status', 'Lengkap')
-            ->where('verification_status', 1)
-            ->latest()
+            
+        // 2. Tab "Pengajuan Terverifikasi"
+        $pengajuans_query = BudgetSubmission::with(['user', 'payment_method'])
+            ->where('requirements_status', 'Lengkap')
+            ->where('verification_status', 1);
+        $applyTypeFilter($pengajuans_query);
+        $pengajuans = $pengajuans_query->latest()
             ->paginate(10, ['*'], 'all_submit')
             ->appends($request->query());
 
-        // 3. Tab "Diarsipkan": Hanya yang sudah diarsip (is_archive = 1)
-        $arsip_submissions = BudgetSubmission::where('is_archive', 1)
-            ->latest()
+        // 3. Tab "Diarsipkan"
+        $arsip_query = BudgetSubmission::with(['user', 'payment_method'])
+            ->where('is_archive', 1);
+        $applyTypeFilter($arsip_query);
+        $arsip_submissions = $arsip_query->latest()
             ->paginate(10, ['*'], 'archive_submit')
             ->appends($request->query());
 
-        return view('features.verifikasi_final.list_verifikasi_final', compact('pengajuans', 'submit_sign', 'arsip_submissions'));
+        return view('features.verifikasi_final.list_verifikasi_final', compact(
+            'pengajuans', 
+            'submit_sign', 
+            'arsip_submissions', 
+            'tipe',
+            'isBendaharaUP',
+            'isBendaharaLS'
+        ));
     }
 
     /**
@@ -71,10 +118,22 @@ class FinalVerificationController extends Controller
      */
     public function show(string $id)
     {
-        $pengajuan = BudgetSubmission::with('user')
-            ->with('finance_officer')
-            ->with('revenue_officer')
-            ->where('id', $id)->first();
+        $pengajuan = BudgetSubmission::with(['user', 'finance_officer', 'revenue_officer', 'payment_method'])
+            ->where('id', $id)
+            ->firstOrFail();
+
+        // Validasi hak akses akun
+        $userEmail = strtolower(trim(Auth::user()->email));
+        $isDocLS = $pengajuan->payment_method && str_contains(strtoupper($pengajuan->payment_method->payment_method_name), 'LS');
+
+        if (in_array($userEmail, ['bendahara1@gmail.com', 'bendaharaup@gmail.com']) && $isDocLS) {
+            return redirect()->route('final.index')->with('error', 'Akses ditolak: Akun Anda adalah Bendahara UP, tidak dapat memproses dokumen LS SPM.');
+        }
+
+        if (in_array($userEmail, ['bendahara2@gmail.com']) && !$isDocLS) {
+            return redirect()->route('final.index')->with('error', 'Akses ditolak: Akun Anda adalah Bendahara LS SPM, tidak dapat memproses dokumen UP Bendahara.');
+        }
+
         $cabinets = Cabinet::all();
         $payment_method = PaymentMethod::all();
         $funding_source = FundingSource::all();
@@ -94,6 +153,18 @@ class FinalVerificationController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $targetDoc = BudgetSubmission::with('payment_method')->findOrFail($id);
+        $userEmail = strtolower(trim(Auth::user()->email));
+        $isDocLS = $targetDoc->payment_method && str_contains(strtoupper($targetDoc->payment_method->payment_method_name), 'LS');
+
+        // Blokir jika bukan haknya
+        if (in_array($userEmail, ['bendahara1@gmail.com', 'bendaharaup@gmail.com']) && $isDocLS) {
+            return redirect()->route('final.index')->with('error', 'Gagal memproses: Anda hanya berwenang menandatangani dokumen UP Bendahara.');
+        }
+        if (in_array($userEmail, ['bendahara2@gmail.com']) && !$isDocLS) {
+            return redirect()->route('final.index')->with('error', 'Gagal memproses: Anda hanya berwenang menandatangani dokumen LS SPM.');
+        }
+
         // validasi kategori arsip (kode harus ada di daftar resmi DigitalArchive)
         $request->validate([
             'kategori' => ['required', Rule::in(DigitalArchive::KATEGORI_LIST)],

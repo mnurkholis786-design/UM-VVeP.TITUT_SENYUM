@@ -357,6 +357,7 @@
                             @endif
 
 
+                             @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                             {{-- TAMBAH TAHUN --}}
                             <form action="{{ route('year.create') }}"
                                 method="GET">
@@ -407,6 +408,7 @@
                                 </button>
 
                             </form>
+                            @endif
 
                         </div>
 
@@ -578,6 +580,7 @@
                                     </a>
 
 
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- ACTIONS --}}
                                     <div class="px-5 pb-5">
 
@@ -689,6 +692,7 @@
                                         </div>
 
                                     </div>
+                                    @endif
 
                                 </div>
 
