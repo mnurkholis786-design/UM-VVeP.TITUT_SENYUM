@@ -750,14 +750,13 @@
 
                             <div>
                                 <label class="form-label">
-                                    Tingkat Pertimbangan
+                                    Tingkat Perkembangan
                                 </label>
-
                                 <input type="text"
                                     name="tingkat_pertimbangan"
                                     value="{{ old('tingkat_pertimbangan') }}"
                                     class="form-input"
-                                    placeholder="Tingkat pertimbangan">
+                                    placeholder="Tingkat Perkembangan (Asli / Salinan / Tembusan)">
 
                                 @error('tingkat_pertimbangan')
                                     <p class="error-text">{{ $message }}</p>

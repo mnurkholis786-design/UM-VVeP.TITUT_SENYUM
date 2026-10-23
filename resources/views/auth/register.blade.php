@@ -1,188 +1,1864 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-cover bg-center relative -mt-20">
-        <div class="flex flex-col items-center justify-center w-full px-4">
-            <div class="w-full max-w-lg bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-8">
-                <h2 class="text-lg font-bold text-blue-700 text-center mb-6">Create Your Account</h2>
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    {{-- =========================================================
+        REGISTER CARD STYLE ONLY (MATCHED WITH LOGIN)
+    ========================================================== --}}
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        /* =====================================================
+           FONT
+        ====================================================== */
+
+        .vvep-login {
+            font-family: 'Poppins', sans-serif;
+        }
+
+
+        /* =====================================================
+           3D SCENE
+        ====================================================== */
+
+        .login-3d-scene {
+            width: 100%;
+            max-width: 440px;
+            perspective: 1400px;
+        }
+
+
+        /* =====================================================
+           3D WRAPPER
+        ====================================================== */
+
+        .login-3d-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+
+            transition:
+                transform 0.18s
+                cubic-bezier(.2, .8, .2, 1);
+        }
+
+
+        /* =====================================================
+           BACK 3D LAYERS
+        ====================================================== */
+
+        .login-3d-layer-1,
+        .login-3d-layer-2,
+        .login-card-glow {
+            position: absolute;
+            inset: 0;
+
+            border-radius: 26px;
+
+            pointer-events: none;
+
+            transition:
+                transform 0.25s ease;
+        }
+
+
+        .login-3d-layer-1 {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(2, 31, 76, 0.70),
+                    rgba(0, 84, 170, 0.48)
+                );
+
+            transform:
+                translateZ(-38px)
+                translateX(15px)
+                translateY(18px);
+
+            filter: blur(1px);
+
+            box-shadow:
+                0 35px 65px rgba(2, 31, 76, 0.22);
+        }
+
+
+        .login-3d-layer-2 {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(0, 174, 239, 0.25),
+                    rgba(0, 87, 184, 0.38)
+                );
+
+            transform:
+                translateZ(-22px)
+                translateX(8px)
+                translateY(10px);
+
+            border:
+                1px solid rgba(255, 255, 255, 0.35);
+        }
+
+
+        /* =====================================================
+           GLOW AROUND CARD
+        ====================================================== */
+
+        .login-card-glow {
+            transform:
+                translateZ(-3px);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(0, 174, 239, 0.25),
+                    rgba(0, 87, 184, 0.18),
+                    transparent 65%
+                );
+
+            filter: blur(18px);
+
+            opacity: 0.75;
+        }
+
+
+        /* =====================================================
+           MAIN CARD
+        ====================================================== */
+
+        .login-3d-card {
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 30px 30px 24px;
+
+            border-radius: 26px;
+
+            border:
+                1px solid rgba(255, 255, 255, 0.95);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.985),
+                    rgba(248, 252, 255, 0.97)
+                );
+
+            transform-style: preserve-3d;
+
+            box-shadow:
+                0 8px 18px rgba(3, 27, 67, 0.06),
+                0 25px 55px rgba(0, 63, 135, 0.14),
+                0 45px 90px rgba(3, 27, 67, 0.13);
+
+            transition:
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+        }
+
+
+        .login-3d-wrapper:hover .login-3d-card {
+            border-color:
+                rgba(255, 255, 255, 1);
+
+            box-shadow:
+                0 12px 24px rgba(3, 27, 67, 0.08),
+                0 32px 68px rgba(0, 63, 135, 0.17),
+                0 55px 105px rgba(3, 27, 67, 0.15);
+        }
+
+
+        /* =====================================================
+           CARD TOP ACCENT
+        ====================================================== */
+
+        .card-top-accent {
+            position: absolute;
+
+            top: 0;
+            left: 8%;
+
+            width: 84%;
+            height: 4px;
+
+            border-radius:
+                0 0 999px 999px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #00aeef 25%,
+                    #0057b8 50%,
+                    #00aeef 75%,
+                    transparent
+                );
+
+            box-shadow:
+                0 2px 12px rgba(0, 174, 239, 0.18);
+
+            opacity: 0.9;
+        }
+
+
+        /* =====================================================
+           CARD TOP GLOW
+        ====================================================== */
+
+        .card-top-glow {
+            position: absolute;
+
+            top: -100px;
+            left: 50%;
+
+            width: 330px;
+            height: 190px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius: 999px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(0, 174, 239, 0.12),
+                    transparent 70%
+                );
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           CARD SHINE
+        ====================================================== */
+
+        .card-shine {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 44%;
+
+            border-radius:
+                26px
+                26px
+                55%
+                55%;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(255, 255, 255, 0.72),
+                    rgba(255, 255, 255, 0)
+                );
+
+            pointer-events: none;
+
+            transform:
+                translateZ(5px);
+        }
+
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        .login-header {
+            position: relative;
+
+            z-index: 10;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =====================================================
+           LOGO ROW
+        ====================================================== */
+
+        .logo-3d {
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            transform:
+                translateZ(35px);
+
+            transition:
+                transform 0.3s ease;
+        }
+
+
+        .login-3d-wrapper:hover .logo-3d {
+            transform:
+                translateZ(48px)
+                translateY(-2px);
+        }
+
+
+        /* =====================================================
+           TVRI LOGO BOX
+        ====================================================== */
+
+        .logo-box {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 84px;
+            height: 58px;
+
+            padding:
+                7px 11px;
+
+            background:
+                rgba(255, 255, 255, 0.98);
+
+            border:
+                1px solid rgba(0, 87, 184, 0.08);
+
+            border-radius:
+                15px;
+
+            box-shadow:
+                0 5px 12px rgba(0, 63, 135, 0.07),
+                0 12px 25px rgba(0, 63, 135, 0.09);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+
+        .logo-box::before {
+            content: "";
+
+            position: absolute;
+
+            inset: -4px;
+
+            border-radius:
+                18px;
+
+            border:
+                1px solid rgba(0, 174, 239, 0.10);
+
+            pointer-events: none;
+        }
+
+
+        .login-3d-wrapper:hover .logo-box {
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 15px rgba(0, 63, 135, 0.08),
+                0 16px 30px rgba(0, 63, 135, 0.11);
+        }
+
+
+        .logo-box img {
+            display: block;
+
+            width: auto;
+            height: 43px;
+
+            max-width: 73px;
+
+            object-fit: contain;
+        }
+
+
+        /* =====================================================
+           DIVIDER
+        ====================================================== */
+
+        .logo-divider {
+            width: 1px;
+            height: 38px;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    transparent,
+                    #cbd9e9,
+                    transparent
+                );
+        }
+
+
+        /* =====================================================
+           VVeP TITLE
+        ====================================================== */
+
+        .vvep-title {
+            font-size: 25px;
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            letter-spacing: -0.7px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #031b43 0%,
+                    #0057b8 55%,
+                    #00aeef 100%
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+            transform:
+                translateZ(32px);
+        }
+
+
+        .vvep-subtitle {
+            display: block;
+
+            margin-top: 6px;
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.8px;
+
+            color: #7b91aa;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =====================================================
+           WELCOME / REGISTER TITLE
+        ====================================================== */
+
+        .login-title {
+            margin-top: 14px;
+
+            color: #667b95;
+
+            font-size: 12px;
+
+            font-weight: 500;
+
+            text-align: center;
+
+            transform:
+                translateZ(22px);
+        }
+
+
+        .login-title strong {
+            color: #18345f;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           FORM
+        ====================================================== */
+
+        .form-3d {
+            position: relative;
+
+            z-index: 10;
+
+            transform:
+                translateZ(18px);
+        }
+
+
+        /* =====================================================
+           LABEL
+        ====================================================== */
+
+        .login-label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            color: #18345f;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.15px;
+        }
+
+
+        /* =====================================================
+           INPUT WRAPPER
+        ====================================================== */
+
+        .input-3d {
+            position: relative;
+
+            transition:
+                transform 0.2s ease;
+        }
+
+
+        .input-3d:focus-within {
+            transform:
+                translateZ(8px)
+                translateY(-1px);
+        }
+
+
+        /* =====================================================
+           INPUT
+        ====================================================== */
+
+        .input-3d input {
+            width: 100%;
+
+            min-height: 46px;
+
+            padding-top: 11px !important;
+            padding-bottom: 11px !important;
+
+            color: #17345e !important;
+
+            background:
+                rgba(255, 255, 255, 0.92) !important;
+
+            border:
+                1px solid #d9e4f0 !important;
+
+            border-radius:
+                12px !important;
+
+            outline: none;
+
+            box-shadow:
+                inset 0 1px 2px rgba(3, 27, 67, 0.025),
+                0 3px 8px rgba(0, 63, 135, 0.025);
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+
+        .input-3d input::placeholder {
+            color: #9aabc0;
+        }
+
+
+        .input-3d input:hover {
+            background:
+                #ffffff !important;
+
+            border-color:
+                #b9cfe6 !important;
+        }
+
+
+        .input-3d input:focus {
+            background:
+                #ffffff !important;
+
+            border-color:
+                #0878dc !important;
+
+            box-shadow:
+                0 0 0 3px rgba(0, 87, 184, 0.09),
+                0 8px 18px rgba(0, 87, 184, 0.07);
+        }
+
+
+        /* =====================================================
+           ICON
+        ====================================================== */
+
+        .input-icon {
+            color: #8ba1ba;
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .input-3d:focus-within .input-icon {
+            color:
+                #0057b8;
+
+            transform:
+                scale(1.05);
+        }
+
+
+        /* =====================================================
+           PASSWORD BUTTON
+        ====================================================== */
+
+        .password-toggle {
+            color: #8ba1ba;
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .password-toggle:hover {
+            color:
+                #0057b8;
+
+            transform:
+                scale(1.06);
+        }
+
+
+        /* =====================================================
+           REGISTER / ACTION BUTTON
+        ====================================================== */
+
+        .login-button-3d {
+            position: relative;
+
+            width: 100%;
+
+            min-height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            padding:
+                12px 18px;
+
+            border: none;
+
+            border-radius:
+                13px;
+
+            color:
+                #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.3px;
+
+            cursor: pointer;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #031b43 0%,
+                    #0057b8 52%,
+                    #008ee0 100%
+                );
+
+            box-shadow:
+                0 5px 0 #003f8f,
+                0 12px 25px rgba(0, 87, 184, 0.27);
+
+            transform:
+                translateZ(22px);
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease,
+                filter 0.2s ease;
+        }
+
+
+        .login-button-3d:hover {
+            filter:
+                brightness(1.04);
+
+            transform:
+                translateZ(30px)
+                translateY(-2px);
+
+            box-shadow:
+                0 6px 0 #003879,
+                0 17px 30px rgba(0, 87, 184, 0.34);
+        }
+
+
+        .login-button-3d:active {
+            transform:
+                translateZ(10px)
+                translateY(4px);
+
+            box-shadow:
+                0 1px 0 #003879,
+                0 6px 12px rgba(0, 87, 184, 0.22);
+        }
+
+
+        .login-button-3d:focus-visible {
+            outline: none;
+
+            box-shadow:
+                0 0 0 4px rgba(0, 174, 239, 0.15),
+                0 5px 0 #003f8f,
+                0 12px 25px rgba(0, 87, 184, 0.27);
+        }
+
+
+        /* =====================================================
+           BUTTON SHINE
+        ====================================================== */
+
+        .login-button-3d::after {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: -120%;
+
+            width: 55%;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.27),
+                    transparent
+                );
+
+            transform:
+                skewX(-20deg);
+
+            transition:
+                left 0.65s ease;
+        }
+
+
+        .login-button-3d:hover::after {
+            left: 130%;
+        }
+
+
+        /* =====================================================
+           BUTTON ARROW
+        ====================================================== */
+
+        .button-arrow {
+            transition:
+                transform 0.2s ease;
+        }
+
+
+        .login-button-3d:hover .button-arrow {
+            transform:
+                translateX(4px);
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        .card-footer-3d {
+            position: relative;
+
+            z-index: 10;
+
+            margin-top: 20px;
+
+            padding-top: 15px;
+
+            border-top:
+                1px solid #edf2f7;
+
+            transform:
+                translateZ(12px);
+        }
+
+
+        .footer-text {
+            color:
+                #7b8ea6;
+
+            font-size: 10px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.1px;
+        }
+
+
+        .footer-dot {
+            display: inline-block;
+
+            width: 5px;
+            height: 5px;
+
+            margin-right: 6px;
+
+            border-radius: 999px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #00aeef,
+                    #0057b8
+                );
+
+            box-shadow:
+                0 0 0 3px rgba(0, 174, 239, 0.08);
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 640px) {
+
+            .login-3d-scene {
+                max-width: 390px;
+            }
+
+
+            .login-3d-card {
+                padding:
+                    25px 20px 20px;
+
+                border-radius:
+                    23px;
+            }
+
+
+            .login-3d-layer-1,
+            .login-3d-layer-2,
+            .login-card-glow {
+                border-radius:
+                    23px;
+            }
+
+
+            .vvep-title {
+                font-size: 22px;
+            }
+
+
+            .logo-box {
+                min-width: 75px;
+                height: 53px;
+            }
+
+
+            .logo-box img {
+                height: 38px;
+                max-width: 65px;
+            }
+
+
+            .logo-divider {
+                height: 34px;
+            }
+
+
+            .login-3d-layer-1 {
+                transform:
+                    translateZ(-23px)
+                    translateX(8px)
+                    translateY(10px);
+            }
+
+
+            .login-3d-layer-2 {
+                transform:
+                    translateZ(-14px)
+                    translateX(5px)
+                    translateY(6px);
+            }
+
+
+            .login-card-glow {
+                transform:
+                    translateZ(-2px);
+            }
+        }
+
+
+        /* =====================================================
+           SMALL MOBILE
+        ====================================================== */
+
+        @media (max-width: 390px) {
+
+            .login-3d-card {
+                padding:
+                    22px 16px 18px;
+            }
+
+
+            .logo-3d {
+                gap: 9px;
+            }
+
+
+            .logo-box {
+                min-width: 68px;
+                height: 49px;
+
+                padding:
+                    6px 8px;
+            }
+
+
+            .logo-box img {
+                height: 34px;
+                max-width: 58px;
+            }
+
+
+            .vvep-title {
+                font-size: 20px;
+            }
+
+
+            .login-title {
+                font-size: 11px;
+            }
+        }
+
+
+        /* =====================================================
+           REDUCED MOTION
+        ====================================================== */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .login-3d-wrapper,
+            .login-3d-card,
+            .logo-3d,
+            .logo-box,
+            .login-button-3d {
+                transition: none !important;
+            }
+        }
+    </style>
+
+
+    {{-- =========================================================
+        3D REGISTER CARD
+    ========================================================== --}}
+
+    <div
+        class="vvep-login login-3d-scene"
+
+        x-data="{
+            rotateX: 0,
+            rotateY: 0,
+
+            moveCard(event) {
+
+                if (window.innerWidth < 768) {
+                    return;
+                }
+
+                const rect =
+                    $el.getBoundingClientRect();
+
+                const x =
+                    event.clientX - rect.left;
+
+                const y =
+                    event.clientY - rect.top;
+
+                const centerX =
+                    rect.width / 2;
+
+                const centerY =
+                    rect.height / 2;
+
+                this.rotateY =
+                    ((x - centerX) / centerX) * 5;
+
+                this.rotateX =
+                    ((centerY - y) / centerY) * 5;
+            },
+
+            resetCard() {
+                this.rotateX = 0;
+                this.rotateY = 0;
+            }
+        }"
+
+        @mousemove="moveCard($event)"
+        @mouseleave="resetCard()"
+    >
+
+        <div
+            class="login-3d-wrapper"
+
+            :style="`
+                transform:
+                    rotateX(${rotateX}deg)
+                    rotateY(${rotateY}deg);
+            `"
+        >
+
+            {{-- =================================================
+                BACK LAYERS
+            ================================================== --}}
+
+            <div class="login-card-glow"></div>
+
+            <div class="login-3d-layer-1"></div>
+
+            <div class="login-3d-layer-2"></div>
+
+
+            {{-- =================================================
+                MAIN CARD
+            ================================================== --}}
+
+            <div class="login-3d-card">
+
+                {{-- Top Accent --}}
+
+                <div class="card-top-accent"></div>
+
+
+                {{-- Top Glow --}}
+
+                <div class="card-top-glow"></div>
+
+
+                {{-- Shine --}}
+
+                <div class="card-shine"></div>
+
+
+                {{-- =================================================
+                    HEADER
+                ================================================== --}}
+
+                <div class="login-header">
+
+                    <div class="logo-3d">
+
+                        {{-- TVRI LOGO --}}
+
+                        <div class="logo-box">
+
+                            <img
+                                src="{{ asset('images/tvri.png') }}"
+                                alt="TVRI"
+                            >
+
+                        </div>
+
+
+                        {{-- Divider --}}
+
+                        <div class="logo-divider"></div>
+
+
+                        {{-- VVeP --}}
+
+                        <div>
+
+                            <div class="vvep-title">
+                                VVeP App
+                            </div>
+
+                            <span class="vvep-subtitle">
+                                Digital Verification System
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Welcome / Subtitle --}}
+
+                    <h2 class="login-title">
+
+                        Buat Akun Baru,
+                        <strong>Silahkan Registrasi</strong>
+
+                    </h2>
+
+                </div>
+
+
+                {{-- =================================================
+                    SESSION STATUS
+                ================================================== --}}
+
+                <div class="relative z-10">
+
+                    <x-auth-session-status
+                        class="mb-4"
+                        :status="session('status')"
+                    />
+
+                </div>
+
+
+                {{-- =================================================
+                    FORM
+                ================================================== --}}
+
+                <form
+                    method="POST"
+
+                    action="{{ route('register') }}"
+
+                    class="form-3d space-y-4"
+                >
+
                     @csrf
 
-                    <!-- Nama -->
+
+                    {{-- =================================================
+                        FULL NAME
+                    ================================================== --}}
+
                     <div>
-                        <x-input-label for="name" :value="__('Full Name')" class="text-gray-700 font-semibold" />
-                        <div class="mt-2 relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                        clip-rule="evenodd" />
+
+                        <label
+                            for="name"
+                            class="login-label"
+                        >
+                            {{ __('Full Name') }}
+                        </label>
+
+
+                        <div class="input-3d">
+
+                            {{-- User Icon --}}
+
+                            <div
+                                class="
+                                    absolute
+                                    inset-y-0
+                                    left-0
+                                    pl-3.5
+                                    flex
+                                    items-center
+                                    pointer-events-none
+                                    z-10
+                                "
+                            >
+
+                                <svg
+                                    class="input-icon w-5 h-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+
                                 </svg>
+
                             </div>
-                            <x-text-input id="name"
-                                class="block w-full pl-10 pr-3 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-                                type="text" name="name" :value="old('name')" required autofocus autocomplete="name"
-                                placeholder="Enter your full name" />
-                        </div>
-                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                    </div>
 
-                    <!-- Email -->
-                    <div>
-                        <x-input-label for="email" :value="__('Email Address')" class="text-gray-700 font-semibold" />
-                        <div class="mt-2 relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <x-text-input id="email"
-                                class="block w-full pl-10 pr-3 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-                                type="email" name="email" :value="old('email')" required autocomplete="username"
-                                placeholder="Enter your email address" />
-                        </div>
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                    </div>
 
-                    <!-- Divisi -->
-                    {{-- <div>
-                        <x-input-label for="divisi" :value="__('Division')" class="text-gray-700 font-semibold" />
-                        <div class="mt-2 relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            </div>
-                            <select id="divisi" name="divisi"
-                                class="block w-full pl-10 pr-3 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 appearance-none bg-white cursor-pointer">
-                                <option value="" disabled selected>Divisi</option>
-                                <option value="Program">📋 Program</option>
-                                <option value="Berita">📰 Berita</option>
-                                <option value="Teknik">⚙️ Teknik</option>
-                                <option value="KMB">🎯 KMB</option>
-                                <option value="Promo">📢 Promo</option>
-                                <option value="Umum">🏢 Umum</option>
-                                <option value="Tata usaha">📝 Tata Usaha</option>
-                                <option value="Pengembangan usaha">📈 Pengembangan Usaha</option>
-                                <option value="Keuangan">💰 Keuangan</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"></div>
-                        </div>
-                        <x-input-error :messages="$errors->get('divisi')" class="mt-2" />
-                    </div> --}}
+                            <x-text-input
+                                id="name"
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Password -->
-                        <div x-data="{ show: false }">
-                            <x-input-label for="password" :value="__('Password')" class="text-gray-800 font-semibold" />
-                            <div class="relative mt-2">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                </div>
+                                class="
+                                    block
+                                    w-full
+                                    pl-11
+                                    pr-3
+                                    py-3
+                                "
 
-                                <x-text-input id="password"
-                                    class="block w-full pl-10 pr-12 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-                                    ::type="show ? 'text' : 'password'" name="password" required autocomplete="current-password"
-                                    placeholder="Enter your password" />
+                                type="text"
 
-                                <button type="button" @click="show = !show"
-                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none">
+                                name="name"
 
-                                    <svg x-show="!show" class="h-5 w-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
+                                :value="old('name')"
 
-                                    <svg x-show="show" x-cloak class="h-5 w-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
-
-                        {{-- <div>
-                            <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="text-gray-700 font-semibold" />
-                            <div class="mt-2 relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <x-text-input id="password_confirmation" class="block w-full pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" type="password" name="password_confirmation" required placeholder="Confirm password" />
-                            </div>
-                        </div> --}}
-                        <!-- Confirm Password -->
-                        <div x-data="{ show: false }">
-                            <x-input-label for="password_confirmation" :value="__('Confirm Password')"
-                                class="text-gray-800 font-semibold" />
-                            <div class="relative mt-2">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-
-                                <x-text-input id="password_confirmation"
-                                    class="block w-full pl-10 pr-12 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-                                    ::type="show ? 'text' : 'password'" {{-- <<<<<<< HEAD
-                                name="password"
                                 required
-                                autocomplete="current-password"
-======= --}} name="password_confirmation" required
-                                    autocomplete="new-password" placeholder="Confirm password" />
 
-                                <button type="button" @click="show = !show"
-                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none">
+                                autofocus
 
-                                    <svg x-show="!show" class="h-5 w-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
+                                autocomplete="name"
 
-                                    <svg x-show="show" x-cloak class="h-5 w-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                                placeholder="Enter your full name"
+                            />
+
                         </div>
+
+
+                        <x-input-error
+                            :messages="$errors->get('name')"
+
+                            class="mt-1"
+                        />
+
                     </div>
 
 
-                    <div class="pt-4">
-                        <x-primary-button
-                            class="w-full flex justify-center py-3 px-4 rounded-lg shadow-lg font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:scale-[1.02] transition">
-                            {{ __('Create Account') }}
-                        </x-primary-button>
+                    {{-- =================================================
+                        EMAIL ADDRESS
+                    ================================================== --}}
+
+                    <div>
+
+                        <label
+                            for="email"
+                            class="login-label"
+                        >
+                            {{ __('Email Address') }}
+                        </label>
+
+
+                        <div class="input-3d">
+
+                            {{-- Email Icon --}}
+
+                            <div
+                                class="
+                                    absolute
+                                    inset-y-0
+                                    left-0
+                                    pl-3.5
+                                    flex
+                                    items-center
+                                    pointer-events-none
+                                    z-10
+                                "
+                            >
+
+                                <svg
+                                    class="input-icon w-5 h-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M4 8l8 5 8-5"
+                                    />
+
+                                </svg>
+
+                            </div>
+
+
+                            <x-text-input
+                                id="email"
+
+                                class="
+                                    block
+                                    w-full
+                                    pl-11
+                                    pr-3
+                                    py-3
+                                "
+
+                                type="email"
+
+                                name="email"
+
+                                :value="old('email')"
+
+                                required
+
+                                autocomplete="username"
+
+                                placeholder="Enter your email"
+                            />
+
+                        </div>
+
+
+                        <x-input-error
+                            :messages="$errors->get('email')"
+
+                            class="mt-1"
+                        />
+
                     </div>
 
-                    <div class="text-center pt-2">
-                        <p class="text-sm text-gray-600">
-                            Already have an account? <a href="{{ route('login') }}"
-                                class="font-bold text-indigo-700 hover:text-indigo-500 transition">Sign in here</a>
-                        </p>
+
+                    {{-- =================================================
+                        PASSWORD
+                    ================================================== --}}
+
+                    <div
+                        x-data="{ show: false }"
+                    >
+
+                        <label
+                            for="password"
+                            class="login-label"
+                        >
+                            {{ __('Password') }}
+                        </label>
+
+
+                        <div class="input-3d">
+
+                            {{-- Lock Icon --}}
+
+                            <div
+                                class="
+                                    absolute
+                                    inset-y-0
+                                    left-0
+                                    flex
+                                    items-center
+                                    pl-3.5
+                                    pointer-events-none
+                                    z-10
+                                "
+                            >
+
+                                <svg
+                                    class="input-icon h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M7 10V7a5 5 0 0110 0v3"
+                                    />
+
+                                    <rect
+                                        x="4"
+                                        y="10"
+                                        width="16"
+                                        height="11"
+                                        rx="2"
+
+                                        stroke-width="1.8"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-width="1.8"
+
+                                        d="M12 14v3"
+                                    />
+
+                                </svg>
+
+                            </div>
+
+
+                            {{-- Password Input --}}
+
+                            <x-text-input
+                                id="password"
+
+                                class="
+                                    block
+                                    w-full
+                                    pl-11
+                                    pr-12
+                                    py-3
+                                "
+
+                                ::type="
+                                    show
+                                        ? 'text'
+                                        : 'password'
+                                "
+
+                                name="password"
+
+                                required
+
+                                autocomplete="new-password"
+
+                                placeholder="Enter your password"
+                            />
+
+
+                            {{-- Eye Button --}}
+
+                            <button
+                                type="button"
+
+                                @click="show = !show"
+
+                                class="
+                                    password-toggle
+                                    absolute
+                                    inset-y-0
+                                    right-0
+                                    pr-3.5
+                                    flex
+                                    items-center
+                                    focus:outline-none
+                                    z-10
+                                "
+
+                                :aria-label="
+                                    show
+                                        ? 'Hide password'
+                                        : 'Show password'
+                                "
+                            >
+
+                                {{-- Show Password --}}
+
+                                <svg
+                                    x-show="!show"
+
+                                    class="h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+
+                                </svg>
+
+
+                                {{-- Hide Password --}}
+
+                                <svg
+                                    x-show="show"
+
+                                    x-cloak
+
+                                    class="h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M3 3l18 18"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M10.58 10.58a2 2 0 102.83 2.83"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M9.88 4.24A9.53 9.53 0 0112 4c4.48 0 8.27 2.94 9.54 7a9.72 9.72 0 01-4.13 5.41M6.61 6.61A9.94 9.94 0 002.46 12c1.27 4.06 5.06 7 9.54 7 1.1 0 2.15-.19 3.13-.54"
+                                    />
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+
+                        <x-input-error
+                            :messages="$errors->get('password')"
+
+                            class="mt-1"
+                        />
+
                     </div>
+
+
+                    {{-- =================================================
+                        CONFIRM PASSWORD
+                    ================================================== --}}
+
+                    <div
+                        x-data="{ show: false }"
+                    >
+
+                        <label
+                            for="password_confirmation"
+                            class="login-label"
+                        >
+                            {{ __('Confirm Password') }}
+                        </label>
+
+
+                        <div class="input-3d">
+
+                            {{-- Lock Icon --}}
+
+                            <div
+                                class="
+                                    absolute
+                                    inset-y-0
+                                    left-0
+                                    flex
+                                    items-center
+                                    pl-3.5
+                                    pointer-events-none
+                                    z-10
+                                "
+                            >
+
+                                <svg
+                                    class="input-icon h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M7 10V7a5 5 0 0110 0v3"
+                                    />
+
+                                    <rect
+                                        x="4"
+                                        y="10"
+                                        width="16"
+                                        height="11"
+                                        rx="2"
+
+                                        stroke-width="1.8"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-width="1.8"
+
+                                        d="M12 14v3"
+                                    />
+
+                                </svg>
+
+                            </div>
+
+
+                            {{-- Confirm Password Input --}}
+
+                            <x-text-input
+                                id="password_confirmation"
+
+                                class="
+                                    block
+                                    w-full
+                                    pl-11
+                                    pr-12
+                                    py-3
+                                "
+
+                                ::type="
+                                    show
+                                        ? 'text'
+                                        : 'password'
+                                "
+
+                                name="password_confirmation"
+
+                                required
+
+                                autocomplete="new-password"
+
+                                placeholder="Confirm your password"
+                            />
+
+
+                            {{-- Eye Button --}}
+
+                            <button
+                                type="button"
+
+                                @click="show = !show"
+
+                                class="
+                                    password-toggle
+                                    absolute
+                                    inset-y-0
+                                    right-0
+                                    pr-3.5
+                                    flex
+                                    items-center
+                                    focus:outline-none
+                                    z-10
+                                "
+
+                                :aria-label="
+                                    show
+                                        ? 'Hide password'
+                                        : 'Show password'
+                                "
+                            >
+
+                                {{-- Show Password --}}
+
+                                <svg
+                                    x-show="!show"
+
+                                    class="h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+
+                                </svg>
+
+
+                                {{-- Hide Password --}}
+
+                                <svg
+                                    x-show="show"
+
+                                    x-cloak
+
+                                    class="h-5 w-5"
+
+                                    fill="none"
+
+                                    stroke="currentColor"
+
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M3 3l18 18"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M10.58 10.58a2 2 0 102.83 2.83"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+
+                                        d="M9.88 4.24A9.53 9.53 0 0112 4c4.48 0 8.27 2.94 9.54 7a9.72 9.72 0 01-4.13 5.41M6.61 6.61A9.94 9.94 0 002.46 12c1.27 4.06 5.06 7 9.54 7 1.1 0 2.15-.19 3.13-.54"
+                                    />
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+
+                        <x-input-error
+                            :messages="$errors->get('password_confirmation')"
+
+                            class="mt-1"
+                        />
+
+                    </div>
+
+
+                    {{-- =================================================
+                        REGISTER BUTTON
+                    ================================================== --}}
+
+                    <div class="pt-2">
+
+                        <button
+                            type="submit"
+
+                            class="login-button-3d"
+                        >
+
+                            <span>
+                                {{ __('Register') }}
+                            </span>
+
+
+                            <svg
+                                class="
+                                    button-arrow
+                                    ml-2
+                                    w-4
+                                    h-4
+                                "
+
+                                fill="none"
+
+                                stroke="currentColor"
+
+                                viewBox="0 0 24 24"
+                            >
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                />
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+
+                    {{-- =================================================
+                        LOGIN LINK
+                    ================================================== --}}
+
+                    @if (Route::has('login'))
+
+                        <div class="text-center pt-2">
+
+                            <p class="text-xs text-gray-600">
+
+                                {{ __('Already have an account?') }}
+
+                                <a
+                                    href="{{ route('login') }}"
+
+                                    class="font-bold text-[#0057b8] hover:text-[#003f8f] transition"
+                                >
+                                    {{ __('Login here') }}
+                                </a>
+
+                            </p>
+
+                        </div>
+
+                    @endif
+
                 </form>
+
+
+                {{-- =================================================
+                    FOOTER
+                ================================================== --}}
+
+                <div class="card-footer-3d text-center">
+
+                    <p class="footer-text">
+
+                        <span class="footer-dot"></span>
+
+                        VVeP App • TVRI Kalimantan Selatan
+
+                    </p>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
 </x-guest-layout>

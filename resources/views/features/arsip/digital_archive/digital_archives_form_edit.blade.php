@@ -258,11 +258,12 @@
                                 <div class="relative">
 
                                     <select
-                                        name="kategori"
-                                        id="kategori"
-                                        required
-                                        class="form-input appearance-none pr-11 font-medium"
-                                    >
+<select
+    name="kategori"
+    id="kategori"
+    required
+    class="form-input font-medium cursor-pointer"
+>
 
                                         <option value="">
                                             -- Pilih Kategori Arsip --
@@ -353,24 +354,7 @@
 
                                     </select>
 
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-
-                                        <svg class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
-
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M19 9l-7 7-7-7" />
-
-                                        </svg>
-
-                                    </div>
-
                                 </div>
-
                                 @error('kategori')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
@@ -531,13 +515,14 @@
                                         Rp
                                     </span>
 
-                                    <input
-                                        type="number"
-                                        name="nominal"
-                                        value="{{ old('nominal', $digital->nominal) }}"
-                                        class="form-input pl-11"
-                                        placeholder="0"
-                                    >
+<input
+    type="number"
+    name="nominal"
+    value="{{ old('nominal', $digital->nominal) }}"
+    class="form-input"
+    style="padding-left: 2.75rem !important;"
+    placeholder="0"
+>
 
                                 </div>
 
@@ -722,13 +707,14 @@
                                         Rp
                                     </span>
 
-                                    <input
-                                        type="number"
-                                        name="nilai_sp2d"
-                                        value="{{ old('nilai_sp2d', $digital->nilai_sp2d) }}"
-                                        class="form-input pl-11"
-                                        placeholder="0"
-                                    >
+<input
+    type="number"
+    name="nilai_sp2d"
+    value="{{ old('nilai_sp2d', $digital->nilai_sp2d) }}"
+    class="form-input"
+    style="padding-left: 2.75rem !important;"
+    placeholder="0"
+>
 
                                 </div>
 
@@ -918,20 +904,17 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 
-                            {{-- TINGKAT PERTIMBANGAN --}}
-
+                            {{-- TINGKAT PERKEMBANGAN --}}
                             <div>
-
                                 <label class="form-label">
-                                    Tingkat Pertimbangan
+                                    Tingkat Perkembangan
                                 </label>
-
                                 <input
                                     type="text"
                                     name="tingkat_pertimbangan"
                                     value="{{ old('tingkat_pertimbangan', $digital->tingkat_pertimbangan) }}"
                                     class="form-input"
-                                    placeholder="Tingkat Pertimbangan"
+                                    placeholder="Tingkat Perkembangan (Asli / Salinan / Tembusan)"
                                 >
 
                                 @error('tingkat_pertimbangan')
@@ -1897,6 +1880,17 @@
             color: #1f2937;
         }
 
+        /* Hilangkan panah kecil naik-turun di ujung kanan input number */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+    </style>
     </style>
 
 
@@ -2270,8 +2264,88 @@
 
             updateFileInputState();
 
+
+            // =====================================================================
+            // FITUR AUTO-SAVE DRAF & RESTORE OTOMATIS (LOCALSTORAGE)
+            // =====================================================================
+            const formEdit = document.querySelector('form[action*="digital"]');
+            const archiveId = "{{ $digital->id }}";
+            const storageKey = 'draft_arsip_edit_' + archiveId;
+
+            if (formEdit) {
+                // 1. CEK DAN PULIHKAN DRAF JIKA ADA
+                const savedDraft = localStorage.getItem(storageKey);
+                if (savedDraft) {
+                    try {
+                        const draftData = JSON.parse(savedDraft);
+                        let hasRestored = false;
+
+                        Object.keys(draftData).forEach(fieldName => {
+                            const input = formEdit.querySelector(`[name="${fieldName}"]`);
+                            if (input && input.type !== 'file' && input.name !== '_token' && input.name !== '_method') {
+                                if (draftData[fieldName] !== undefined && draftData[fieldName] !== null && input.value !== draftData[fieldName]) {
+                                    input.value = draftData[fieldName];
+                                    hasRestored = true;
+                                }
+                            }
+                        });
+
+                        // Tampilkan banner notifikasi bahwa draf berhasil dipulihkan
+                        if (hasRestored) {
+                            const banner = document.createElement('div');
+                            banner.id = 'draft-recovery-banner';
+                            banner.className = 'mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm';
+                            banner.innerHTML = `
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">💾</span>
+                                    <div>
+                                        <p class="font-bold text-sm">Draf Pengisian Otomatis Berhasil Dipulihkan</p>
+                                        <p class="text-xs text-amber-700 mt-0.5">Data yang Anda ketik sebelumnya telah dikembalikan sehingga tidak perlu mengisi ulang dari awal.</p>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-discard-draft" class="self-start sm:self-center px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold transition shadow-sm">
+                                    Buang Draf
+                                </button>
+                            `;
+                            formEdit.parentNode.insertBefore(banner, formEdit);
+
+                            // Tombol jika user ingin membatalkan draf dan kembali ke data asli database
+                            document.getElementById('btn-discard-draft')?.addEventListener('click', function () {
+                                if (confirm('Yakin ingin membuang draf yang belum disimpan dan kembali ke data asli database?')) {
+                                    localStorage.removeItem(storageKey);
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Gagal membaca draf:', e);
+                    }
+                }
+
+                // 2. SIMPAN DRAF OTOMATIS SETIAP KALI PEGAWAI MENGETIK / MEMILIH DATA
+                function saveDraft() {
+                    const formData = {};
+                    const inputs = formEdit.querySelectorAll('input, select, textarea');
+
+                    inputs.forEach(input => {
+                        if (input.name && input.type !== 'file' && input.name !== '_token' && input.name !== '_method') {
+                            formData[input.name] = input.value;
+                        }
+                    });
+
+                    localStorage.setItem(storageKey, JSON.stringify(formData));
+                }
+
+                formEdit.addEventListener('input', saveDraft);
+                formEdit.addEventListener('change', saveDraft);
+
+                // 3. HAPUS DRAF DARI BROWSER SETELAH BERHASIL DISIMPAN / DISUBMIT
+                formEdit.addEventListener('submit', function () {
+                    localStorage.removeItem(storageKey);
+                });
+            }
+
         });
 
     </script>
-
 </x-app-layout>

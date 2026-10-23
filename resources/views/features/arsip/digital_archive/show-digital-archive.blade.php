@@ -587,7 +587,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                         <div>
-                            <label class="field-label">Tingkat Pertimbangan</label>
+                            <label class="field-label">Tingkat Perkembangan</label>
                             <div class="info-box">
                                 {{ $archive->tingkat_pertimbangan ?? '-' }}
                             </div>
@@ -1111,7 +1111,7 @@
             {{-- ACTION BUTTON --}}
             {{-- ========================================================= --}}
 
-            @if(Route::has('digital.archive.edit') && Route::has('digital.archive.destroy'))
+            @if(Route::has('digital.edit'))
 
                 <div class="bg-white rounded-3xl border border-gray-200 shadow-xl p-6 mb-8">
 
@@ -1124,7 +1124,7 @@
                             </h3>
 
                             <p class="text-sm text-gray-500 mt-1">
-                                Ubah informasi atau hapus arsip digital ini.
+                                Ubah informasi atau lengkapi data arsip digital ini.
                             </p>
 
                         </div>
@@ -1132,7 +1132,7 @@
 
                         <div class="flex flex-wrap items-center gap-3">
 
-                            <a href="{{ route('digital.archive.edit', $archive->id) }}"
+                            <a href="{{ route('digital.edit', $archive->id) }}"
                                 class="inline-flex items-center gap-2 px-5 py-2.5
                                 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600
                                 text-white text-sm font-bold shadow-lg shadow-blue-200
@@ -1144,13 +1144,13 @@
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
 
-                                Edit
+                                Edit Data Arsip
                             </a>
 
 
-                            <form action="{{ route('digital.archive.destroy', $archive->id) }}"
-                                method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus arsip digital ini?')">
+<form action="{{ route('digital.destroy', $archive->id) }}"
+    method="POST"
+    onsubmit="return confirm('Yakin ingin menghapus arsip digital ini?')">
 
                                 @csrf
                                 @method('DELETE')
