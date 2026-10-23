@@ -287,7 +287,7 @@
                         {{-- Jumlah Halaman --}}
                         <div>
                             <label class="text-sm font-medium text-gray-500 mb-2 block">Jumlah Halaman</label>
-                            <input type="number" name="jumlah_halaman" value="{{ old('jumlah_halaman', $digital->jumlah_halaman) }}"
+                            <input type="number" name="jumlah_halaman" value="{{ old('jumlah_halaman', $digital->jumlah_halaman ?: $digital->jumlah_halaman_pdf) }}"
                                 class="w-full text-gray-800 px-4 py-2.5 bg-gray-50 rounded-md border border-gray-200
                                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="Jumlah Halaman">

@@ -257,6 +257,30 @@ class FinalVerificationController extends Controller
             'url' => route('submit.show', $pengajuan->id),
         ]);
 
+          // Deteksi apakah dokumen yang sedang diverifikasi adalah UP Bendahara
+        $isDocUP = ($pengajuan->payment_method && str_contains(strtoupper($pengajuan->payment_method->payment_method_name), 'UP'))
+            || ($category && str_contains(strtoupper($category->category_name), 'UP'))
+            || !empty($request->no_spby);
+
+        // === HITUNG JUMLAH HALAMAN DARI PDF SECARA OTOMATIS ===
+        $jumlahHalamanPdf = null;
+        if (Storage::disk('private')->exists($newPath)) {
+            $fullPdfPath = Storage::disk('private')->path($newPath);
+            try {
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $jumlahHalamanPdf = $pdf->setSourceFile($fullPdfPath);
+            } catch (\Throwable $e) {
+                $content = @file_get_contents($fullPdfPath);
+                if ($content) {
+                    $matches = [];
+                    $count = preg_match_all("/\/Type\s*\/Page[^s]/", $content, $matches);
+                    if ($count > 0) {
+                        $jumlahHalamanPdf = $count;
+                    }
+                }
+            }
+        }
+
         // create digital archive
         $digital = DigitalArchive::create([
             'category_id' => $idcategory,
@@ -273,8 +297,16 @@ class FinalVerificationController extends Controller
             'disposal_date' => Carbon::now()->addYear(5),
             'no_spby' => $request->no_spby,
             'no_sp2d' => $request->no_sp2d,
+            'kode_klasifikasi'     => $isDocUP ? 'KU.02.03' : null,
+            'indeks1'              => $isDocUP ? 'Dokumen Keuangan' : null,
+            'tingkat_pertimbangan' => $isDocUP ? 'asli' : null,
+            'jumlah_halaman'       => $jumlahHalamanPdf,
+            'retensi_arsip_aktif'  => $isDocUP ? 2 : null,
+            'retensi_arsip_inaktif'=> $isDocUP ? 5 : null,
+            'nasib_akhir_arsip'    => $isDocUP ? 'musnah' : null,
+            'klasifikasi_keamanan' => $isDocUP ? 'terbatas' : null,
         ]);
-
+        
         $adminUsers = User::where('role', 'Admin')->get();
 foreach ($adminUsers as $admin) {
     Notification::create([

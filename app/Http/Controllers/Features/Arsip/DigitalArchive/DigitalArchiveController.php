@@ -142,6 +142,26 @@ class DigitalArchiveController extends Controller
             }
         }
 
+        // Hitung otomatis jumlah lembar PDF jika belum diisi manual
+        $jumlahHalaman = $validated['jumlah_halaman'] ?? null;
+        if (empty($jumlahHalaman) && !empty($filePaths)) {
+            try {
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $calcTotal = 0;
+                foreach ($filePaths as $f) {
+                    $p = Storage::disk('private')->path($f);
+                    if (file_exists($p)) {
+                        $calcTotal += $pdf->setSourceFile($p);
+                    }
+                }
+                if ($calcTotal > 0) {
+                    $jumlahHalaman = $calcTotal;
+                }
+            } catch (\Throwable $e) {
+                // Abaikan jika ada kegagalan membaca
+            }
+        }
+
         DigitalArchive::create([
             'category_id' => $category->id,
             'folder_id' => $validated['folder_id'] ?? null,
@@ -173,7 +193,7 @@ class DigitalArchiveController extends Controller
             'tgl_invoice' => $validated['tgl_invoice'] ?? null,
             'tgl_terima' => $validated['tgl_terima'] ?? null,
             'tingkat_pertimbangan' => $validated['tingkat_pertimbangan'] ?? null,
-            'jumlah_halaman' => $validated['jumlah_halaman'] ?? null,
+            'jumlah_halaman' => $jumlahHalaman,
             'retensi_arsip_aktif' => $validated['retensi_arsip_aktif'] ?? null,
             'retensi_arsip_inaktif' => $validated['retensi_arsip_inaktif'] ?? null,
             'nasib_akhir_arsip' => $validated['nasib_akhir_arsip'] ?? null,
@@ -317,6 +337,26 @@ class DigitalArchiveController extends Controller
                 ->withInput();
         }
 
+        // Hitung otomatis jumlah lembar PDF jika belum diisi manual
+        $jumlahHalaman = $validated['jumlah_halaman'] ?? null;
+        if (empty($jumlahHalaman) && !empty($allFiles)) {
+            try {
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $calcTotal = 0;
+                foreach ($allFiles as $f) {
+                    $p = Storage::disk('private')->path($f);
+                    if (file_exists($p)) {
+                        $calcTotal += $pdf->setSourceFile($p);
+                    }
+                }
+                if ($calcTotal > 0) {
+                    $jumlahHalaman = $calcTotal;
+                }
+            } catch (\Throwable $e) {
+                // Abaikan jika ada kegagalan membaca
+            }
+        }
+
         $archive->update([
             'category_id' => $archive->category_id,
             'folder_id' => $validated['folder_id'] ?? null,
@@ -348,7 +388,7 @@ class DigitalArchiveController extends Controller
             'tgl_invoice' => $validated['tgl_invoice'] ?? null,
             'tgl_terima' => $validated['tgl_terima'] ?? null,
             'tingkat_pertimbangan' => $validated['tingkat_pertimbangan'] ?? null,
-            'jumlah_halaman' => $validated['jumlah_halaman'] ?? null,
+            'jumlah_halaman' => $jumlahHalaman,
             'retensi_arsip_aktif' => $validated['retensi_arsip_aktif'] ?? null,
             'retensi_arsip_inaktif' => $validated['retensi_arsip_inaktif'] ?? null,
             'nasib_akhir_arsip' => $validated['nasib_akhir_arsip'] ?? null,
@@ -634,7 +674,7 @@ class DigitalArchiveController extends Controller
                     $retensiAktif = str_ireplace('Tahun', '', $rawAktif) . ' Tahun';
                 }
             } else {
-                $retensiAktif = '-';
+                $retensiAktif = '2 Tahun';
             }
 
             // Logika Format Retensi Inaktif
@@ -647,7 +687,7 @@ class DigitalArchiveController extends Controller
                     $retensiInaktif = str_ireplace('Tahun', '', $rawInaktif) . ' Tahun';
                 }
             } else {
-                $retensiInaktif = '-';
+                $retensiInaktif = '5 Tahun';
             }
 
             $sheet->setCellValue('A' . $rowNumber, $index + 1);

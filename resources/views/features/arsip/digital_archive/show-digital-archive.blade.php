@@ -22,7 +22,7 @@
         </div>
     </x-slot>
 
-    @php
+       @php
         $archiveFiles = $archive->file_path_archive ?? [];
 
         if (!is_array($archiveFiles)) {
@@ -31,6 +31,11 @@
 
         $kategori = $archive->kategori ?? '-';
         $status = $archive->status ?? '-';
+
+        // Deteksi apakah arsip ini adalah UP Bendahara
+        $isUpBendahara = ($archive->category && str_contains(strtoupper($archive->category->category_name), 'UP'))
+            || !empty($archive->no_spby)
+            || (isset($archive->category_archive) && str_contains(strtoupper($archive->category_archive->category_name ?? ''), 'UP'));
     @endphp
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 py-8">
@@ -355,14 +360,14 @@
                         </div>
 
 
-                        {{-- Klasifikasi --}}
+                         {{-- Klasifikasi --}}
                         <div>
                             <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">
                                 Kode Klasifikasi
                             </label>
 
                             <div class="info-box">
-                                {{ $archive->kode_klasifikasi ?? '-' }}
+                                {{ (trim($archive->kode_klasifikasi ?? '') ?: ($isUpBendahara ? 'KU.02.03' : '-')) }}
                             </div>
                         </div>
 
@@ -374,7 +379,7 @@
                             </label>
 
                             <div class="info-box">
-                                {{ $archive->indeks1 ?? '-' }}
+                                {{ (trim($archive->indeks1 ?? '') ?: ($isUpBendahara ? 'Dokumen Keuangan' : '-')) }}
                             </div>
                         </div>
 
@@ -589,42 +594,42 @@
                         <div>
                             <label class="field-label">Tingkat Perkembangan</label>
                             <div class="info-box">
-                                {{ $archive->tingkat_pertimbangan ?? '-' }}
+                                {{ (trim($archive->tingkat_pertimbangan ?? '') ?: ($isUpBendahara ? 'asli' : '-')) }}
                             </div>
                         </div>
 
                         <div>
                             <label class="field-label">Jumlah Halaman</label>
                             <div class="info-box">
-                                {{ $archive->jumlah_halaman ? $archive->jumlah_halaman . ' lembar' : '-' }}
+                                {{ ($archive->jumlah_halaman ?: $archive->jumlah_halaman_pdf) ? ($archive->jumlah_halaman ?: $archive->jumlah_halaman_pdf) . ' lembar' : '-' }}
                             </div>
                         </div>
 
                         <div>
                             <label class="field-label">Retensi Arsip Aktif</label>
                             <div class="info-box">
-                                {{ $archive->retensi_arsip_aktif ? $archive->retensi_arsip_aktif . ' tahun' : '-' }}
+                                {{ ($archive->retensi_arsip_aktif ?: ($isUpBendahara ? 2 : null)) ? ($archive->retensi_arsip_aktif ?: ($isUpBendahara ? 2 : null)) . ' tahun' : '-' }}
                             </div>
                         </div>
 
                         <div>
                             <label class="field-label">Retensi Arsip Inaktif</label>
                             <div class="info-box">
-                                {{ $archive->retensi_arsip_inaktif ? $archive->retensi_arsip_inaktif . ' tahun' : '-' }}
+                                {{ ($archive->retensi_arsip_inaktif ?: ($isUpBendahara ? 5 : null)) ? ($archive->retensi_arsip_inaktif ?: ($isUpBendahara ? 5 : null)) . ' tahun' : '-' }}
                             </div>
                         </div>
 
                         <div>
                             <label class="field-label">Nasib Akhir Arsip</label>
                             <div class="info-box">
-                                {{ $archive->nasib_akhir_arsip ?? '-' }}
+                                {{ (trim($archive->nasib_akhir_arsip ?? '') ?: ($isUpBendahara ? 'musnah' : '-')) }}
                             </div>
                         </div>
 
                         <div>
                             <label class="field-label">Klasifikasi Keamanan</label>
                             <div class="info-box">
-                                {{ $archive->klasifikasi_keamanan ?? '-' }}
+                                {{ (trim($archive->klasifikasi_keamanan ?? '') ?: ($isUpBendahara ? 'terbatas' : '-')) }}
                             </div>
                         </div>
 

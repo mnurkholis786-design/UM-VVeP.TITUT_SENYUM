@@ -13,7 +13,7 @@
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 py-8" x-data="{ showCreateModal: false }">
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 py-8" x-data="{ showCreateModal: false, showDeleteModal: false, deleteActionUrl: '', deleteTitle: '', deleteMessage: '' }">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {{-- TOMBOL KEMBALI --}}
@@ -113,10 +113,11 @@
                                     <a href="{{ route('category.downloadArsipFisik', [$category->id, $tahun]) }}" class="px-2 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Unduh</a>
                                     @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     <button type="button" @click="showEdit = !showEdit" class="px-2 py-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Edit File</button>
-                                    <form action="{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus berkas Tahun {{ $tahun }} ini?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="w-full px-2 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Hapus</button>
-                                    </form>
+                                    <button type="button" 
+                                        @click="deleteActionUrl = '{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}'; deleteTitle = 'Hapus Berkas Tahun {{ $tahun }}'; deleteMessage = 'Yakin ingin menghapus berkas Tahun {{ $tahun }} ini?'; showDeleteModal = true" 
+                                        class="w-full px-2 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">
+                                        Hapus
+                                    </button>
                                     @endif
                                 </div>
 
@@ -148,10 +149,11 @@
                                     <button type="submit" class="w-full py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition">Upload Excel {{ $tahun }}</button>
                                 </form>
                                 
-                                <form action="{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kartu Tahun {{ $tahun }} ini?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="w-full py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">Hapus Kartu</button>
-                                </form>
+                                <button type="button" 
+                                    @click="deleteActionUrl = '{{ route('category.deleteArsipFisik', [$category->id, $tahun]) }}'; deleteTitle = 'Hapus Kartu Tahun {{ $tahun }}'; deleteMessage = 'Yakin ingin menghapus kartu Tahun {{ $tahun }} ini?'; showDeleteModal = true" 
+                                    class="w-full py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-center text-xs font-semibold transition">
+                                    Hapus Kartu
+                                </button>
                             @endif
                         </div>
                         @empty
@@ -199,6 +201,51 @@
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-md hover:bg-blue-700 transition">Simpan Arsip</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        {{-- MODAL POP-UP KONFIRMASI HAPUS --}}
+        <div x-show="showDeleteModal" style="display: none;" 
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+             
+            <div @click.away="showDeleteModal = false" 
+                 class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                {{-- Icon Peringatan Merah --}}
+                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-inner">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+
+                <h3 class="text-base font-bold text-gray-800 mb-1" x-text="deleteTitle">Konfirmasi Hapus</h3>
+                <p class="text-xs text-gray-500 mb-6" x-text="deleteMessage">
+                    Yakin ingin menghapus berkas ini?
+                </p>
+
+                <form :action="deleteActionUrl" method="POST" class="flex items-center justify-center gap-3">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" @click="showDeleteModal = false" class="w-1/2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-red-200 transition">
+                        Ya, Hapus
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>

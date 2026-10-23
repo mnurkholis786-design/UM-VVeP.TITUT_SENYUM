@@ -237,4 +237,111 @@ class DigitalArchive extends Model
             }
         );
     }
+
+    /**
+     * Hitung total lembar halaman PDF dari file arsip yang tersimpan di disk.
+     */
+    public function hitungJumlahHalamanPdf(): ?int
+    {
+        $files = $this->file_path_archive;
+        if (empty($files)) {
+            return null;
+        }
+
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+
+        $total = 0;
+        foreach ($files as $file) {
+            if (empty($file)) {
+                continue;
+            }
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('private')->path($file);
+            if (!file_exists($fullPath)) {
+                continue;
+            }
+
+            try {
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $total += $pdf->setSourceFile($fullPath);
+            } catch (\Throwable $e) {
+                // Fallback jika FPDI terkendala versi PDF
+                $content = @file_get_contents($fullPath);
+                if ($content) {
+                    $matches = [];
+                    $count = preg_match_all("/\/Type\s*\/Page[^s]/", $content, $matches);
+                    if ($count > 0) {
+                        $total += $count;
+                    }
+                }
+            }
+        }
+
+        return $total > 0 ? $total : null;
+    }
+
+    /**
+     * Accessor untuk atribut jumlah_halaman_pdf.
+     */
+    public function getJumlahHalamanPdfAttribute(): ?int
+    {
+        return $this->hitungJumlahHalamanPdf();
+    }
+
+    /**
+     * Accessor cerdas untuk jumlah_halaman:
+     * Mengembalikan nilai yang tersimpan di database jika ada,
+     * atau menghitung otomatis dari file PDF jika kosong/null.
+     */
+    protected function jumlahHalaman(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value !== null && $value !== '' && (int) $value > 0) {
+                    return (int) $value;
+                }
+                return $this->hitungJumlahHalamanPdf();
+            },
+            set: fn ($value) => $value
+        );
+    }
+
+    /**
+     * Normalisasi retensi_arsip_aktif.
+     * Kolom tipe YEAR di MySQL otomatis menyimpan angka 1..99 sebagai 2001..2099.
+     * Accessor ini mengembalikan angka durasi tahun murni (contoh: 1, 2).
+     */
+    protected function retensiArsipAktif(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value === null || $value === '' || $value === '-') {
+                    return null;
+                }
+                $val = (int) $value;
+                return $val > 1900 ? max(abs($val - 2000), 1) : $val;
+            },
+            set: fn ($value) => ($value !== null && $value !== '') ? (int) $value : null
+        );
+    }
+
+    /**
+     * Normalisasi retensi_arsip_inaktif.
+     * Kolom tipe YEAR di MySQL otomatis menyimpan angka 1..99 sebagai 2001..2099.
+     * Accessor ini mengembalikan angka durasi tahun murni (contoh: 3, 4, 5).
+     */
+    protected function retensiArsipInaktif(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value === null || $value === '' || $value === '-') {
+                    return null;
+                }
+                $val = (int) $value;
+                return $val > 1900 ? max(abs($val - 2000), 1) : $val;
+            },
+            set: fn ($value) => ($value !== null && $value !== '') ? (int) $value : null
+        );
+    }
 }

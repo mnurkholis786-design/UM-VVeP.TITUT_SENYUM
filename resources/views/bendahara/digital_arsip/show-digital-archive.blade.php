@@ -203,7 +203,7 @@
                     <div>
                         <p class="text-sm font-medium text-gray-500 mb-2">Jumlah Halaman</p>
                         <p class="text-gray-800 px-4 py-2.5 bg-gray-50 rounded-md border border-gray-200">
-                            {{ $archive->jumlah_halaman ? $archive->jumlah_halaman . ' lembar' : '-' }}
+                            {{ ($archive->jumlah_halaman ?: $archive->jumlah_halaman_pdf) ? ($archive->jumlah_halaman ?: $archive->jumlah_halaman_pdf) . ' lembar' : '-' }}
                         </p>
                     </div>
 

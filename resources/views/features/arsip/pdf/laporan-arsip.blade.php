@@ -314,7 +314,7 @@
                                     $retensiAktif = str_ireplace('Tahun', '', $rawAktif) . ' Tahun';
                                 }
                             } else {
-                                $retensiAktif = '-';
+                                $retensiAktif = '2 Tahun';
                             }
 
                             $rawInaktif = trim((string)($archive->retensi_arsip_inaktif ?? ''));
@@ -326,7 +326,7 @@
                                     $retensiInaktif = str_ireplace('Tahun', '', $rawInaktif) . ' Tahun';
                                 }
                             } else {
-                                $retensiInaktif = '-';
+                                $retensiInaktif = '5 Tahun';
                             }
                         @endphp
 

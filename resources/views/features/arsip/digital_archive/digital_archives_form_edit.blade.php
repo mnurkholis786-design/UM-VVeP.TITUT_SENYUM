@@ -22,12 +22,17 @@
     </x-slot>
 
 
+     @php
+        $isUpBendahara = ($digital->category && str_contains(strtoupper($digital->category->category_name), 'UP'))
+            || !empty($digital->no_spby)
+            || (isset($digital->category_archive) && str_contains(strtoupper($digital->category_archive->category_name ?? ''), 'UP'));
+    @endphp
+
     {{-- ========================================================= --}}
     {{-- BACK BUTTON --}}
     {{-- ========================================================= --}}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-
         <a href="{{ route('year.show', $digital->category_id) }}"
             class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
             bg-white border border-gray-200 text-gray-600
@@ -256,14 +261,12 @@
                                 @endphp
 
                                 <div class="relative">
-
                                     <select
-<select
-    name="kategori"
-    id="kategori"
-    required
-    class="form-input font-medium cursor-pointer"
->
+                                        name="kategori"
+                                        id="kategori"
+                                        required
+                                        class="form-input font-medium cursor-pointer"
+                                    >
 
                                         <option value="">
                                             -- Pilih Kategori Arsip --
@@ -419,7 +422,7 @@
                                 <input
                                     type="text"
                                     name="kode_klasifikasi"
-                                    value="{{ old('kode_klasifikasi', $digital->kode_klasifikasi) }}"
+                                    value="{{ old('kode_klasifikasi', $digital->kode_klasifikasi ?: ($isUpBendahara ? 'KU.02.03' : '')) }}"
                                     class="form-input"
                                     placeholder="Kode Klasifikasi"
                                 >
@@ -442,11 +445,10 @@
                                 <input
                                     type="text"
                                     name="indeks1"
-                                    value="{{ old('indeks1', $digital->indeks1) }}"
+                                    value="{{ old('indeks1', $digital->indeks1 ?: ($isUpBendahara ? 'Dokumen Keuangan' : '')) }}"
                                     class="form-input"
                                     placeholder="Indeks 1"
                                 >
-
                                 @error('indeks1')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
@@ -912,11 +914,10 @@
                                 <input
                                     type="text"
                                     name="tingkat_pertimbangan"
-                                    value="{{ old('tingkat_pertimbangan', $digital->tingkat_pertimbangan) }}"
+                                    value="{{ old('tingkat_pertimbangan', $digital->tingkat_pertimbangan ?: ($isUpBendahara ? 'asli' : '')) }}"
                                     class="form-input"
                                     placeholder="Tingkat Perkembangan (Asli / Salinan / Tembusan)"
                                 >
-
                                 @error('tingkat_pertimbangan')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
@@ -935,7 +936,7 @@
                                 <input
                                     type="number"
                                     name="jumlah_halaman"
-                                    value="{{ old('jumlah_halaman', $digital->jumlah_halaman) }}"
+                                    value="{{ old('jumlah_halaman', $digital->jumlah_halaman ?: $digital->jumlah_halaman_pdf) }}"
                                     class="form-input"
                                     placeholder="Jumlah Halaman"
                                 >
@@ -956,13 +957,21 @@
                                     <span class="text-xs font-normal text-gray-400">(Tahun)</span>
                                 </label>
 
-                                <input
-                                    type="number"
-                                    name="retensi_arsip_aktif"
-                                    value="{{ old('retensi_arsip_aktif', $digital->retensi_arsip_aktif) }}"
-                                    class="form-input"
-                                    placeholder="Retensi Arsip Aktif"
-                                >
+                                @if($isUpBendahara)
+                                    <select name="retensi_arsip_aktif" class="form-input">
+                                        <option value="">-- Pilih Retensi Aktif --</option>
+                                        <option value="1" {{ old('retensi_arsip_aktif', $digital->retensi_arsip_aktif) == 1 ? 'selected' : '' }}>1 tahun</option>
+                                        <option value="2" {{ old('retensi_arsip_aktif', $digital->retensi_arsip_aktif ?: 2) == 2 ? 'selected' : '' }}>2 tahun</option>
+                                    </select>
+                                @else
+                                    <input
+                                        type="number"
+                                        name="retensi_arsip_aktif"
+                                        value="{{ old('retensi_arsip_aktif', $digital->retensi_arsip_aktif) }}"
+                                        class="form-input"
+                                        placeholder="Retensi Arsip Aktif"
+                                    >
+                                @endif
 
                                 @error('retensi_arsip_aktif')
                                     <p class="form-error">{{ $message }}</p>
@@ -980,13 +989,22 @@
                                     <span class="text-xs font-normal text-gray-400">(Tahun)</span>
                                 </label>
 
-                                <input
-                                    type="number"
-                                    name="retensi_arsip_inaktif"
-                                    value="{{ old('retensi_arsip_inaktif', $digital->retensi_arsip_inaktif) }}"
-                                    class="form-input"
-                                    placeholder="Retensi Arsip Inaktif"
-                                >
+                                @if($isUpBendahara)
+                                    <select name="retensi_arsip_inaktif" class="form-input">
+                                        <option value="">-- Pilih Retensi Inaktif --</option>
+                                        <option value="3" {{ old('retensi_arsip_inaktif', $digital->retensi_arsip_inaktif) == 3 ? 'selected' : '' }}>3 tahun</option>
+                                        <option value="4" {{ old('retensi_arsip_inaktif', $digital->retensi_arsip_inaktif) == 4 ? 'selected' : '' }}>4 tahun</option>
+                                        <option value="5" {{ old('retensi_arsip_inaktif', $digital->retensi_arsip_inaktif ?: 5) == 5 ? 'selected' : '' }}>5 tahun</option>
+                                    </select>
+                                @else
+                                    <input
+                                        type="number"
+                                        name="retensi_arsip_inaktif"
+                                        value="{{ old('retensi_arsip_inaktif', $digital->retensi_arsip_inaktif) }}"
+                                        class="form-input"
+                                        placeholder="Retensi Arsip Inaktif"
+                                    >
+                                @endif
 
                                 @error('retensi_arsip_inaktif')
                                     <p class="form-error">{{ $message }}</p>
@@ -1006,7 +1024,7 @@
                                 <input
                                     type="text"
                                     name="nasib_akhir_arsip"
-                                    value="{{ old('nasib_akhir_arsip', $digital->nasib_akhir_arsip) }}"
+                                    value="{{ old('nasib_akhir_arsip', $digital->nasib_akhir_arsip ?: ($isUpBendahara ? 'musnah' : '')) }}"
                                     class="form-input"
                                     placeholder="Nasib Akhir Arsip"
                                 >
@@ -1029,7 +1047,7 @@
                                 <input
                                     type="text"
                                     name="klasifikasi_keamanan"
-                                    value="{{ old('klasifikasi_keamanan', $digital->klasifikasi_keamanan) }}"
+                                    value="{{ old('klasifikasi_keamanan', $digital->klasifikasi_keamanan ?: ($isUpBendahara ? 'terbatas' : '')) }}"
                                     class="form-input"
                                     placeholder="Klasifikasi Keamanan"
                                 >
@@ -2283,7 +2301,7 @@
                         Object.keys(draftData).forEach(fieldName => {
                             const input = formEdit.querySelector(`[name="${fieldName}"]`);
                             if (input && input.type !== 'file' && input.name !== '_token' && input.name !== '_method') {
-                                if (draftData[fieldName] !== undefined && draftData[fieldName] !== null && input.value !== draftData[fieldName]) {
+                                if (draftData[fieldName] !== undefined && draftData[fieldName] !== null && String(draftData[fieldName]).trim() !== '' && input.value !== draftData[fieldName]) {
                                     input.value = draftData[fieldName];
                                     hasRestored = true;
                                 }
