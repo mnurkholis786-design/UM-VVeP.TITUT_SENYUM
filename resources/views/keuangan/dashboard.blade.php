@@ -420,35 +420,47 @@
 
 
                 <div
-                    class="bg-white/95
+                    class="progress-card relative overflow-hidden
+                           bg-gradient-to-br from-white via-white to-emerald-50/30
                            rounded-3xl
-                           border border-gray-100
-                           shadow-xl shadow-gray-200/50
+                           border border-emerald-100/80
+                           shadow-xl shadow-emerald-950/5
+                           hover:shadow-2xl hover:shadow-emerald-500/10
+                           hover:-translate-y-1
                            p-6 sm:p-7
+                           transition-all duration-300
                            animate-fade-in animate-delay-2">
 
+                    {{-- Efek ambient glow di pojok kartu --}}
+                    <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                    {{-- Header Widget --}}
                     <div class="flex flex-col sm:flex-row
                                 sm:items-center
                                 sm:justify-between
-                                gap-4 mb-5">
+                                gap-4 mb-6 relative z-10">
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3.5">
 
+                            {{-- Ikon 3D Glow --}}
                             <div
-                                class="w-11 h-11
-                                       rounded-xl
-                                       bg-gradient-to-br
-                                       from-emerald-100 to-green-100
-                                       flex items-center justify-center">
+                                class="w-12 h-12
+                                       rounded-2xl
+                                       bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700
+                                       text-white
+                                       flex items-center justify-center
+                                       shadow-lg shadow-emerald-500/30
+                                       border border-white/20
+                                       transition-transform duration-300 hover:scale-110 hover:rotate-3">
 
-                                <svg class="w-5 h-5 text-emerald-600"
+                                <svg class="w-6 h-6 drop-shadow-sm"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24">
 
                                     <path stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        stroke-width="2"
+                                        stroke-width="2.2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z">
                                     </path>
 
@@ -458,11 +470,11 @@
 
                             <div>
 
-                                <h3 class="text-lg font-extrabold text-gray-800">
+                                <h3 class="text-lg font-black text-gray-800 tracking-tight">
                                     Progress Verifikasi
                                 </h3>
 
-                                <p class="text-xs text-gray-500">
+                                <p class="text-xs font-medium text-gray-500 mt-0.5">
                                     Persentase pengajuan yang telah diverifikasi
                                 </p>
 
@@ -470,76 +482,98 @@
 
                         </div>
 
-
+                        {{-- Badge Persentase 3D dengan Live Pulse Dot --}}
                         <div
-                            class="px-4 py-2
-                                   rounded-full
-                                   bg-emerald-50
-                                   border border-emerald-100
-                                   text-emerald-700
-                                   font-extrabold text-sm">
+                            class="inline-flex items-center gap-2
+                                   px-4 py-2
+                                   rounded-2xl
+                                   bg-gradient-to-r from-emerald-50 to-teal-50
+                                   border border-emerald-200/80
+                                   shadow-sm shadow-emerald-900/5">
 
-                            {{ $formattedProgress }}%
+                            <span class="relative flex h-2.5 w-2.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                            </span>
+
+                            <span class="text-base font-black text-emerald-700 tracking-tight">
+                                {{ $formattedProgress }}%
+                            </span>
 
                         </div>
 
                     </div>
 
 
+                    {{-- Track Kapsul Progress Bar 3D Inset --}}
                     <div
-                        class="w-full
-                               bg-gray-100
+                        class="relative w-full
+                               bg-slate-100/90
                                rounded-full
-                               h-4
-                               overflow-hidden
-                               shadow-inner">
+                               h-6 p-1
+                               border border-slate-200/80
+                               shadow-inner
+                               overflow-hidden">
 
+                        {{-- Bar Isi dengan Efek Energi Mengalir & Kilau 3D --}}
                         <div
-                            class="h-4
-                                   rounded-full
-                                   bg-gradient-to-r
-                                   from-emerald-400
-                                   via-green-500
-                                   to-emerald-600
-                                   transition-all duration-700
-                                   shadow-sm"
+                            class="progress-bar-animated relative h-full rounded-full
+                                   bg-gradient-to-r from-emerald-500 via-green-400 to-teal-400
+                                   shadow-md shadow-emerald-500/40
+                                   transition-all duration-1000 ease-out"
                             style="width: {{ $progress }}%;">
+
+                            {{-- Lapisan kilau specular kaca atas --}}
+                            <div class="absolute inset-0 bg-gradient-to-b from-white/35 to-transparent rounded-full pointer-events-none"></div>
+
+                            {{-- Titik Pendar Cahaya di Ujung Bar --}}
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_8px_#ffffff] opacity-85"></div>
+
                         </div>
 
                     </div>
 
 
+                    {{-- Footer Keterangan & Detail Statistik --}}
                     <div
                         class="flex flex-col sm:flex-row
-                               sm:justify-between
-                               gap-2
-                               mt-4
-                               text-sm text-gray-500">
+                               sm:items-center sm:justify-between
+                               gap-3
+                               mt-5 pt-3
+                               border-t border-slate-100
+                               text-sm relative z-10">
 
-                        <span>
+                        <div class="flex items-center gap-2 text-gray-600">
 
-                            <strong class="text-gray-800">
-                                {{ $sudah }}
-                            </strong>
+                            <div class="w-5 h-5 rounded-md bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
 
-                            dari
+                            <span>
+                                <strong class="text-gray-900 font-bold text-base">
+                                    {{ $sudah }}
+                                </strong>
+                                <span class="text-gray-400 font-medium">/</span>
+                                <strong class="text-gray-900 font-bold text-base">
+                                    {{ $total }}
+                                </strong>
+                                <span class="text-gray-500 text-xs sm:text-sm font-medium">pengajuan telah diverifikasi</span>
+                            </span>
 
-                            <strong class="text-gray-800">
-                                {{ $total }}
-                            </strong>
+                        </div>
 
-                            pengajuan telah diverifikasi
-
-                        </span>
-
-                        <span class="font-semibold text-emerald-600">
-                            {{ $formattedProgress }}% selesai
-                        </span>
+                        <div class="flex items-center gap-1.5 self-start sm:self-auto px-3 py-1 bg-emerald-50/80 rounded-xl border border-emerald-100 text-emerald-700 text-xs font-bold">
+                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ $formattedProgress }}% selesai</span>
+                        </div>
 
                     </div>
 
                 </div>
-
 
 
                 {{-- ========================================================= --}}
@@ -1277,20 +1311,58 @@
 
     <style>
 
-        /* Keyframes untuk Animasi Masuk (Fade In + Slide Up) */
+        /* ========================================================= */
+        /* 1. KEYFRAMES & 3D ANIMASI                                */
+        /* ========================================================= */
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(16px);
+                transform: translateY(18px) scale(0.98);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Efek Kilau Sapuan Kaca 3D */
+        @keyframes shimmerSweep {
+            0% {
+                transform: translateX(-150%) skewX(-20deg);
+            }
+            100% {
+                transform: translateX(250%) skewX(-20deg);
+            }
+        }
+
+        /* Animasi garis mengalir & kilau 3D pada Progress Bar */
+        .progress-bar-animated {
+            background-size: 30px 30px;
+            background-image: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.22) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.22) 50%,
+                rgba(255, 255, 255, 0.22) 75%,
+                transparent 75%,
+                transparent
+            );
+            animation: moveStripes 2s linear infinite;
+        }
+
+        @keyframes moveStripes {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 60px 0;
             }
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .animate-delay-1 {
@@ -1306,22 +1378,32 @@
         }
 
 
+        /* ========================================================= */
+        /* 2. STAT CARD 3D & EFEK GLOSS                             */
+        /* ========================================================= */
+
         .stat-card {
             position: relative;
             overflow: hidden;
             padding: 24px;
             border-radius: 24px;
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid #eef2f7;
+            background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            perspective: 1000px;
+            transform: perspective(1000px) translateZ(0);
             box-shadow:
-                0 10px 25px rgba(15, 23, 42, 0.05),
-                0 3px 8px rgba(15, 23, 42, 0.03);
+                0 4px 6px -1px rgba(0, 0, 0, 0.04),
+                0 10px 20px -3px rgba(15, 23, 42, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.95),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.02);
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
+                transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
                 border-color 0.3s ease;
+            will-change: transform, box-shadow;
         }
 
+        /* Garis kilau atas dengan gradasi 3D glow */
         .stat-card::before {
             content: "";
             position: absolute;
@@ -1332,203 +1414,274 @@
             background: linear-gradient(
                 90deg,
                 #2563eb,
-                #4f46e5
+                #4f46e5,
+                #06b6d4
             );
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transform: translateY(-2px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
+        /* Efek Shimmer Kilau Kaca saat di-hover */
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.45),
+                transparent
+            );
+            transform: translateX(-150%) skewX(-20deg);
+            pointer-events: none;
+        }
+
+        /* Hover 3D: Terangkat maju ke arah pengguna + bayangan bertingkat */
         .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: #dbeafe;
+            transform: perspective(1000px) translateY(-8px) translateZ(10px) rotateX(2deg);
+            border-color: rgba(191, 219, 254, 0.9);
             box-shadow:
-                0 20px 35px rgba(37, 99, 235, 0.10),
-                0 8px 15px rgba(15, 23, 42, 0.05);
+                0 20px 35px -8px rgba(37, 99, 235, 0.16),
+                0 10px 18px -4px rgba(15, 23, 42, 0.08),
+                0 0 0 1px rgba(37, 99, 235, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
         }
 
         .stat-card:hover::before {
             opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-card:hover::after {
+            animation: shimmerSweep 0.85s ease-out;
         }
 
         .stat-icon {
-            width: 58px;
-            height: 58px;
-            border-radius: 18px;
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow:
+                0 6px 14px rgba(15, 23, 42, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease;
+                transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.4s ease;
         }
 
+        /* Ikon melayang 3D & berputar dinamis */
         .stat-card:hover .stat-icon {
-            transform: scale(1.07) rotate(-2deg);
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.10);
+            transform: perspective(600px) scale(1.14) rotate(-6deg) translateZ(15px);
+            box-shadow:
+                0 12px 24px rgba(37, 99, 235, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
 
-        /* Quick action */
+        /* ========================================================= */
+        /* 3. QUICK ACTION 3D TACTILE BUTTONS                        */
+        /* ========================================================= */
 
         .quick-action {
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 18px;
-            border-radius: 18px;
+            padding: 20px;
+            border-radius: 20px;
             border: 1px solid #e5e7eb;
-            background:
-                linear-gradient(
-                    135deg,
-                    #faf5ff,
-                    #ffffff
-                );
+            background: linear-gradient(135deg, #ffffff 0%, #fbfcfe 60%, #f5f3ff 100%);
+            box-shadow:
+                0 4px 10px rgba(0, 0, 0, 0.03),
+                0 1px 3px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: perspective(800px) translateZ(0);
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border-color 0.3s ease;
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.25s ease;
+            will-change: transform;
         }
 
         .quick-action:hover {
-            transform: translateY(-4px);
+            transform: perspective(800px) translateY(-6px) translateZ(12px);
             border-color: #c4b5fd;
             box-shadow:
-                0 15px 30px rgba(124, 58, 237, 0.10);
+                0 18px 32px -6px rgba(124, 58, 237, 0.16),
+                0 8px 16px -4px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+        }
+
+        /* Feedback fisik saat tombol ditekan */
+        .quick-action:active {
+            transform: perspective(800px) translateY(1px) translateZ(2px) scale(0.985);
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.12);
         }
 
         .quick-icon {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             flex-shrink: 0;
-            border-radius: 15px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow:
-                0 8px 16px rgba(124, 58, 237, 0.18);
-            transition: transform 0.3s ease;
+                0 8px 18px rgba(124, 58, 237, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition:
+                transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease;
         }
 
         .quick-action:hover .quick-icon {
-            transform: scale(1.08) rotate(-3deg);
+            transform: scale(1.12) rotate(-5deg) translateZ(10px);
+            box-shadow:
+                0 14px 26px rgba(124, 58, 237, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
 
-        /* Tabs */
+        /* ========================================================= */
+        /* 4. DASHBOARD TABS 3D                                      */
+        /* ========================================================= */
 
         .dashboard-tab {
             position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 9px;
-            padding: 13px 16px;
+            gap: 10px;
+            padding: 13px 18px;
             margin-bottom: -1px;
             white-space: nowrap;
             border-bottom: 3px solid transparent;
             color: #6b7280;
             font-size: 14px;
             font-weight: 800;
+            border-radius: 12px 12px 0 0;
             transition:
-                color 0.2s ease,
-                border-color 0.2s ease;
+                color 0.25s ease,
+                border-color 0.25s ease,
+                background-color 0.25s ease,
+                transform 0.25s ease;
         }
 
         .dashboard-tab:hover {
             color: #2563eb;
+            background: rgba(37, 99, 235, 0.03);
+            transform: translateY(-2px);
         }
 
         .dashboard-tab.active {
             color: #1d4ed8;
             border-color: #2563eb;
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .tab-count {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 27px;
-            height: 25px;
-            padding: 0 7px;
+            min-width: 28px;
+            height: 26px;
+            padding: 0 8px;
             border-radius: 999px;
-            background: #f3f4f6;
-            color: #6b7280;
+            background: #f1f5f9;
+            color: #64748b;
             font-size: 11px;
             font-weight: 900;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
         }
 
         .active-count {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+            transform: scale(1.05);
         }
 
 
-        /* Submission */
+        /* ========================================================= */
+        /* 5. SUBMISSION CARD 3D LIST                                */
+        /* ========================================================= */
 
         .submission-card {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 18px;
-            padding: 18px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 22px;
             border: 1px solid #eef2f7;
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffffff,
-                    #f8fafc
-                );
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow:
+                0 4px 10px rgba(15, 23, 42, 0.03),
+                0 1px 3px rgba(15, 23, 42, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: perspective(1000px) translateZ(0);
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border-color 0.3s ease;
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.25s ease;
+            will-change: transform;
         }
 
         .submission-card:hover {
-            transform: translateY(-3px);
+            transform: perspective(1000px) translateY(-5px) translateZ(8px);
             border-color: #bfdbfe;
             box-shadow:
-                0 15px 30px rgba(37, 99, 235, 0.08);
+                0 18px 30px -8px rgba(37, 99, 235, 0.12),
+                0 8px 16px -4px rgba(15, 23, 42, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+        }
+
+        .submission-card:active {
+            transform: perspective(1000px) translateY(-1px) scale(0.995);
         }
 
         .submission-icon {
-            width: 52px;
-            height: 52px;
+            width: 54px;
+            height: 54px;
             flex-shrink: 0;
-            border-radius: 16px;
-            background:
-                linear-gradient(
-                    135deg,
-                    #eff6ff,
-                    #dbeafe
-                );
+            border-radius: 18px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow:
+                0 6px 14px rgba(37, 99, 235, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease;
+                transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease;
         }
 
         .submission-card:hover .submission-icon {
-            transform: scale(1.06);
+            transform: scale(1.1) rotate(-3deg);
             box-shadow:
-                0 8px 16px rgba(37, 99, 235, 0.12);
+                0 10px 20px rgba(37, 99, 235, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
         }
 
 
-        /* Mobile */
+        /* ========================================================= */
+        /* 6. MOBILE & UTILITIES                                     */
+        /* ========================================================= */
 
         @media (max-width: 640px) {
-
             .submission-card {
                 align-items: flex-start;
                 flex-direction: column;
             }
-
         }
-
-
-        /* Hide scrollbar */
 
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
