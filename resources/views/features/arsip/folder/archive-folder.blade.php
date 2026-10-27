@@ -49,7 +49,7 @@
                                 Kelola Folder Arsip
                             </h3>
                             <p class="text-sm mt-1 font-medium" style="color: #dbeafe !important;">
-                                Total Folder di Rak Ini: <span class="font-extrabold text-white bg-white/20 px-2.5 py-0.5 rounded-lg ml-1">{{ $folders->count() }} Folder</span>
+                                Total Folder di Rak Ini: <span class="font-extrabold text-white bg-white/20 px-2.5 py-0.5 rounded-lg ml-1">{{ $folders->whereNotNull('folder_name')->where('folder_name', '!=', '')->count() }} Folder</span>
                             </p>
                         </div>
                     </div>
@@ -69,69 +69,64 @@
             </div>
 
             {{-- LIST FOLDER DI DALAM RAK --}}
+            @php
+                $validFolders = $folders->whereNotNull('folder_name')->filter(fn($f) => !empty(trim($f->folder_name)));
+                $no = 1;
+            @endphp
+
             <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border-2 border-slate-200">
-                @php $no = 1; @endphp
-
-                @if ($folders->count() > 0)
+                @if ($validFolders->count() > 0)
                     <div class="space-y-4">
-                        @foreach ($folders as $folder)
-                            @if ($folder->folder_name)
-                                <div class="flex items-center justify-between p-4 bg-slate-50 hover:bg-cyan-50/40 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 hover:shadow-md transition-all duration-200 group">
+                        @foreach ($validFolders as $folder)
+                            <div class="flex items-center justify-between p-4 bg-slate-50 hover:bg-cyan-50/40 rounded-2xl border-2 border-slate-200 hover:border-cyan-500 hover:shadow-md transition-all duration-200 group">
 
-                                    {{-- AREA KLIK --}}
-                                    <a href="{{ route('folder.show', $folder->id) }}"
-                                        class="flex items-center gap-4 flex-1 min-w-0 pr-4">
-                                        <div class="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-blue-700 text-white font-black text-sm shadow-md">
-                                            {{ $no++ }}
-                                        </div>
+                                {{-- AREA KLIK --}}
+                                <a href="{{ route('folder.show', $folder->id) }}"
+                                    class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+                                    <div class="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-blue-700 text-white font-black text-sm shadow-md">
+                                        {{ $no++ }}
+                                    </div>
 
-                                        <div class="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl bg-cyan-100 text-cyan-800 border border-cyan-300">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-                                            </svg>
-                                        </div>
+                                    <div class="min-w-0">
+                                        <p class="text-slate-900 font-extrabold text-base leading-tight group-hover:text-cyan-800 transition-colors truncate">
+                                            {{ $folder->folder_name }}
+                                        </p>
+                                        <p class="text-xs font-bold text-slate-500 mt-1">
+                                            Kode folder: <span class="text-slate-800 font-black">{{ $folder->kode_folder ?? '-' }}</span>
+                                        </p>
+                                    </div>
+                                </a>
 
-                                        <div class="min-w-0">
-                                            <p class="text-slate-900 font-extrabold text-base leading-tight group-hover:text-cyan-800 transition-colors truncate">
-                                                {{ $folder->folder_name }}
-                                            </p>
-                                            <p class="text-xs font-bold text-slate-500 mt-1">
-                                                Kode folder: <span class="text-slate-800 font-black">{{ $folder->kode_folder ?? '-' }}</span>
-                                            </p>
-                                        </div>
+                                @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                                {{-- AKSI --}}
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="{{ route('folder.edit', $folder->id) }}"
+                                        class="p-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm hover:shadow active:scale-95 transition-all"
+                                        title="Edit Folder">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
                                     </a>
 
-                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
-                                    {{-- AKSI --}}
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <a href="{{ route('folder.edit', $folder->id) }}"
-                                            class="p-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm hover:shadow active:scale-95 transition-all"
-                                            title="Edit Folder">
+                                    <form action="{{ route('folder.destroy', $folder->id) }}" method="POST"
+                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus folder ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="p-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm hover:shadow active:scale-95 transition-all"
+                                            title="Hapus Folder">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                        </a>
-
-                                        <form action="{{ route('folder.destroy', $folder->id) }}" method="POST"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus folder ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="p-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm hover:shadow active:scale-95 transition-all"
-                                                title="Hapus Folder">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                    @endif
+                                        </button>
+                                    </form>
                                 </div>
-                            @endif
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 @else
-                    {{-- EMPTY STATE TEGAS --}}
+                    {{-- KETERANGAN BELUM ADA FOLDER ARSIP --}}
                     <div class="text-center py-16 px-4">
                         <div class="w-20 h-20 mx-auto rounded-3xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-4 border-2 border-cyan-100 shadow-inner">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +135,7 @@
                         </div>
                         <h4 class="text-lg font-black text-slate-800">Belum Ada Folder Arsip</h4>
                         <p class="text-sm font-medium text-slate-500 max-w-sm mx-auto mt-1">
-                            Rak ini belum memiliki folder. Silakan klik tombol "Tambah Folder Arsip" di atas untuk mulai mengelompokkan berkas Anda.
+                            Rak ini masih kosong dan belum ditambahkan folder arsip apa pun. Silakan klik tombol <span class="font-bold text-slate-700">"+ Tambah Folder Arsip"</span> di atas untuk mulai membuat folder baru.
                         </p>
                     </div>
                 @endif
