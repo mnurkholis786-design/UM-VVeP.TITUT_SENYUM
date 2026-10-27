@@ -56,144 +56,60 @@
             {{-- =========================
                 WELCOME HERO
             ========================== --}}
-            <div
-                class="relative overflow-hidden
-                       bg-gradient-to-r from-[#003A8F] via-[#0066CC] to-[#00AEEF]
-                       text-white
-                       p-8 sm:p-10
-                       rounded-[28px]
-                       shadow-[0_20px_50px_rgba(0,58,143,0.25)]
-                       mb-8
-                       dashboard-fade-in"
-            >
+            {{-- HERO BANNER ROYAL BLUE TVRI --}}
+            <div class="relative overflow-hidden rounded-3xl p-7 md:p-9 shadow-2xl shadow-blue-900/25 border border-blue-900/20 text-white mb-8"
+                 style="background: linear-gradient(120deg, #002766 0%, #003A8F 52%, #0056C7 100%) !important;">
 
-                {{-- Decorative circles --}}
-                <div
-                    class="absolute -top-20 -right-20
-                           w-72 h-72
-                           rounded-full
-                           bg-white/10
-                           blur-sm"
-                ></div>
+                {{-- Ambient Light Background 3D --}}
+                <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-400/15 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-20 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl pointer-events-none"></div>
 
-                <div
-                    class="absolute -bottom-28 -left-20
-                           w-80 h-80
-                           rounded-full
-                           bg-white/10"
-                ></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div class="max-w-2xl">
 
-                <div
-                    class="absolute top-10 right-1/3
-                           w-16 h-16
-                           rounded-full
-                           bg-white/10"
-                ></div>
-
-
-                <div class="relative z-10">
-
-                    <div
-                        class="inline-flex items-center gap-2
-                               px-4 py-2
-                               rounded-full
-                               bg-white/15
-                               border border-white/20
-                               backdrop-blur-md
-                               text-sm font-semibold
-                               mb-5"
-                    >
-                        <span
-                            class="w-2.5 h-2.5
-                                   rounded-full
-                                   bg-cyan-300
-                                   shadow-[0_0_12px_rgba(103,232,249,0.9)]"
-                        ></span>
-
-                        Dashboard Aktif
-                    </div>
-
-
-                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-
-                        <div class="max-w-3xl">
-
-                            <h1
-                                class="text-3xl sm:text-4xl lg:text-5xl
-                                       font-extrabold
-                                       tracking-tight
-                                       leading-tight"
-                            >
-                                Selamat Datang di
-                                <span class="text-cyan-200">
-                                    Dashboard Administrator!
-                                </span>
-                            </h1>
-
-                            <p
-                                class="mt-4
-                                       text-blue-50
-                                       text-base sm:text-lg
-                                       leading-relaxed
-                                       max-w-2xl"
-                            >
-                                Kelola dokumen, pantau statistik, dan akses
-                                berbagai fitur sistem dengan lebih mudah,
-                                cepat, dan terorganisir.
-                            </p>
-
+                        {{-- Tag Badge dengan Live Pulse Dot --}}
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/25 text-xs font-bold tracking-wide uppercase mb-3 shadow-inner">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-white">TVRI Kalimantan Selatan • Administrator Sistem</span>
                         </div>
 
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug text-white">
+                            Selamat Datang di Dashboard Admin
+                        </h1>
 
-                        {{-- Admin Icon --}}
-                        <div
-                            class="hidden md:flex
-                                   flex-shrink-0
-                                   w-28 h-28
-                                   rounded-3xl
-                                   bg-white/15
-                                   border border-white/20
-                                   backdrop-blur-md
-                                   items-center justify-center
-                                   shadow-xl"
-                        >
+                        <p class="text-blue-100 text-sm md:text-base mt-2.5 leading-relaxed font-normal">
+                            Panel pengawasan terpadu untuk monitoring arsip digital, pengguna, dan pengelolaan sistem secara real-time.
+                        </p>
 
-                            <svg
-                                class="w-16 h-16 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M12 11c2.21 0 4-1.79
-                                       4-4s-1.79-4-4-4-4 1.79-4 4
-                                       1.79 4 4 4z"
-                                />
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M5.5 21a6.5 6.5 0 0113 0"
-                                />
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M19 8v6m3-3h-6"
-                                />
+                        {{-- Tanggal Hari Ini --}}
+                        <div class="flex items-center gap-2 mt-5 text-xs font-semibold text-blue-100">
+                            <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-
+                            <span>{{ now()->isoFormat('dddd, D MMMM YYYY') }}</span>
                         </div>
-
                     </div>
 
+                    {{-- Widget Ringkasan Kanan (Kaca 3D) --}}
+                    <div class="shrink-0 bg-white/15 border border-white/30 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl flex items-center gap-4 md:min-w-[265px]">
+                        <div class="w-12 h-12 shrink-0 rounded-xl bg-white/15 flex items-center justify-center border border-white/25 shadow-inner">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-blue-100">
+                                Total Seluruh Arsip
+                            </p>
+                            <p class="text-3xl font-black mt-1 tracking-tight text-white">
+                                {{ $arsip ?? 0 }}
+                            </p>
+                            <p class="text-xs mt-1 text-blue-200 font-medium">
+                                Berkas tersimpan
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
             </div>
 
 

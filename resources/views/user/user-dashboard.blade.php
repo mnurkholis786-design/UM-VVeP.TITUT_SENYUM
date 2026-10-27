@@ -177,59 +177,61 @@
                 {{-- ========================================================= --}}
                 {{-- HERO SECTION --}}
                 {{-- ========================================================= --}}
-                <div class="hero-dashboard rounded-2xl">
+                {{-- HERO BANNER ROYAL BLUE TVRI --}}
+                <div class="relative overflow-hidden rounded-3xl p-7 md:p-9 shadow-2xl shadow-blue-900/25 border border-blue-900/20 text-white"
+                     style="background: linear-gradient(120deg, #002766 0%, #003A8F 52%, #0056C7 100%) !important;">
 
-                    <div class="relative z-10 p-7 sm:p-9">
+                    {{-- Ambient Light Background --}}
+                    <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-400/15 blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-20 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl pointer-events-none"></div>
 
-                        <div class="flex items-center justify-between gap-6">
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div class="max-w-2xl">
 
-                            {{-- TEXT --}}
-                            <div class="min-w-0">
-
-                                <div
-                                    class="inline-flex items-center gap-2 px-3 py-1.5 mb-4 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm">
-                                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
-
-                                    <span class="text-xs font-medium text-blue-100">
-                                        Sistem Pengajuan Keuangan
-                                    </span>
-                                </div>
-
-                                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">
-                                    Halo, {{ Auth::user()->name }}! 👋
-                                </h1>
-
-                                <p class="text-blue-100 text-sm sm:text-base max-w-xl leading-relaxed">
-                                    Selamat datang di dashboard Anda.
-                                    Pantau pengajuan keuangan dan status dokumen dengan mudah.
-                                </p>
-
+                            {{-- Tag Badge --}}
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/25 text-xs font-bold tracking-wide uppercase mb-3 shadow-inner">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-white">TVRI Kalimantan Selatan • {{ Auth::user()->role ?? 'Divisi' }}</span>
                             </div>
 
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug text-white">
+                                Halo, {{ Auth::user()->name }}! 👋
+                            </h1>
 
-                            {{-- ICON --}}
-                            <div class="hidden sm:flex shrink-0">
+                            <p class="text-blue-100 text-sm md:text-base mt-2.5 leading-relaxed font-normal">
+                                Pantau progres pengajuan anggaran, kelengkapan berkas, dan histori verifikasi Anda.
+                            </p>
 
-                                <div
-                                    class="hero-icon w-20 h-20 rounded-2xl bg-white/15 border border-white/20 backdrop-blur-md flex items-center justify-center">
-
-                                    <svg class="w-10 h-10 text-white" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                        </path>
-
-                                    </svg>
-
-                                </div>
-
+                            {{-- Tanggal Hari Ini --}}
+                            <div class="flex items-center gap-2 mt-5 text-xs font-semibold text-blue-100">
+                                <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ now()->isoFormat('dddd, D MMMM YYYY') }}</span>
                             </div>
-
                         </div>
 
+                        {{-- Widget Ringkasan Kanan (Kaca 3D) --}}
+                        {{-- Widget Ringkasan Kanan (Kaca 3D) --}}
+                        <div class="shrink-0 bg-white/15 border border-white/30 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl flex items-center gap-4 md:min-w-[265px]">
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-white/15 flex items-center justify-center border border-white/25 shadow-inner">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-blue-100">
+                                    Pengajuan Saya
+                                </p>
+                                <p class="text-3xl font-black mt-1 tracking-tight text-white">
+                                    {{ $all_submit ?? ($total_submission ?? 0) }}
+                                </p>
+                                <p class="text-xs mt-1 text-blue-200 font-medium">
+                                    Total diajukan
+                                </p>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
 

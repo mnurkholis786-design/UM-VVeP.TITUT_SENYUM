@@ -57,144 +57,60 @@
                 {{-- HERO --}}
                 {{-- ========================================================= --}}
 
-                <div
-                    class="relative overflow-hidden
-                           rounded-3xl
-                           bg-gradient-to-br
-                           from-blue-600
-                           via-indigo-600
-                           to-blue-900
-                           shadow-2xl
-                           shadow-blue-200/60
-                           animate-fade-in">
+                {{-- HERO BANNER ROYAL BLUE TVRI --}}
+                <div class="relative overflow-hidden rounded-3xl p-7 md:p-9 shadow-2xl shadow-blue-900/25 border border-blue-900/20 text-white animate-fade-in"
+                     style="background: linear-gradient(120deg, #002766 0%, #003A8F 52%, #0056C7 100%) !important;">
 
-                    {{-- Decorative circles --}}
-                    <div
-                        class="absolute -top-24 -right-20
-                               w-80 h-80
-                               bg-white/10
-                               rounded-full">
-                    </div>
+                    {{-- Ambient Light Background --}}
+                    <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-400/15 blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-20 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl pointer-events-none"></div>
 
-                    <div
-                        class="absolute -bottom-32 -left-20
-                               w-96 h-96
-                               bg-cyan-400/10
-                               rounded-full">
-                    </div>
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div class="max-w-2xl">
 
-                    <div
-                        class="absolute top-10 right-64
-                               w-20 h-20
-                               bg-white/5
-                               rounded-full
-                               blur-sm">
-                    </div>
-
-
-                    <div class="relative p-7 sm:p-9">
-
-                        <div class="flex flex-col md:flex-row
-                                    md:items-center
-                                    md:justify-between
-                                    gap-7">
-
-                            <div class="flex items-center gap-5">
-
-                                <div
-                                    class="flex-shrink-0
-                                           w-16 h-16
-                                           rounded-2xl
-                                           bg-white/15
-                                           backdrop-blur-md
-                                           border border-white/20
-                                           flex items-center justify-center
-                                           shadow-xl">
-
-                                    <svg class="w-8 h-8 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24">
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="1.7"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-
-                                    </svg>
-
-                                </div>
-
-
-                                <div>
-
-                                    <p class="text-blue-100 text-sm font-semibold mb-1">
-                                        Sistem Keuangan
-                                    </p>
-
-                                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
-                                        Dashboard Verifikasi Keuangan
-                                    </h1>
-
-                                    <p class="text-blue-100 text-sm sm:text-base mt-2">
-                                        Kelola dan verifikasi pengajuan keuangan dengan mudah
-                                    </p>
-
-                                </div>
-
+                            {{-- Tag Badge --}}
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/25 text-xs font-bold tracking-wide uppercase mb-3 shadow-inner">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-white">TVRI Kalimantan Selatan • Verifikator Keuangan</span>
                             </div>
 
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug text-white">
+                                Selamat Datang, Verifikator Keuangan
+                            </h1>
 
-                            {{-- Total --}}
-                            <div
-                                class="flex items-center gap-4
-                                       px-5 py-4
-                                       rounded-2xl
-                                       bg-white/10
-                                       backdrop-blur-md
-                                       border border-white/20
-                                       shadow-xl">
+                            <p class="text-blue-100 text-sm md:text-base mt-2.5 leading-relaxed font-normal">
+                                Panel verifikasi pengajuan anggaran belanja secara terpadu, cepat, dan transparan.
+                            </p>
 
-                                <div
-                                    class="w-12 h-12
-                                           rounded-xl
-                                           bg-white/15
-                                           flex items-center justify-center">
-
-                                    <svg class="w-6 h-6 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24">
-
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="1.8"
-                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                                        </path>
-
-                                    </svg>
-
-                                </div>
-
-                                <div>
-
-                                    <p class="text-xs text-blue-100">
-                                        Total Pengajuan
-                                    </p>
-
-                                    <p class="text-2xl font-extrabold text-white">
-                                        {{ $total_pengajuan ?? 0 }}
-                                    </p>
-
-                                </div>
-
+                            {{-- Tanggal Hari Ini --}}
+                            <div class="flex items-center gap-2 mt-5 text-xs font-semibold text-blue-100">
+                                <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ now()->isoFormat('dddd, D MMMM YYYY') }}</span>
                             </div>
-
                         </div>
 
+                        {{-- Widget Ringkasan Kanan (Kaca 3D) --}}
+                        <div class="shrink-0 bg-white/15 border border-white/30 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl flex items-center gap-4 md:min-w-[265px]">
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-white/15 flex items-center justify-center border border-white/25 shadow-inner">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-blue-100">
+                                    Total Pengajuan
+                                </p>
+                                <p class="text-3xl font-black mt-1 tracking-tight text-white">
+                                    {{ $total_pengajuan ?? 0 }}
+                                </p>
+                                <p class="text-xs mt-1 text-blue-200 font-medium">
+                                    Berkas terdaftar
+                                </p>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
 
@@ -419,162 +335,107 @@
                 @endphp
 
 
-                <div
-                    class="progress-card relative overflow-hidden
-                           bg-gradient-to-br from-white via-white to-emerald-50/30
-                           rounded-3xl
-                           border border-emerald-100/80
-                           shadow-xl shadow-emerald-950/5
-                           hover:shadow-2xl hover:shadow-emerald-500/10
-                           hover:-translate-y-1
-                           p-6 sm:p-7
-                           transition-all duration-300
-                           animate-fade-in animate-delay-2">
+                <div class="relative overflow-hidden bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-[0_10px_30px_-5px_rgba(0,58,143,0.06)] hover:shadow-xl transition-all duration-300 animate-fade-in animate-delay-2">
 
-                    {{-- Efek ambient glow di pojok kartu --}}
-                    <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                    {{-- Ambient Light Halus --}}
+                    <div class="absolute -top-16 -right-16 w-52 h-52 bg-blue-100/40 rounded-full blur-3xl pointer-events-none"></div>
 
-                    {{-- Header Widget --}}
-                    <div class="flex flex-col sm:flex-row
-                                sm:items-center
-                                sm:justify-between
-                                gap-4 mb-6 relative z-10">
-
-                        <div class="flex items-center gap-3.5">
-
-                            {{-- Ikon 3D Glow --}}
-                            <div
-                                class="w-12 h-12
-                                       rounded-2xl
-                                       bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700
-                                       text-white
-                                       flex items-center justify-center
-                                       shadow-lg shadow-emerald-500/30
-                                       border border-white/20
-                                       transition-transform duration-300 hover:scale-110 hover:rotate-3">
-
-                                <svg class="w-6 h-6 drop-shadow-sm"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2.2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z">
-                                    </path>
-
+                    {{-- Bagian Header: Judul + Persentase Besar --}}
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 relative z-10">
+                        <div class="flex items-center gap-4">
+                            {{-- Ikon Royal Blue TVRI 3D --}}
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-900/25 shrink-0"
+                                 style="background: linear-gradient(135deg, #003A8F 0%, #0056C7 100%);">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-
                             </div>
 
                             <div>
-
-                                <h3 class="text-lg font-black text-gray-800 tracking-tight">
-                                    Progress Verifikasi
-                                </h3>
-
-                                <p class="text-xs font-medium text-gray-500 mt-0.5">
-                                    Persentase pengajuan yang telah diverifikasi
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-lg font-black text-gray-900 tracking-tight">
+                                        Progress Verifikasi Berkas
+                                    </h3>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        Real-time
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-0.5">
+                                    Tingkat penyelesaian pemeriksaan pengajuan anggaran keuangan
                                 </p>
-
                             </div>
-
                         </div>
 
-                        {{-- Badge Persentase 3D dengan Live Pulse Dot --}}
-                        <div
-                            class="inline-flex items-center gap-2
-                                   px-4 py-2
-                                   rounded-2xl
-                                   bg-gradient-to-r from-emerald-50 to-teal-50
-                                   border border-emerald-200/80
-                                   shadow-sm shadow-emerald-900/5">
-
-                            <span class="relative flex h-2.5 w-2.5">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        {{-- Persentase Besar & Gagah --}}
+                        <div class="text-left sm:text-right">
+                            <div class="flex items-baseline sm:justify-end gap-1">
+                                <span class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+                                    {{ $formattedProgress }}
+                                </span>
+                                <span class="text-xl font-black text-[#003A8F]">%</span>
+                            </div>
+                            <span class="text-xs font-semibold text-emerald-600 block mt-0.5">
+                                ✓ Hampir Selesai Seluruhnya
                             </span>
-
-                            <span class="text-base font-black text-emerald-700 tracking-tight">
-                                {{ $formattedProgress }}%
-                            </span>
-
                         </div>
-
                     </div>
 
-
-                    {{-- Track Kapsul Progress Bar 3D Inset --}}
-                    <div
-                        class="relative w-full
-                               bg-slate-100/90
-                               rounded-full
-                               h-6 p-1
-                               border border-slate-200/80
-                               shadow-inner
-                               overflow-hidden">
-
-                        {{-- Bar Isi dengan Efek Energi Mengalir & Kilau 3D --}}
-                        <div
-                            class="progress-bar-animated relative h-full rounded-full
-                                   bg-gradient-to-r from-emerald-500 via-green-400 to-teal-400
-                                   shadow-md shadow-emerald-500/40
-                                   transition-all duration-1000 ease-out"
-                            style="width: {{ $progress }}%;">
-
-                            {{-- Lapisan kilau specular kaca atas --}}
-                            <div class="absolute inset-0 bg-gradient-to-b from-white/35 to-transparent rounded-full pointer-events-none"></div>
-
-                            {{-- Titik Pendar Cahaya di Ujung Bar --}}
-                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_8px_#ffffff] opacity-85"></div>
-
+                    {{-- Progress Bar Padat & Gagah (Gradasi TVRI Blue ke Emerald) --}}
+                    <div class="relative w-full bg-slate-100 rounded-full h-4 overflow-hidden border border-slate-200/80 shadow-inner my-5">
+                        <div class="h-full rounded-full transition-all duration-1000 ease-out shadow-sm"
+                             style="width: {{ $progress }}%; background: linear-gradient(90deg, #003A8F 0%, #0066CC 55%, #10b981 100%);">
+                            {{-- Kilau Kaca Halus Atas --}}
+                            <div class="w-full h-1/2 bg-white/30 rounded-t-full"></div>
                         </div>
-
                     </div>
 
+                    {{-- 3 Mini KPI Cards 3D di Bagian Bawah (Mengisi Ruang Secara Proporsional) --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-5 pt-4 border-t border-slate-100 relative z-10">
 
-                    {{-- Footer Keterangan & Detail Statistik --}}
-                    <div
-                        class="flex flex-col sm:flex-row
-                               sm:items-center sm:justify-between
-                               gap-3
-                               mt-5 pt-3
-                               border-t border-slate-100
-                               text-sm relative z-10">
-
-                        <div class="flex items-center gap-2 text-gray-600">
-
-                            <div class="w-5 h-5 rounded-md bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        {{-- 1. Sudah Diverifikasi --}}
+                        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100/90 shadow-sm">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-
-                            <span>
-                                <strong class="text-gray-900 font-bold text-base">
-                                    {{ $sudah }}
-                                </strong>
-                                <span class="text-gray-400 font-medium">/</span>
-                                <strong class="text-gray-900 font-bold text-base">
-                                    {{ $total }}
-                                </strong>
-                                <span class="text-gray-500 text-xs sm:text-sm font-medium">pengajuan telah diverifikasi</span>
-                            </span>
-
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Telah Diverifikasi</p>
+                                <p class="text-lg font-black text-gray-900 leading-tight mt-0.5">{{ $sudah }} <span class="text-xs font-normal text-gray-500">berkas</span></p>
+                            </div>
                         </div>
 
-                        <div class="flex items-center gap-1.5 self-start sm:self-auto px-3 py-1 bg-emerald-50/80 rounded-xl border border-emerald-100 text-emerald-700 text-xs font-bold">
-                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            <span>{{ $formattedProgress }}% selesai</span>
+                        {{-- 2. Menunggu Verifikasi --}}
+                        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/60 to-white border border-amber-100/90 shadow-sm">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Menunggu Tindakan</p>
+                                <p class="text-lg font-black text-gray-900 leading-tight mt-0.5">{{ max(0, $total - $sudah) }} <span class="text-xs font-normal text-gray-500">berkas</span></p>
+                            </div>
+                        </div>
+
+                        {{-- 3. Total Keseluruhan --}}
+                        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/60 to-white border border-blue-100/90 shadow-sm">
+                            <div class="w-9 h-9 rounded-xl text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-900/20"
+                                 style="background: #003A8F;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-blue-900">Total Pengajuan</p>
+                                <p class="text-lg font-black text-gray-900 leading-tight mt-0.5">{{ $total }} <span class="text-xs font-normal text-gray-500">berkas</span></p>
+                            </div>
                         </div>
 
                     </div>
 
                 </div>
-
 
                 {{-- ========================================================= --}}
                 {{-- AKSI CEPAT --}}

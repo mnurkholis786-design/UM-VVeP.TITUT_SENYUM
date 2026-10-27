@@ -135,50 +135,56 @@
             {{-- =====================================================
                 HERO BANNER 3D
             ====================================================== --}}
-            <div class="hero-spatial rounded-3xl p-8 md:p-10 text-white">
-                <div class="floating-orb-1"></div>
-                <div class="floating-orb-2"></div>
+            {{-- HERO BANNER ROYAL BLUE TVRI --}}
+            <div class="relative overflow-hidden rounded-3xl p-7 md:p-9 shadow-2xl shadow-blue-900/25 border border-blue-900/20 text-white"
+                 style="background: linear-gradient(120deg, #002766 0%, #003A8F 52%, #0056C7 100%) !important;">
+
+                {{-- Ambient Light Background --}}
+                <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-blue-400/15 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-20 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                    <div>
-                        <div class="inline-flex items-center gap-2 glass-badge rounded-full px-3.5 py-1.5 mb-4 shadow-sm">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span class="text-xs font-bold tracking-wider uppercase text-blue-100">
-                                Portal Validasi SPM
-                            </span>
+                    <div class="max-w-2xl">
+
+                        {{-- Tag Badge --}}
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/25 text-xs font-bold tracking-wide uppercase mb-3 shadow-inner">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-white">TVRI Kalimantan Selatan • Pejabat PPSPM</span>
                         </div>
 
-                        <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-snug">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-snug text-white">
                             Selamat Datang, {{ Auth::user()->name }}
                         </h1>
 
-                        <p class="text-blue-100/90 text-sm md:text-base mt-2.5 max-w-2xl leading-relaxed font-normal">
-                            Portal pengesahan Surat Perintah Membayar (SPM) TVRI Kalimantan Selatan. Lakukan penandatanganan dan validasi berkas belanja langsung (LS).
+                        <p class="text-blue-100 text-sm md:text-base mt-2.5 leading-relaxed font-normal">
+                            Portal pengesahan Surat Perintah Membayar (SPM) untuk belanja langsung (LS).
                         </p>
 
-                        <div class="flex items-center gap-3 mt-6">
-                            <a href="{{ route('validation.index') }}?tab=1" 
-                               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#003A8F] hover:bg-blue-50 font-bold text-xs shadow-lg transition-all transform hover:scale-105">
-                                <svg class="w-4 h-4 text-[#003A8F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Periksa Pengajuan Menunggu ({{ $menunggu ?? 0 }})
-                            </a>
+                        {{-- Tanggal Hari Ini --}}
+                        <div class="flex items-center gap-2 mt-5 text-xs font-semibold text-blue-100">
+                            <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>{{ now()->isoFormat('dddd, D MMMM YYYY') }}</span>
                         </div>
                     </div>
 
-                    <div class="hidden lg:block">
-                        <div class="glass-badge rounded-2xl p-5 text-left max-w-xs transform hover:scale-105 transition-transform">
-                            <div class="flex items-center gap-2.5 mb-2">
-                                <div class="w-7 h-7 rounded-lg bg-blue-500/30 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-blue-200">Alur Sistem</span>
-                            </div>
-                            <p class="text-xs text-white/90 leading-relaxed">
-                                PPSPM hanya menandatangani <strong>LS SPM</strong>. Berkas <strong>UP Bendahara</strong> otomatis langsung diteruskan ke Bendahara.
+                    {{-- Widget Ringkasan Kanan (Kaca 3D) --}}
+                    <div class="shrink-0 bg-white/15 border border-white/30 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl flex items-center gap-4 md:min-w-[265px]">
+                        <div class="w-12 h-12 shrink-0 rounded-xl bg-white/15 flex items-center justify-center border border-white/25 shadow-inner">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-blue-100">
+                                Total Dokumen
+                            </p>
+                            <p class="text-3xl font-black mt-1 tracking-tight text-white">
+                                {{ $totalMasuk ?? 0 }}
+                            </p>
+                            <p class="text-xs mt-1 text-blue-200 font-medium">
+                                Berkas terdaftar
                             </p>
                         </div>
                     </div>
