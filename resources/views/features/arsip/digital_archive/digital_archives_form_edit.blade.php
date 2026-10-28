@@ -794,20 +794,20 @@
                             </div>
 
 
-                            {{-- NO INVOICE --}}
+                            {{-- NO KUITANSI --}}
 
                             <div>
 
                                 <label class="form-label">
-                                    No Invoice
+                                    No Kuitansi
                                 </label>
 
                                 <input
                                     type="text"
                                     name="no_invoice"
-                                    value="{{ old('no_invoice', $digital->no_invoice) }}"
+                                    value="{{ old('no_invoice', $digital->no_invoice ?: $digital->no_kuitansi_display) }}"
                                     class="form-input"
-                                    placeholder="No Invoice"
+                                    placeholder="No Kuitansi"
                                 >
 
                                 @error('no_invoice')
@@ -817,21 +817,20 @@
                             </div>
 
 
-                            {{-- TANGGAL INVOICE --}}
+                            {{-- TANGGAL KUITANSI --}}
 
                             <div>
 
                                 <label class="form-label">
-                                    Tanggal Invoice
+                                    Tanggal Kuitansi
                                 </label>
 
                                 <input
                                     type="date"
                                     name="tgl_invoice"
-                                    value="{{ old('tgl_invoice', $digital->tgl_invoice) }}"
+                                    value="{{ old('tgl_invoice', $digital->tanggal_kuitansi_input) }}"
                                     class="form-input"
                                 >
-
                                 @error('tgl_invoice')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
@@ -1070,7 +1069,7 @@
                                 <input
                                     type="text"
                                     name="status"
-                                    value="{{ old('status', $digital->status) }}"
+                                    value="{{ old('status', $digital->status ?: 'terbatas') }}"
                                     class="form-input"
                                     placeholder="Status"
                                 >
@@ -1089,7 +1088,6 @@
                                 <label class="form-label">
                                     Tanggal Pembuangan
                                 </label>
-
                                 <input
                                     type="date"
                                     name="disposal_date"
@@ -1098,6 +1096,29 @@
                                 >
 
                                 @error('disposal_date')
+                                    <p class="form-error">{{ $message }}</p>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- LOKASI SIMPAN SERVER --}}
+
+                            <div class="md:col-span-2">
+
+                                <label class="form-label">
+                                    Lokasi Simpan Server
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="lokasi_simpan_server"
+                                    value="{{ old('lokasi_simpan_server', $digital->lokasi_simpan_server ?: 'Keuangan') }}"
+                                    class="form-input"
+                                    placeholder="Lokasi Simpan Server (contoh: Keuangan)"
+                                >
+
+                                @error('lokasi_simpan_server')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
 

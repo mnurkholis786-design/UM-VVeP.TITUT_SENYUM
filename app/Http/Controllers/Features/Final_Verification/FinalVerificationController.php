@@ -281,6 +281,16 @@ class FinalVerificationController extends Controller
             }
         }
 
+        // Ekstrak otomatis uraian dari PDF (Untuk Pembayaran)
+        $uraianOtomatis = null;
+        if (Storage::disk('private')->exists($newPath)) {
+            $cmd = 'pdftotext -f 1 -l 4 ' . escapeshellarg(Storage::disk('private')->path($newPath)) . ' -';
+            $extractedText = @shell_exec($cmd);
+            if ($extractedText && preg_match('/Untuk\s+Pembayaran\s*[:\s]?\s*([^\n\r]+(?:\r?\n(?!\s*(?:Atas\s+Dasar|Banjarmasin|Setuju|Diterima|Lunas|An\s+Kuasa|Diajukan|\d+\.))[^\n\r]+)*)/i', $extractedText, $m)) {
+                $uraianOtomatis = trim(preg_replace('/\s+/', ' ', $m[1]));
+            }
+        }
+
         // create digital archive
         $digital = DigitalArchive::create([
             'category_id' => $idcategory,
@@ -293,6 +303,7 @@ class FinalVerificationController extends Controller
             'file_path_archive' => $newPath,
             'archive_code' => $request->kuitansi,
             'nominal' => $request->biaya,
+            'uraian' => $uraianOtomatis,
             'archive_by' => Auth::user()->name,
             'disposal_date' => Carbon::now()->addYear(5),
             'no_spby' => $request->no_spby,
@@ -301,10 +312,11 @@ class FinalVerificationController extends Controller
             'indeks1'              => $isDocUP ? 'Dokumen Keuangan' : null,
             'tingkat_pertimbangan' => $isDocUP ? 'asli' : null,
             'jumlah_halaman'       => $jumlahHalamanPdf,
-            'retensi_arsip_aktif'  => $isDocUP ? 2 : null,
             'retensi_arsip_inaktif'=> $isDocUP ? 5 : null,
             'nasib_akhir_arsip'    => $isDocUP ? 'musnah' : null,
             'klasifikasi_keamanan' => $isDocUP ? 'terbatas' : null,
+            'status'               => $isDocUP ? 'terbatas' : 'terbatas',
+            'lokasi_simpan_server' => 'Keuangan',
         ]);
         
         $adminUsers = User::where('role', 'Admin')->get();

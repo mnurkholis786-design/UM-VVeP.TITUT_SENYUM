@@ -344,4 +344,194 @@ class DigitalArchive extends Model
             set: fn ($value) => ($value !== null && $value !== '') ? (int) $value : null
         );
     }
+
+    /**
+     * Ekstrak data No Kuitansi dan Tanggal Kuitansi dari file PDF arsip.
+     */
+    public function extractKuitansiDataFromPdf(): array
+    {
+        $files = is_array($this->file_path_archive)
+            ? $this->file_path_archive
+            : (json_decode($this->file_path_archive, true) ?: [$this->file_path_archive]);
+
+        $result = ['no_kuitansi' => null, 'tanggal_kuitansi' => null];
+
+        foreach ($files as $file) {
+            if (!$file) {
+                continue;
+            }
+
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('private')->path($file);
+            if (!file_exists($fullPath)) {
+                continue;
+            }
+
+            // Ekstrak teks halaman 1 s/d 4 dengan mempertahankan tata letak (layout)
+            $cmd = 'pdftotext -f 1 -l 4 -layout ' . escapeshellarg($fullPath) . ' -';
+            $text = @shell_exec($cmd);
+
+            if (!$text) {
+                continue;
+            }
+
+            // 1. Ekstrak No Kuitansi (Mendukung nomor berspasi seperti Disposisi & multi-line)
+            if (preg_match('/SURAT\s+PERINTAH\s+BAYAR[\s\r\n]+No\s*:\s*([^\r\n]+)/i', $text, $m)) {
+                $candidate = trim($m[1]);
+                if (strlen($candidate) > 3) {
+                    $result['no_kuitansi'] = $candidate;
+                }
+            } elseif (preg_match('/No\s*[\r\n\s]*Kuitansi\s*[\r\n\s]*([^\r\n]+(?:\r?\n\s{10,}[^\r\n]+)?)/i', $text, $m)) {
+                $lines = array_map('trim', explode("\n", $m[1]));
+                $candidate = implode(' ', array_filter($lines));
+                $candidate = preg_replace('/-\s+/', '-', $candidate);
+                if (strlen($candidate) > 3) {
+                    $result['no_kuitansi'] = $candidate;
+                }
+            } elseif (preg_match('/(?:SPBY|PEMBEBANAN|KWITANSI)[^\r\n]*?-(Disposisi\/[^\r\n]+)/i', $text, $m)) {
+                $result['no_kuitansi'] = trim($m[1]);
+            }
+
+            // 2. Ekstrak Tanggal Kuitansi (Contoh: 24 Juli 2026)
+            if (preg_match('/Kuitansi(?:\/Bukti\s+Pembayaran)?\s+(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i', $text, $m)) {
+                $result['tanggal_kuitansi'] = trim($m[1]);
+            } elseif (preg_match('/Banjarmasin,\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i', $text, $m)) {
+                $result['tanggal_kuitansi'] = trim($m[1]);
+            }
+
+            if ($result['no_kuitansi'] || $result['tanggal_kuitansi']) {
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Accessor tampilan No Kuitansi:
+     * Mengambil dari no_invoice (jika pernah diinput), atau ekstrak otomatis dari PDF.
+     */
+    public function getNoKuitansiDisplayAttribute(): string
+    {
+        if (!empty($this->no_invoice) && trim($this->no_invoice) !== '-') {
+            return $this->no_invoice;
+        }
+
+        $data = $this->extractKuitansiDataFromPdf();
+        if (!empty($data['no_kuitansi'])) {
+            return $data['no_kuitansi'];
+        }
+
+        return $this->archive_code ?? '-';
+    }
+
+    /**
+     * Accessor tampilan Tanggal Kuitansi:
+     * Mengambil dari tgl_invoice (jika pernah diinput), atau ekstrak otomatis dari PDF.
+     */
+    public function getTanggalKuitansiDisplayAttribute(): string
+    {
+        if (!empty($this->tgl_invoice)) {
+            return \Carbon\Carbon::parse($this->tgl_invoice)->format('d F Y');
+        }
+
+        $data = $this->extractKuitansiDataFromPdf();
+        if (!empty($data['tanggal_kuitansi'])) {
+            return $data['tanggal_kuitansi'];
+        }
+
+        return $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('d F Y') : '-';
+    }
+
+    /**
+     * Format tanggal kuitansi khusus untuk input type="date" (format Y-m-d)
+     */
+    public function getTanggalKuitansiInputAttribute(): ?string
+    {
+        if (!empty($this->tgl_invoice)) {
+            try {
+                return \Carbon\Carbon::parse($this->tgl_invoice)->format('Y-m-d');
+            } catch (\Throwable $e) {}
+        }
+
+        $data = $this->extractKuitansiDataFromPdf();
+        if (!empty($data['tanggal_kuitansi'])) {
+            $indoMonths = [
+                'Januari' => 'January', 'Februari' => 'February', 'Maret' => 'March',
+                'April' => 'April', 'Mei' => 'May', 'Juni' => 'June',
+                'Juli' => 'July', 'Agustus' => 'August', 'September' => 'September',
+                'Oktober' => 'October', 'November' => 'November', 'Desember' => 'December',
+            ];
+            $trans = str_ireplace(array_keys($indoMonths), array_values($indoMonths), $data['tanggal_kuitansi']);
+            try {
+                return \Carbon\Carbon::parse($trans)->format('Y-m-d');
+            } catch (\Throwable $e) {}
+        }
+
+        return $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('Y-m-d') : null;
+    }
+
+    /**
+     * Ekstrak teks 'Untuk Pembayaran' langsung dari file PDF arsip.
+     */
+    public function extractUraianFromPdf(): ?string
+    {
+        $files = is_array($this->file_path_archive)
+            ? $this->file_path_archive
+            : (json_decode($this->file_path_archive, true) ?: [$this->file_path_archive]);
+
+        foreach ($files as $file) {
+            if (!$file) {
+                continue;
+            }
+
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('private')->path($file);
+            if (!file_exists($fullPath)) {
+                continue;
+            }
+
+            // Baca teks dari halaman 1 sampai 4 PDF menggunakan pdftotext
+            $cmd = 'pdftotext -f 1 -l 4 ' . escapeshellarg($fullPath) . ' -';
+            $text = @shell_exec($cmd);
+
+            if (!$text) {
+                continue;
+            }
+
+            // Pola 1: Format Kuitansi / SPBY ("Untuk Pembayaran ...")
+            if (preg_match('/Untuk\s+Pembayaran\s*[:\s]?\s*([^\n\r]+(?:\r?\n(?!\s*(?:Atas\s+Dasar|Banjarmasin|Setuju|Diterima|Lunas|An\s+Kuasa|Diajukan|\d+\.))[^\n\r]+)*)/i', $text, $match)) {
+                $clean = trim(preg_replace('/\s+/', ' ', $match[1]));
+                if (strlen($clean) > 5) {
+                    return $clean;
+                }
+            }
+
+            // Pola 2: Format Lembar Pembebanan ("Untuk ...")
+            if (preg_match('/Untuk\s+(?:Program\s+Kegiatan\s+)?([^\n\r]+(?:\r?\n(?!\s*(?:Program|Kegiatan|KRO|RO|Komponen|MAK|Diajukan))[^\n\r]+)*)/i', $text, $match)) {
+                $clean = trim(preg_replace('/\s+/', ' ', $match[1]));
+                if (strlen($clean) > 5) {
+                    return $clean;
+                }
+            }
+        }
+
+        // Fallback: jika tidak terdeteksi, ambil nama arsip dan bersihkan prefix 'SPJ'
+        return $this->archive_name ? trim(preg_replace('/^(?:SPJ\s+|PENGAJUAN\s+)/i', '', $this->archive_name)) : null;
+    }
+
+    /**
+     * Accessor cerdas untuk kolom uraian:
+     * Jika database kosong/null, otomatis membaca dari PDF.
+     */
+    protected function uraian(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value !== null && trim($value) !== '' && trim($value) !== '-') {
+                    return $value;
+                }
+                return $this->extractUraianFromPdf();
+            },
+            set: fn ($value) => $value
+        );
+    }
 }

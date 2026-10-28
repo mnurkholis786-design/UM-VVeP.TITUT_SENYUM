@@ -30,7 +30,7 @@
         }
 
         $kategori = $archive->kategori ?? '-';
-        $status = $archive->status ?? '-';
+        $status = trim($archive->status ?? '') ?: 'terbatas';
 
         // Deteksi apakah arsip ini adalah UP Bendahara
         $isUpBendahara = ($archive->category && str_contains(strtoupper($archive->category->category_name), 'UP'))
@@ -520,19 +520,18 @@
                         </div>
 
                         <div>
-                            <label class="field-label">No Invoice</label>
+                            <label class="field-label">No Kuitansi</label>
                             <div class="info-box">
-                                {{ $archive->no_invoice ?? '-' }}
+                                {{ $archive->no_kuitansi_display }}
                             </div>
                         </div>
 
                         <div>
-                            <label class="field-label">Tanggal Invoice</label>
+                            <label class="field-label">Tanggal Kuitansi</label>
                             <div class="info-box">
-                                {{ $archive->tgl_invoice ? \Carbon\Carbon::parse($archive->tgl_invoice)->format('d F Y') : '-' }}
+                                {{ $archive->tanggal_kuitansi_display }}
                             </div>
                         </div>
-
                         <div>
                             <label class="field-label">Tanggal Terima</label>
                             <div class="info-box">
@@ -636,7 +635,7 @@
                         <div>
                             <label class="field-label">Status</label>
                             <div class="info-box">
-                                {{ $archive->status ?? '-' }}
+                                {{ (trim($archive->status ?? '') ?: ($isUpBendahara ? 'terbatas' : 'terbatas')) }}
                             </div>
                         </div>
 
@@ -650,7 +649,7 @@
                         <div class="md:col-span-2">
                             <label class="field-label">Lokasi Simpan Server</label>
                             <div class="info-box">
-                                {{ $archive->lokasi_simpan_server ?? '-' }}
+                                {{ (trim($archive->lokasi_simpan_server ?? '') ?: 'Keuangan') }}
                             </div>
                         </div>
 
