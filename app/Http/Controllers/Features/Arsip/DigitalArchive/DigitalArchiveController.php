@@ -762,12 +762,36 @@ class DigitalArchiveController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Detail Arsip Digital');
 
+        // Deteksi apakah arsip termasuk UP Bendahara agar nilai standar otomatis terisi
+        $isUpBendahara = ($archive->category && str_contains(strtoupper($archive->category->category_name), 'UP'))
+            || !empty($archive->no_spby)
+            || (isset($archive->category_archive) && str_contains(strtoupper($archive->category_archive->category_name ?? ''), 'UP'));
+
+        // Nilai fallback disesuaikan persis dengan tampilan Detail Arsip
+        $kodeKlasifikasi = trim($archive->kode_klasifikasi ?? '') ?: ($isUpBendahara ? 'KU.02.03' : '-');
+        $indeks1 = trim($archive->indeks1 ?? '') ?: ($isUpBendahara ? 'Dokumen Keuangan' : '-');
+        $tingkatPerkembangan = trim($archive->tingkat_pertimbangan ?? '') ?: ($isUpBendahara ? 'asli' : '-');
+        
+        $jmlHalamanVal = $archive->jumlah_halaman ?: ($archive->jumlah_halaman_pdf ?? null);
+        $jumlahHalaman = $jmlHalamanVal ? $jmlHalamanVal . ' lembar' : '-';
+
+        $retensiAktifVal = $archive->retensi_arsip_aktif ?: ($isUpBendahara ? 2 : null);
+        $retensiAktif = $retensiAktifVal ? $retensiAktifVal . ' tahun' : '-';
+
+        $retensiInaktifVal = $archive->retensi_arsip_inaktif ?: ($isUpBendahara ? 5 : null);
+        $retensiInaktif = $retensiInaktifVal ? $retensiInaktifVal . ' tahun' : '-';
+
+        $nasibAkhir = trim($archive->nasib_akhir_arsip ?? '') ?: ($isUpBendahara ? 'musnah' : '-');
+        $klasifikasiKeamanan = trim($archive->klasifikasi_keamanan ?? '') ?: ($isUpBendahara ? 'terbatas' : '-');
+        $status = trim($archive->status ?? '') ?: ($isUpBendahara ? 'terbatas' : 'terbatas');
+        $lokasiSimpanServer = trim($archive->lokasi_simpan_server ?? '') ?: 'Keuangan';
+
         $rows = [
             ['Nama Archive', $archive->archive_name ?? '-'],
             ['Kode Arsip', $archive->archive_code ?? '-'],
             ['Divisi Asal', $archive->from_division ?? '-'],
-            ['Kode Klasifikasi', $archive->kode_klasifikasi ?? '-'],
-            ['Indeks 1', $archive->indeks1 ?? '-'],
+            ['Kode Klasifikasi', $kodeKlasifikasi],
+            ['Indeks 1', $indeks1],
             ['Indeks 2', $archive->indeks2 ?? '-'],
             ['No Item', $archive->no_item ?? '-'],
             ['Nominal', $archive->nominal ? 'Rp ' . number_format($archive->nominal, 0, ',', '.') : '-'],
@@ -780,22 +804,24 @@ class DigitalArchiveController extends Controller
             ['Jenis SP2D', $archive->jenis_sp2d ?? '-'],
             ['Tanggal SP2D', $archive->tgl_sp2d ? \Carbon\Carbon::parse($archive->tgl_sp2d)->format('d F Y') : '-'],
             ['Tanggal Selesai SP2D', $archive->tgl_selesai_sp2d ? \Carbon\Carbon::parse($archive->tgl_selesai_sp2d)->format('d F Y') : '-'],
+            ['No Kuitansi', $archive->no_kuitansi_display ?? '-'],
+            ['Tanggal Kuitansi', $archive->tanggal_kuitansi_display ?? '-'],
             ['No Invoice', $archive->no_invoice ?? '-'],
             ['Tanggal Invoice', $archive->tgl_invoice ? \Carbon\Carbon::parse($archive->tgl_invoice)->format('d F Y') : '-'],
             ['Tanggal Terima', $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->format('d F Y') : '-'],
-            ['Tingkat Pertimbangan', $archive->tingkat_pertimbangan ?? '-'],
-            ['Jumlah Halaman', $archive->jumlah_halaman ? $archive->jumlah_halaman . ' lembar' : '-'],
-            ['Retensi Arsip Aktif', $archive->retensi_arsip_aktif ? $archive->retensi_arsip_aktif . ' tahun' : '-'],
-            ['Retensi Arsip Inaktif', $archive->retensi_arsip_inaktif ? $archive->retensi_arsip_inaktif . ' tahun' : '-'],
-            ['Nasib Akhir Arsip', $archive->nasib_akhir_arsip ?? '-'],
-            ['Klasifikasi Keamanan', $archive->klasifikasi_keamanan ?? '-'],
-            ['Status', $archive->status ?? '-'],
+            ['Tingkat Perkembangan', $tingkatPerkembangan],
+            ['Jumlah Halaman', $jumlahHalaman],
+            ['Retensi Arsip Aktif', $retensiAktif],
+            ['Retensi Arsip Inaktif', $retensiInaktif],
+            ['Nasib Akhir Arsip', $nasibAkhir],
+            ['Klasifikasi Keamanan', $klasifikasiKeamanan],
+            ['Status', $status],
             ['Tanggal Pembuangan', $archive->disposal_date ? \Carbon\Carbon::parse($archive->disposal_date)->format('d F Y') : '-'],
             ['Pengaju', $archive->submiter_name ?? '-'],
             ['Divisi Keuangan', $archive->finance_officer_name ?? '-'],
             ['Bendahara', $archive->revenue_officer_name ?? '-'],
             ['Keterangan', $archive->keterangan ?? '-'],
-            ['Lokasi Simpan Server', $archive->lokasi_simpan_server ?? '-'],
+            ['Lokasi Simpan Server', $lokasiSimpanServer],
         ];
 
         $sheet->setCellValue('A1', 'Field');
