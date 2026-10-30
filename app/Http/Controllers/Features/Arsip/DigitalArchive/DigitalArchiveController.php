@@ -532,21 +532,32 @@ class DigitalArchiveController extends Controller
      */
     public function exportReportExcel(Request $request, string $id)
     {
+        // Hilangkan batas waktu eksekusi agar tidak timeout saat export data banyak
+        set_time_limit(0);
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit', '512M');
+
         $category = Category::findOrFail($id);
 
-        // Dukung export Semua Sub Kategori pada Excel
+        // Dukung export Semua Sub Kategori atau per Sub Kategori pada Excel
         if ($request->input('sub_category_id') === 'all') {
             $allCategoryIds = Category::where('category_name', $category->category_name)
                 ->where('year', $category->year)
                 ->pluck('id');
             $query = DigitalArchive::whereIn('category_id', $allCategoryIds);
+            $subKategoriNama = 'Semua Sub Kategori (' . ($category->category_name ?? 'UP Bendahara') . ')';
         } elseif ($request->filled('sub_category_id')) {
             $selectedSub = Category::find($request->sub_category_id);
             $targetId = $selectedSub ? $selectedSub->id : $category->id;
             $query = DigitalArchive::where('category_id', $targetId);
+            $subKategoriNama = $selectedSub ? $selectedSub->sub_category : ($category->sub_category ?? '-');
         } else {
             $query = DigitalArchive::where('category_id', $category->id);
+            $subKategoriNama = $category->sub_category ?? '-';
         }
+
+        $periodeMulai = $request->filled('tanggal_mulai') ? \Carbon\Carbon::parse($request->tanggal_mulai)->format('d/m/Y') : 'Awal';
+        $periodeSelesai = $request->filled('tanggal_selesai') ? \Carbon\Carbon::parse($request->tanggal_selesai)->format('d/m/Y') : 'Sekarang';
 
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('created_at', '>=', $request->tanggal_mulai);
@@ -589,6 +600,10 @@ class DigitalArchiveController extends Controller
 
         $archives = $query->orderBy('kategori')->orderBy('created_at')->get();
 
+        // Deteksi apakah konteks ini adalah UP Bendahara (sama seperti logika halaman detail)
+        $isUpBendahara = str_contains(strtoupper($category->category_name ?? ''), 'UP')
+            || str_contains(strtoupper($category->sub_category ?? ''), 'UP');
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Daftar Arsip');
@@ -606,6 +621,11 @@ class DigitalArchiveController extends Controller
         $sheet->setCellValue('B6', ': Tim Perencanaan dan Pengendalian Anggaran');
         $sheet->setCellValue('A7', 'Unit Kearsipan');
         $sheet->setCellValue('B7', ': Unit Kearsipan II, TVRI Stasiun Kalimantan Selatan');
+        $sheet->setCellValue('D6', 'Sub Kategori');
+        $sheet->setCellValue('E6', ': ' . ($subKategoriNama ?? '-'));
+        $sheet->setCellValue('D7', 'Periode');
+        $sheet->setCellValue('E7', ': ' . $periodeMulai . ' s/d ' . $periodeSelesai);
+        $sheet->getStyle('D6:D7')->getFont()->setBold(true);
 
         // Layout Header Tabel (Baris 8 & 9)
         $sheet->setCellValue('A8', 'No');
@@ -690,13 +710,36 @@ class DigitalArchiveController extends Controller
                 $retensiInaktif = '5 Tahun';
             }
 
+            // Fallback sama persis dengan halaman detail arsip digital
+            $kodeKlasifikasiRow = trim($archive->kode_klasifikasi ?? '') ?: ($isUpBendahara ? 'KU.02.03' : '-');
+            $indeks1Row = trim($archive->indeks1 ?? '') ?: ($isUpBendahara ? 'Dokumen Keuangan' : '-');
+
             $sheet->setCellValue('A' . $rowNumber, $index + 1);
-            $sheet->setCellValue('B' . $rowNumber, $archive->kode_klasifikasi ?? '-');
-            $sheet->setCellValue('C' . $rowNumber, $archive->indeks1 ?? '-');
+            $sheet->setCellValue('B' . $rowNumber, $kodeKlasifikasiRow);
+            $sheet->setCellValue('C' . $rowNumber, $indeks1Row);
             $sheet->setCellValue('D' . $rowNumber, $archive->indeks2 ?? '-');
             $sheet->setCellValue('E' . $rowNumber, $archive->no_item ?? ($index + 1));
             $sheet->setCellValue('F' . $rowNumber, $uraianVal);
-            $sheet->setCellValue('G' . $rowNumber, $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->translatedFormat('d F Y') : '-');
+            // Tanggal Terima: prioritas tgl_terima → tgl_invoice → created_at (sama seperti halaman detail)
+            $tglTerimaExcel = '-';
+            $rawTglTerima = $archive->getRawOriginal('tgl_terima');
+            $rawTglInvoice = $archive->getRawOriginal('tgl_invoice');
+            if (!empty($rawTglTerima)) {
+                try {
+                    $tglTerimaExcel = \Carbon\Carbon::parse($rawTglTerima)->translatedFormat('d F Y');
+                } catch (\Throwable $e) {
+                    $tglTerimaExcel = $rawTglTerima;
+                }
+            } elseif (!empty($rawTglInvoice)) {
+                try {
+                    $tglTerimaExcel = \Carbon\Carbon::parse($rawTglInvoice)->translatedFormat('d F Y');
+                } catch (\Throwable $e) {
+                    $tglTerimaExcel = $rawTglInvoice;
+                }
+            } elseif ($archive->created_at) {
+                $tglTerimaExcel = \Carbon\Carbon::parse($archive->created_at)->translatedFormat('d F Y');
+            }
+            $sheet->setCellValue('G' . $rowNumber, $tglTerimaExcel);
             $sheet->setCellValue('H' . $rowNumber, $archive->tingkat_pertimbangan ?? 'Asli');
             $sheet->setCellValue('I' . $rowNumber, $archive->jumlah_halaman ? $archive->jumlah_halaman . ' Lembar' : '-');
             $sheet->setCellValue('J' . $rowNumber, $retensiAktif);
@@ -736,8 +779,8 @@ class DigitalArchiveController extends Controller
         }
 
         $categoryName = $category->category_name ?? $category->name ?? 'arsip';
-        $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . '.xlsx';
-
+        $safeSubNama = str_replace([' ', '/', '\\', '(', ')'], '-', strtolower($subKategoriNama ?? ''));
+        $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . ($safeSubNama ? '-' . $safeSubNama : '') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(
@@ -797,8 +840,10 @@ class DigitalArchiveController extends Controller
             ['Nominal', $archive->nominal ? 'Rp ' . number_format($archive->nominal, 0, ',', '.') : '-'],
             ['Uraian', $archive->uraian ?? '-'],
             ['No SPBy', $archive->no_spby ?? '-'],
-            ['No SPM', $archive->no_spm ?? '-'],
-            ['Jenis SPM', $archive->jenis_spm ?? '-'],
+            ...(!$isUpBendahara ? [
+                ['No SPM', $archive->no_spm ?? '-'],
+                ['Jenis SPM', $archive->jenis_spm ?? '-'],
+            ] : []),
             ['No SP2D', $archive->no_sp2d ?? '-'],
             ['Nilai SP2D', $archive->nilai_sp2d ? 'Rp ' . number_format($archive->nilai_sp2d, 0, ',', '.') : '-'],
             ['Jenis SP2D', $archive->jenis_sp2d ?? '-'],
@@ -808,7 +853,7 @@ class DigitalArchiveController extends Controller
             ['Tanggal Kuitansi', $archive->tanggal_kuitansi_display ?? '-'],
             ['No Invoice', $archive->no_invoice ?? '-'],
             ['Tanggal Invoice', $archive->tgl_invoice ? \Carbon\Carbon::parse($archive->tgl_invoice)->format('d F Y') : '-'],
-            ['Tanggal Terima', $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->format('d F Y') : '-'],
+            ['Tanggal Terima', $archive->tanggal_terima_display ?? '-'],
             ['Tingkat Perkembangan', $tingkatPerkembangan],
             ['Jumlah Halaman', $jumlahHalaman],
             ['Retensi Arsip Aktif', $retensiAktif],

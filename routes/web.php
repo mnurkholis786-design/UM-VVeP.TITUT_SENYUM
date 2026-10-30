@@ -559,6 +559,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     )->name('digital.report.pdf');
 
     Route::get(
+        '/year/{id}/download-zip',
+        [YearController::class, 'downloadZip']
+    )->name('year.downloadZip');
+
+    Route::get(
         '/digital-archive/report-excel/{id}',
         [DigitalArchiveController::class, 'exportReportExcel']
     )->name('digital.report.excel');

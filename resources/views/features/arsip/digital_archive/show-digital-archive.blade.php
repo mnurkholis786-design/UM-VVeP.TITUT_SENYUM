@@ -32,10 +32,24 @@
         $kategori = $archive->kategori ?? '-';
         $status = trim($archive->status ?? '') ?: 'terbatas';
 
-        // Deteksi apakah arsip ini adalah UP Bendahara
-        $isUpBendahara = ($archive->category && str_contains(strtoupper($archive->category->category_name), 'UP'))
-            || !empty($archive->no_spby)
-            || (isset($archive->category_archive) && str_contains(strtoupper($archive->category_archive->category_name ?? ''), 'UP'));
+        // 1. Cek No SPBy (abaikan tanda strip '-' dan spasi kosong)
+        $cleanSpby = trim($archive->no_spby ?? '');
+        $hasRealSpby = !empty($cleanSpby) && $cleanSpby !== '-';
+
+        // 2. Ambil informasi nama kategori & metode pembayaran
+        $catName = strtoupper($archive->category->category_name ?? '');
+        $subCat = strtoupper($archive->category->sub_category ?? '');
+        $payName = strtoupper($archive->category->payment_method->payment_method_name ?? '');
+
+        // 3. Deteksi LS SPM (Prioritaskan kategori LS atau arsip yang tidak memiliki SPBy fisik)
+        $isLsSpm = str_contains($catName, 'LS')
+            || str_contains($subCat, 'LS')
+            || str_contains($payName, 'LS')
+            || (!$hasRealSpby && (!empty($archive->no_spm) || !empty($archive->jenis_spm)))
+            || !$hasRealSpby;
+
+        // 4. UP Bendahara adalah yang bukan LS SPM
+        $isUpBendahara = !$isLsSpm;
     @endphp
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 py-8">
@@ -469,7 +483,8 @@
                                 {{ $archive->no_spby ?? '-' }}
                             </div>
                         </div>
-
+                        {{-- HANYA MUNCUL DI ARSIP LS SPM --}}
+                        @if($isLsSpm)
                         <div>
                             <label class="field-label">No SPM</label>
                             <div class="info-box">
@@ -483,7 +498,7 @@
                                 {{ $archive->jenis_spm ?? '-' }}
                             </div>
                         </div>
-
+                        @endif
                         <div>
                             <label class="field-label">No SP2D</label>
                             <div class="info-box">
@@ -535,7 +550,7 @@
                         <div>
                             <label class="field-label">Tanggal Terima</label>
                             <div class="info-box">
-                                {{ $archive->tgl_terima ? \Carbon\Carbon::parse($archive->tgl_terima)->format('d F Y') : '-' }}
+                                {{ $archive->tanggal_terima_display }}
                             </div>
                         </div>
 

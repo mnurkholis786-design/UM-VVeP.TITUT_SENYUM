@@ -348,13 +348,19 @@ class DigitalArchive extends Model
     /**
      * Ekstrak data No Kuitansi dan Tanggal Kuitansi dari file PDF arsip.
      */
+    protected ?array $cachedKuitansiData = null;
+
     public function extractKuitansiDataFromPdf(): array
     {
+        if ($this->cachedKuitansiData !== null) {
+            return $this->cachedKuitansiData;
+        }
+
         $files = is_array($this->file_path_archive)
             ? $this->file_path_archive
             : (json_decode($this->file_path_archive, true) ?: [$this->file_path_archive]);
 
-        $result = ['no_kuitansi' => null, 'tanggal_kuitansi' => null];
+        $result = ['no_kuitansi' => null, 'tanggal_kuitansi' => null, 'tanggal_terima' => null];
 
         foreach ($files as $file) {
             if (!$file) {
@@ -366,8 +372,8 @@ class DigitalArchive extends Model
                 continue;
             }
 
-            // Ekstrak teks halaman 1 s/d 4 dengan mempertahankan tata letak (layout)
-            $cmd = 'pdftotext -f 1 -l 4 -layout ' . escapeshellarg($fullPath) . ' -';
+            // Ekstrak teks halaman 1 s/d 2 (karena SPBY ada di hal 2) agar proses 2x lebih cepat
+            $cmd = 'pdftotext -f 1 -l 2 -layout ' . escapeshellarg($fullPath) . ' -';
             $text = @shell_exec($cmd);
 
             if (!$text) {
@@ -398,11 +404,29 @@ class DigitalArchive extends Model
                 $result['tanggal_kuitansi'] = trim($m[1]);
             }
 
-            if ($result['no_kuitansi'] || $result['tanggal_kuitansi']) {
+            // 3. Ekstrak Tanggal Terima Khusus Halaman SURAT PERINTAH BAYAR (SPBy)
+            if (preg_match('/SURAT\s+PERINTAH\s+BAYAR[\s\S]+?(?=KUITANSI\/\s*BUKTI|\z)/i', $text, $spbyMatch)) {
+                $spbyText = $spbyMatch[0];
+                if (preg_match('/Banjarmasin,\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i', $spbyText, $m)) {
+                    $result['tanggal_terima'] = trim($m[1]);
+                } elseif (preg_match('/Kuitansi(?:\/Bukti\s+Pembayaran)?\s+(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i', $spbyText, $m)) {
+                    $result['tanggal_terima'] = trim($m[1]);
+                } elseif (preg_match('/Diterima\s+(?:tanggal|tgl)[^\d\n\r]*(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i', $spbyText, $m)) {
+                    $result['tanggal_terima'] = trim($m[1]);
+                }
+            }
+
+            // Fallback: Jika belum terisi, samakan dengan tanggal kuitansi yang berhasil terdeteksi
+            if (empty($result['tanggal_terima']) && !empty($result['tanggal_kuitansi'])) {
+                $result['tanggal_terima'] = $result['tanggal_kuitansi'];
+            }
+
+            if ($result['no_kuitansi'] || $result['tanggal_kuitansi'] || !empty($result['tanggal_terima'])) {
                 break;
             }
         }
 
+        $this->cachedKuitansiData = $result;
         return $result;
     }
 
@@ -437,6 +461,28 @@ class DigitalArchive extends Model
         $data = $this->extractKuitansiDataFromPdf();
         if (!empty($data['tanggal_kuitansi'])) {
             return $data['tanggal_kuitansi'];
+        }
+
+        return $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('d F Y') : '-';
+    }
+
+    /**
+     * Accessor tampilan Tanggal Terima:
+     * Mengambil dari tgl_terima (jika pernah diinput), atau ekstrak otomatis dari PDF Surat Perintah Bayar.
+     */
+    public function getTanggalTerimaDisplayAttribute(): string
+    {
+        if (!empty($this->tgl_terima) && trim($this->tgl_terima) !== '-') {
+            try {
+                return \Carbon\Carbon::parse($this->tgl_terima)->format('d F Y');
+            } catch (\Throwable $e) {
+                return $this->tgl_terima;
+            }
+        }
+
+        $data = $this->extractKuitansiDataFromPdf();
+        if (!empty($data['tanggal_terima'])) {
+            return $data['tanggal_terima'];
         }
 
         return $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('d F Y') : '-';

@@ -580,7 +580,6 @@
                                     </a>
 
 
-                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- ACTIONS --}}
                                     <div class="px-5 pb-5">
 
@@ -589,7 +588,43 @@
                                                     pt-4
                                                     border-t border-gray-100">
 
+                                            {{-- DOWNLOAD ZIP --}}
+                                            <a href="{{ route('year.downloadZip', $year->id) }}"
+                                                title="Download Semua File PDF Arsip Digital (ZIP)"
+                                                class="flex-1
+                                                       inline-flex
+                                                       items-center
+                                                       justify-center
+                                                       gap-2
+                                                       px-3 py-2
+                                                       bg-emerald-50
+                                                       border border-emerald-200
+                                                       text-emerald-600
+                                                       rounded-xl
+                                                       font-semibold
+                                                       text-sm
+                                                       hover:bg-emerald-600
+                                                       hover:text-white
+                                                       hover:border-emerald-600
+                                                       hover:shadow-lg
+                                                       active:scale-95
+                                                       transition-all duration-200">
 
+                                                <svg class="w-4 h-4"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+
+                                                Download ZIP
+
+                                            </a>
+
+                                            @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                             {{-- EDIT --}}
                                             <form action="{{ route('year.edit', $year->id) }}"
                                                 method="GET"
@@ -688,11 +723,11 @@
                                                 </button>
 
                                             </form>
+                                            @endif
 
                                         </div>
 
                                     </div>
-                                    @endif
 
                                 </div>
 

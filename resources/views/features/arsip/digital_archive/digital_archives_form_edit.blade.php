@@ -625,14 +625,13 @@
                             </div>
 
 
+                            {{-- HANYA MUNCUL DI LS SPM (DI UP BENDAHARA TIDAK ADA) --}}
+                            @if(!$isUpBendahara)
                             {{-- NO SPM --}}
-
                             <div>
-
                                 <label class="form-label">
                                     No SPM
                                 </label>
-
                                 <input
                                     type="text"
                                     name="no_spm"
@@ -640,22 +639,16 @@
                                     class="form-input"
                                     placeholder="No SPM"
                                 >
-
                                 @error('no_spm')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
-
                             </div>
 
-
                             {{-- JENIS SPM --}}
-
                             <div>
-
                                 <label class="form-label">
                                     Jenis SPM
                                 </label>
-
                                 <input
                                     type="text"
                                     name="jenis_spm"
@@ -663,13 +656,11 @@
                                     class="form-input"
                                     placeholder="Jenis SPM"
                                 >
-
                                 @error('jenis_spm')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
-
                             </div>
-
+                            @endif
 
                             {{-- NO SP2D --}}
 

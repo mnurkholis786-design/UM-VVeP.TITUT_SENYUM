@@ -457,4 +457,101 @@ public function show(Request $request, string $id)
         */
         DigitalArchive::whereIn('category_id', $categoryIds)->delete();
     }
+
+    /**
+     * Download seluruh file PDF arsip digital pada tahun terpilih dalam format ZIP.
+     */
+    public function downloadZip(string $id)
+    {
+        set_time_limit(0);
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit', '512M');
+
+        $category = Category::findOrFail($id);
+
+        // Ambil semua arsip digital pada kategori & tahun ini
+        $archives = DigitalArchive::where('category_id', $category->id)->get();
+
+        if ($archives->isEmpty()) {
+            return back()->with('error', 'Tidak ada data arsip digital untuk tahun ' . ($category->year ?? '') . '.');
+        }
+
+        $zipFileName = 'Arsip-Digital-' . \Illuminate\Support\Str::slug(($category->sub_category ?? $category->category_name ?? 'Arsip') . '-Tahun-' . $category->year) . '.zip';
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $tempZipPath = $tempDir . '/' . uniqid('zip_') . '.zip';
+
+        $zip = new \ZipArchive();
+        if ($zip->open($tempZipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return back()->with('error', 'Gagal membuat file arsip ZIP.');
+        }
+
+        $fileCount = 0;
+        $addedNames = [];
+
+        foreach ($archives as $archive) {
+            $files = $archive->file_path_archive;
+            if (is_string($files)) {
+                $decoded = json_decode($files, true);
+                $files = is_array($decoded) ? $decoded : [$files];
+            } elseif (!is_array($files)) {
+                $files = $files ? [$files] : [];
+            }
+
+            foreach ($files as $file) {
+                if (empty($file)) {
+                    continue;
+                }
+
+                $fullPath = null;
+                if (Storage::disk('private')->exists($file)) {
+                    $fullPath = Storage::disk('private')->path($file);
+                } else {
+                    $candidates = [
+                        storage_path('app/private/' . $file),
+                        storage_path('app/public/' . $file),
+                        storage_path('app/' . $file),
+                        public_path('storage/' . $file),
+                        public_path($file),
+                    ];
+                    foreach ($candidates as $cand) {
+                        if (file_exists($cand) && is_file($cand)) {
+                            $fullPath = $cand;
+                            break;
+                        }
+                    }
+                }
+
+                if ($fullPath && file_exists($fullPath)) {
+                    $baseName = basename($fullPath);
+                    $entryName = $baseName;
+
+                    // Hindari duplikasi nama file di dalam ZIP
+                    if (isset($addedNames[$entryName])) {
+                        $addedNames[$entryName]++;
+                        $ext = pathinfo($baseName, PATHINFO_EXTENSION);
+                        $nameOnly = pathinfo($baseName, PATHINFO_FILENAME);
+                        $entryName = $nameOnly . '_' . $addedNames[$entryName] . '.' . $ext;
+                    } else {
+                        $addedNames[$entryName] = 1;
+                    }
+
+                    $zip->addFile($fullPath, $entryName);
+                    $fileCount++;
+                }
+            }
+        }
+
+        $zip->close();
+
+        if ($fileCount === 0) {
+            @unlink($tempZipPath);
+            return back()->with('error', 'Tidak ditemukan file PDF arsip digital fisik untuk diunduh.');
+        }
+
+        return response()->download($tempZipPath, $zipFileName)->deleteFileAfterSend(true);
+    }
 }
