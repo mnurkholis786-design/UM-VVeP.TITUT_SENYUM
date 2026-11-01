@@ -77,9 +77,9 @@ class FolderController extends Controller
     {
         $folder = DocumentFolder::findOrFail($id);
         
-        // Batasi 10 file per halaman dengan pagination
+        // Batasi 10 file per halaman dengan pagination (urut dari awal input ke bawah)
         $archives = ArchiveFile::where('folder_id', $folder->id)
-            ->latest()
+            ->oldest()
             ->paginate(10)
             ->withQueryString();
         

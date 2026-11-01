@@ -435,7 +435,7 @@
                                     <h5 class="text-base font-extrabold text-slate-900">
                                         Upload Berkas PDF
                                     </h5>
-                                    <p class="text-xs font-semibold text-slate-600 mt-0.5">Dapat memilih hingga 100 file PDF</p>
+                                    <p class="text-xs font-semibold text-slate-600 mt-0.5">Dapat memilih hingga 10 file PDF</p>
 
                                     <label for="file_archive"
                                         class="mt-3.5 inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-xs shadow-md hover:bg-red-700 active:scale-95 transition-all">
@@ -451,7 +451,6 @@
                                         class="hidden"
                                         multiple
                                         accept=".pdf,application/pdf">
-
                                     <div class="mt-3 p-3 rounded-xl bg-white border border-red-200">
                                         <p id="pdf-file-info" class="text-xs font-bold text-slate-700 truncate block">
                                             Belum ada file dipilih
@@ -557,6 +556,15 @@
                 return;
             }
 
+            // Batasi maksimal 10 file PDF
+            if (files.length > 10) {
+                alert('Maksimal hanya dapat memilih 10 file PDF sekaligus.');
+                this.value = ''; // Reset pilihan file
+                info.textContent = 'Belum ada file yang dipilih.';
+                info.title = 'Belum ada file yang dipilih.';
+                return;
+            }
+
             if (files.length === 1) {
                 info.textContent = files[0].name;
                 info.title = files[0].name;
@@ -566,7 +574,6 @@
                 info.title = names;
             }
         });
-
 
         // ==============================
         // EXCEL
