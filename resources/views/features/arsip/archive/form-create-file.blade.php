@@ -421,29 +421,33 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                         {{-- ================= CARD UPLOAD PDF ================= --}}
-                        <div class="rounded-2xl p-6 bg-red-50/50 border-2 border-dashed border-red-300 hover:border-red-600 transition-all duration-200">
-                            <div class="flex items-start gap-4">
+                        <div class="rounded-2xl p-7 bg-red-50/50 border-2 border-dashed border-red-300 hover:border-red-600 transition-all duration-200 shadow-sm hover:shadow-md">
+                            <div class="flex items-start gap-5">
                                 <div class="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-red-600/30">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h5 class="text-base font-extrabold text-slate-900">
-                                        Upload Berkas PDF
-                                    </h5>
-                                    <p class="text-xs font-semibold text-slate-600 mt-0.5">Dapat memilih hingga 10 file PDF</p>
+                                <div class="flex-1 min-w-0 flex flex-col gap-3.5">
+                                    <div>
+                                        <h5 class="text-base font-extrabold text-slate-900 leading-tight">
+                                            Upload Berkas PDF
+                                        </h5>
+                                        <p class="text-xs font-semibold text-slate-500 mt-0.5">Dapat memilih hingga 10 file PDF</p>
+                                    </div>
 
-                                    <label for="file_archive"
-                                        class="mt-3.5 inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-xs shadow-md hover:bg-red-700 active:scale-95 transition-all">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                        </svg>
-                                        Pilih Berkas PDF
-                                    </label>
+                                    <div>
+                                        <label for="file_archive"
+                                            class="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs shadow-md hover:bg-red-700 active:scale-95 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                            </svg>
+                                            Pilih Berkas PDF
+                                        </label>
+                                    </div>
 
                                     <input type="file"
                                         id="file_archive"
@@ -451,7 +455,8 @@
                                         class="hidden"
                                         multiple
                                         accept=".pdf,application/pdf">
-                                    <div class="mt-3 p-3 rounded-xl bg-white border border-red-200">
+
+                                    <div class="p-3 rounded-xl bg-white border border-red-200 shadow-inner">
                                         <p id="pdf-file-info" class="text-xs font-bold text-slate-700 truncate block">
                                             Belum ada file dipilih
                                         </p>
@@ -461,26 +466,30 @@
                         </div>
 
                         {{-- ================= CARD UPLOAD EXCEL ================= --}}
-                        <div class="rounded-2xl p-6 bg-emerald-50/50 border-2 border-dashed border-emerald-300 hover:border-emerald-600 transition-all duration-200">
-                            <div class="flex items-start gap-4">
+                        <div class="rounded-2xl p-7 bg-emerald-50/50 border-2 border-dashed border-emerald-300 hover:border-emerald-600 transition-all duration-200 shadow-sm hover:shadow-md">
+                            <div class="flex items-start gap-5">
                                 <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/30">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h5 class="text-base font-extrabold text-slate-900">
-                                        Upload Berkas Excel
-                                    </h5>
-                                    <p class="text-xs font-semibold text-slate-600 mt-0.5">Opsional (1 berkas spreadsheet)</p>
+                                <div class="flex-1 min-w-0 flex flex-col gap-3.5">
+                                    <div>
+                                        <h5 class="text-base font-extrabold text-slate-900 leading-tight">
+                                            Upload Berkas Excel
+                                        </h5>
+                                        <p class="text-xs font-semibold text-slate-500 mt-0.5">Opsional (1 berkas spreadsheet)</p>
+                                    </div>
 
-                                    <label for="file_excel"
-                                        class="mt-3.5 inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md hover:bg-emerald-700 active:scale-95 transition-all">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                        </svg>
-                                        Pilih Berkas Excel
-                                    </label>
+                                    <div>
+                                        <label for="file_excel"
+                                            class="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md hover:bg-emerald-700 active:scale-95 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                            </svg>
+                                            Pilih Berkas Excel
+                                        </label>
+                                    </div>
 
                                     <input type="file"
                                         id="file_excel"
@@ -488,7 +497,7 @@
                                         class="hidden"
                                         accept=".xlsx,.xls,.csv">
 
-                                    <div class="mt-3 p-3 rounded-xl bg-white border border-emerald-200">
+                                    <div class="p-3 rounded-xl bg-white border border-emerald-200 shadow-inner">
                                         <p id="excel-file-info" class="text-xs font-bold text-slate-700 truncate block">
                                             Belum ada file dipilih
                                         </p>
@@ -498,7 +507,6 @@
                         </div>
 
                     </div>
-                </div>
 
                 {{-- ======================================================== --}}
                 {{-- FLOATING ACTION BAR 3D (TEGAS & TIDAK TERTUTUPI)         --}}
