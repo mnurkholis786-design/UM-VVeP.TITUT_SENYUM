@@ -21,8 +21,10 @@ public function index()
     $pengajuan = BudgetSubmission::count();
     $akun = User::count();
     $arsiplist = DigitalArchive::latest()->paginate(10, ['*'], 'arsip_list');
+    $permohonanHapus = DigitalArchive::where('status', 'menunggu_persetujuan_hapus')->latest()->get();
+    $jumlahPermohonanHapus = $permohonanHapus->count();
 
-    return view('admin.admin-dashboard', compact('arsip', 'pengajuan', 'akun', 'arsiplist'));
+    return view('admin.admin-dashboard', compact('arsip', 'pengajuan', 'akun', 'arsiplist', 'permohonanHapus', 'jumlahPermohonanHapus'));
 }
 
     public function input_archive(Request $request)

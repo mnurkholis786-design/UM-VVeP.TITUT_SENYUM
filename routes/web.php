@@ -583,6 +583,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         [DigitalArchiveController::class, 'update']
     )->name('digital.update');
 
+    Route::post(
+        '/digital/{id}/request-delete',
+        [DigitalArchiveController::class, 'requestDelete']
+    )->name('digital.requestDelete');
+
+    Route::post(
+        '/digital/{id}/reject-delete',
+        [DigitalArchiveController::class, 'rejectDelete']
+    )->name('digital.rejectDelete');
+
     Route::delete(
         '/digital/{id}',
         [DigitalArchiveController::class, 'destroy']

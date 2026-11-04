@@ -301,33 +301,78 @@
         </div>
     </div>
 
-    {{-- MODAL REVISI --}}
-    <div id="modal-return" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 space-y-4">
-            <h3 class="text-lg font-black text-gray-900">Alasan Pengembalian Dokumen</h3>
-            <p class="text-xs text-gray-500">Berikan catatan revisi kepada Unit Pengaju.</p>
-            
-            <form action="{{ route('validation.return', $doc->id) }}" method="POST" class="space-y-4">
-                @method('PUT')
-                @csrf
-                <div>
-                    <textarea name="catatan" rows="4" required 
-                              placeholder="Tuliskan catatan perbaikan berkas..."
-                              class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50"></textarea>
+    {{-- =========================================================
+        MODAL REVISI (KEMBALIKAN KE PENGAJU)
+    ========================================================== --}}
+    <div id="modal-return" class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        {{-- Backdrop Gelap & Blur Solid (Anti Tembus) --}}
+        <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" onclick="document.getElementById('modal-return').classList.add('hidden')"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+            <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-md p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
+                
+                {{-- Close Button X --}}
+                <button
+                    type="button"
+                    onclick="document.getElementById('modal-return').classList.add('hidden')"
+                    style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background-color: #F1F5F9; color: #64748B; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                    class="hover:bg-slate-200 hover:text-slate-800 transition"
+                    aria-label="Tutup"
+                >
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                {{-- Icon Badge Amber/Kuning --}}
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl mb-4 shadow-inner" style="background-color: #FEF3C7; color: #D97706;">
+                    <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
                 </div>
 
-                <div class="flex justify-end gap-2">
-                    <button type="button" 
-                            onclick="document.getElementById('modal-return').classList.add('hidden')"
-                            class="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-xs font-bold">
-                        Batal
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs">
-                        Kirim Revisi
-                    </button>
+                {{-- Content --}}
+                <div class="text-center">
+                    <h3 class="text-xl font-black text-gray-900">
+                        Alasan Pengembalian Dokumen
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-2 leading-relaxed">
+                        Berikan catatan perbaikan/revisi agar Unit Pengaju dapat memperbaikinya.
+                    </p>
                 </div>
-            </form>
+                
+                <form action="{{ route('validation.return', $doc->id) }}" method="POST" class="mt-6 space-y-4">
+                    @method('PUT')
+                    @csrf
+                    <div>
+                        <textarea 
+                            name="catatan" 
+                            rows="4" 
+                            required 
+                            placeholder="Tuliskan catatan perbaikan berkas secara jelas..."
+                            style="width: 100%; font-size: 13px; color: #0F172A !important; background-color: #F8FAFC !important; border: 1.5px solid #CBD5E1 !important; border-radius: 14px; padding: 12px 14px; outline: none; box-sizing: border-box;"
+                        ></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 w-full mt-6">
+                        <button 
+                            type="button" 
+                            onclick="document.getElementById('modal-return').classList.add('hidden')"
+                            style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+                            class="w-full transition hover:bg-slate-100 cursor-pointer flex items-center justify-center text-center"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            type="submit" 
+                            style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35); min-height: 48px;"
+                            class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center gap-2 text-center"
+                        >
+                            <span>Kirim Revisi</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </x-app-layout>

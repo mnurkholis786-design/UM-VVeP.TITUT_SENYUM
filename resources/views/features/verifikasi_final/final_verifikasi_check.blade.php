@@ -1163,124 +1163,57 @@
 
 
                                     {{-- =================================================
-                                        CABINET + KATEGORI ARSIP (SEJAJAR)
+                                        CABINET ARSIP
                                     ================================================== --}}
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div class="form-card rounded-2xl p-5">
 
-                                        {{-- CABINET --}}
-                                        <div class="form-card rounded-2xl p-5">
+                                        <div class="flex items-center gap-3 mb-4">
 
-                                            <div class="flex items-center gap-3 mb-4">
-
-                                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
-                                                    <svg class="w-5 h-5" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                                    </svg>
-                                                </div>
-
-                                                <div>
-                                                    <label class="font-bold text-gray-900">
-                                                        Cabinet Arsip
-                                                    </label>
-
-                                                    <p class="text-xs text-gray-500 mt-0.5">
-                                                        Pilih cabinet sesuai kategori arsip.
-                                                    </p>
-                                                </div>
-
+                                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                </svg>
                                             </div>
 
+                                            <div>
+                                                <label class="font-bold text-gray-900">
+                                                    Cabinet Arsip
+                                                </label>
 
-                                            <select name="cabinet_id"
-                                                required
-                                                class="input-modern w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-
-                                                <option value="" disabled selected>
-                                                    — Pilih cabinet arsip —
-                                                </option>
-
-                                                @foreach ($cabinets as $cabinet)
-
-                                                    <option value="{{ $cabinet->id }}"
-                                                        {{ (string) old('cabinet_id') === (string) $cabinet->id ? 'selected' : '' }}>
-                                                        {{ $cabinet->cabinet_name }}
-                                                    </option>
-
-                                                @endforeach
-
-                                            </select>
-
-                                            @error('cabinet_id')
-                                                <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
-                                            @enderror
+                                                <p class="text-xs text-gray-500 mt-0.5">
+                                                    Pilih cabinet penyimpanan untuk arsip ini.
+                                                </p>
+                                            </div>
 
                                         </div>
 
 
-                                        {{-- KATEGORI ARSIP --}}
-                                        <div class="form-card rounded-2xl p-5">
+                                        <select name="cabinet_id"
+                                            required
+                                            class="input-modern w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
 
-                                            <div class="flex items-center gap-3 mb-4">
+                                            <option value="" disabled selected>
+                                                — Pilih cabinet arsip —
+                                            </option>
 
-                                                <div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0">
-                                                    <svg class="w-5 h-5" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                                    </svg>
-                                                </div>
+                                            @foreach ($cabinets as $cabinet)
 
-                                                <div>
-                                                    <label class="font-bold text-gray-900">
-                                                        Kategori Arsip
-                                                    </label>
-
-                                                    <p class="text-xs text-gray-500 mt-0.5">
-                                                        Pilih klasifikasi arsip (kode kategori).
-                                                    </p>
-                                                </div>
-
-                                            </div>
-
-
-                                            <select name="kategori"
-                                                required
-                                                class="input-modern w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-
-                                                <option value="" disabled selected>
-                                                    — Pilih kategori arsip —
+                                                <option value="{{ $cabinet->id }}"
+                                                    {{ (string) old('cabinet_id') === (string) $cabinet->id ? 'selected' : '' }}>
+                                                    {{ $cabinet->cabinet_name }}
                                                 </option>
 
-                                                @foreach (\App\Models\DigitalArchive::KATEGORI_SUB as $groupKey => $items)
+                                            @endforeach
 
-                                                    <optgroup label="{{ \App\Models\DigitalArchive::KATEGORI_GROUP[$groupKey] ?? $groupKey }}">
+                                        </select>
 
-                                                        @foreach ($items as $kode => $nama)
-
-                                                            <option value="{{ $kode }}"
-                                                                {{ old('kategori') === $kode ? 'selected' : '' }}>
-                                                                {{ $kode }} {{ $nama }}
-                                                            </option>
-
-                                                        @endforeach
-
-                                                    </optgroup>
-
-                                                @endforeach
-
-                                            </select>
-
-                                            @error('kategori')
-                                                <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
-                                            @enderror
-
-                                        </div>
+                                        @error('cabinet_id')
+                                            <p class="mt-2 text-xs text-red-500">{{ $message }}</p>
+                                        @enderror
 
                                     </div>
 

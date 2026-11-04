@@ -257,7 +257,14 @@
                                 </label>
 
                                 @php
-                                    $currentKategori = old('kategori', $digital->kategori ?? '');
+                                    // Jika kategori belum pernah disimpan manual, otomatis ambil dari PDF
+                                    $autoKategori = (empty($digital->kategori) || $digital->kategori === '-')
+                                        ? ($digital->kategori_otomatis ?? '')
+                                        : '';
+                                    $currentKategori = old('kategori', (!empty($digital->kategori) && $digital->kategori !== '-')
+                                        ? $digital->kategori
+                                        : $autoKategori
+                                    );
                                 @endphp
 
                                 <div class="relative">
@@ -358,6 +365,18 @@
                                     </select>
 
                                 </div>
+
+                                @if(empty($digital->kategori) || $digital->kategori === '-')
+                                    @if($digital->kategori_otomatis)
+                                        <p class="text-xs text-blue-500 mt-1 flex items-center gap-1">
+                                            <svg class="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                            </svg>
+                                            Kategori otomatis terdeteksi dari PDF: <strong>{{ $digital->kategori_otomatis }}</strong>. Anda tetap bisa menggantinya.
+                                        </p>
+                                    @endif
+                                @endif
+
                                 @error('kategori')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror

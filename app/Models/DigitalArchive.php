@@ -360,7 +360,7 @@ class DigitalArchive extends Model
             ? $this->file_path_archive
             : (json_decode($this->file_path_archive, true) ?: [$this->file_path_archive]);
 
-        $result = ['no_kuitansi' => null, 'tanggal_kuitansi' => null, 'tanggal_terima' => null];
+        $result = ['no_kuitansi' => null, 'tanggal_kuitansi' => null, 'tanggal_terima' => null, 'kategori' => null];
 
         foreach ($files as $file) {
             if (!$file) {
@@ -416,6 +416,47 @@ class DigitalArchive extends Model
                 }
             }
 
+            // 4. Ekstrak Kategori Arsip otomatis dari kode RO dalam teks PDF
+            if (empty($result['kategori'])) {
+                foreach (self::KATEGORI_LIST as $catCode) {
+                    if (preg_match('/(?:^|[^A-Za-z0-9])' . preg_quote($catCode, '/') . '(?:[^A-Za-z0-9]|$)/i', $text)) {
+                        $result['kategori'] = $catCode;
+                        break;
+                    }
+                }
+            }
+            if (empty($result['kategori'])) {
+                if (preg_match('/KRO\s+([A-Z]{2,4})[^\r\n]*/i', $text, $kroMatch)
+                    && preg_match('/\bRO\b\s+(\d{3,4})/i', $text, $roMatch)
+                ) {
+                    $candidate = strtoupper(trim($kroMatch[1])) . '.' . $roMatch[1];
+                    if (in_array($candidate, self::KATEGORI_LIST)) {
+                        $result['kategori'] = $candidate;
+                    }
+                }
+            }
+            if (empty($result['kategori'])) {
+                $roKeywords = [
+                    'BAH.002' => 'Siaran Program dan Promosi Acara',
+                    'BAH.001' => 'Siaran Berita, Current Affairs dan Olahraga',
+                    'BAH.003' => 'Siaran Konten Media Baru',
+                    'AEC.001' => 'Kerja Sama Jasa Siaran',
+                    'CBR.001' => 'Dukungan Teknis Kinerja Transmisi',
+                    'CBT.002' => 'Sarana dan Prasarana Teknik Produksi',
+                    'CDS.001' => 'Pemeliharaan Transmisi',
+                    'CDS.002' => 'Pemeliharaan Peralatan Teknik Produksi',
+                    'CDS.003' => 'Pemeliharaan Infrastruktur',
+                    'EBA.994' => 'Layanan Perkantoran',
+                    'WA.4376' => 'Pelaksanaan Dukungan Manajemen',
+                ];
+                foreach ($roKeywords as $catCode => $keyword) {
+                    if (stripos($text, $keyword) !== false) {
+                        $result['kategori'] = $catCode;
+                        break;
+                    }
+                }
+            }
+
             // Fallback: Jika belum terisi, samakan dengan tanggal kuitansi yang berhasil terdeteksi
             if (empty($result['tanggal_terima']) && !empty($result['tanggal_kuitansi'])) {
                 $result['tanggal_terima'] = $result['tanggal_kuitansi'];
@@ -428,6 +469,17 @@ class DigitalArchive extends Model
 
         $this->cachedKuitansiData = $result;
         return $result;
+    }
+
+    /**
+     * Accessor: Kategori yang otomatis terdeteksi dari isi PDF arsip.
+     * Mengembalikan kode kategori (misal 'BAH.002') atau null jika tidak terdeteksi.
+     * Tidak menyimpan ke database—hanya untuk default/sugesti di form.
+     */
+    public function getKategoriOtomatisAttribute(): ?string
+    {
+        $data = $this->extractKuitansiDataFromPdf();
+        return $data['kategori'] ?? null;
     }
 
     /**

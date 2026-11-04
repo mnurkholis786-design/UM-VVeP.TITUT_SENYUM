@@ -477,12 +477,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                        <div>
+                        <div class="{{ $isLsSpm ? '' : 'md:col-span-2' }}">
                             <label class="field-label">No SPBy</label>
                             <div class="info-box">
                                 {{ $archive->no_spby ?? '-' }}
                             </div>
                         </div>
+
                         {{-- HANYA MUNCUL DI ARSIP LS SPM --}}
                         @if($isLsSpm)
                         <div>
@@ -498,7 +499,7 @@
                                 {{ $archive->jenis_spm ?? '-' }}
                             </div>
                         </div>
-                        @endif
+
                         <div>
                             <label class="field-label">No SP2D</label>
                             <div class="info-box">
@@ -533,6 +534,7 @@
                                 {{ $archive->tgl_selesai_sp2d ? \Carbon\Carbon::parse($archive->tgl_selesai_sp2d)->format('d F Y') : '-' }}
                             </div>
                         </div>
+                        @endif
 
                         <div>
                             <label class="field-label">No Kuitansi</label>
@@ -547,6 +549,7 @@
                                 {{ $archive->tanggal_kuitansi_display }}
                             </div>
                         </div>
+
                         <div>
                             <label class="field-label">Tanggal Terima</label>
                             <div class="info-box">

@@ -165,9 +165,9 @@ class FinalVerificationController extends Controller
             return redirect()->route('final.index')->with('error', 'Gagal memproses: Anda hanya berwenang menandatangani dokumen LS SPM.');
         }
 
-        // validasi kategori arsip (kode harus ada di daftar resmi DigitalArchive)
+        // validasi kategori arsip jika dikirim (opsional, jika kosong diekstrak otomatis dari PDF)
         $request->validate([
-            'kategori' => ['required', Rule::in(DigitalArchive::KATEGORI_LIST)],
+            'kategori' => ['nullable', Rule::in(DigitalArchive::KATEGORI_LIST)],
         ]);
 
         // ========== CEK KATEGORI (folder) SEBELUM ADA PERUBAHAN APA PUN ==========
@@ -291,10 +291,19 @@ class FinalVerificationController extends Controller
             }
         }
 
+        // Kategori arsip: ambil dari input jika ada, atau ekstrak otomatis dari PDF
+        $kategoriOtomatis = $request->kategori;
+        if (empty($kategoriOtomatis)) {
+            $tempArchive = new DigitalArchive();
+            $tempArchive->file_path_archive = $newPath;
+            $pdfData = $tempArchive->extractKuitansiDataFromPdf();
+            $kategoriOtomatis = $pdfData['kategori'] ?? null;
+        }
+
         // create digital archive
         $digital = DigitalArchive::create([
             'category_id' => $idcategory,
-            'kategori' => $request->kategori,
+            'kategori' => $kategoriOtomatis,
             'archive_name' => $pengajuan->budget_submission_name,
             'from_division' => $pengajuan->user->role,
             'submiter_name' => $pengajuan->user->name,

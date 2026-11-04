@@ -1306,33 +1306,37 @@
     @if (Auth::user()->role === 'Keuangan')
 
         <div id="modalTambah"
-            class="hidden fixed inset-0 z-50 overflow-y-auto">
+            class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;">
 
-            <div class="flex items-center justify-center min-h-screen px-4">
+            {{-- BACKGROUND GELAP & BLUR SOLID --}}
+            <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;"
+                onclick="closeTambahModal()">
+            </div>
 
-                {{-- BACKGROUND --}}
-                <div class="fixed inset-0 bg-black bg-opacity-50"
-                    onclick="closeTambahModal()">
-                </div>
+            <div class="flex items-center justify-center min-h-screen p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
 
+                {{-- MODAL CARD --}}
+                <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-md p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
 
-                {{-- MODAL --}}
-                <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                    {{-- Close Button X --}}
+                    <button type="button"
+                        onclick="closeTambahModal()"
+                        style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background-color: #F1F5F9; color: #64748B; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                        class="hover:bg-slate-200 hover:text-slate-800 transition"
+                        aria-label="Tutup">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
 
-                    <div class="flex items-center justify-between mb-5">
-
-                        <h3 class="text-lg font-bold text-gray-900">
+                    <div class="mb-5 text-left">
+                        <h3 class="text-xl font-black text-gray-900">
                             Tambah Dokumen
                         </h3>
-
-                        <button type="button"
-                            onclick="closeTambahModal()"
-                            class="text-gray-400 hover:text-gray-600 text-2xl">
-                            &times;
-                        </button>
-
+                        <p class="text-xs text-gray-500 mt-1">
+                            Tambahkan kelengkapan dokumen persyaratan verifikasi.
+                        </p>
                     </div>
-
 
                     <form action="{{ route('keuangan.checkandupate', $pengajuan->id) }}"
                         method="POST">
@@ -1344,59 +1348,57 @@
                             name="aksi"
                             value="tambah_dokumen">
 
-
                         {{-- INPUT NAMA DOKUMEN --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <div class="mb-4 text-left">
+                            <label class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Nama Dokumen & TTD
                             </label>
                             <input type="text"
                                 name="nama_dokumen"
                                 required
                                 autocomplete="off"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                style="width: 100%; font-size: 13px; color: #0F172A; background-color: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 14px; padding: 12px 14px; outline: none; box-sizing: border-box;"
                                 placeholder="Masukkan nama dokumen">
                         </div>
 
                         {{-- PILIHAN LINGKUP PENERAPAN --}}
-                        <div class="mb-5 bg-slate-50 border border-slate-200 rounded-lg p-3.5">
-                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2.5">
+                        <div class="mb-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left">
+                            <label class="block text-[11px] font-black text-gray-600 uppercase tracking-wider mb-2.5">
                                 Lingkup Penerapan:
                             </label>
-                            <div class="space-y-2">
+                            <div class="space-y-2.5">
                                 <label class="flex items-start gap-2.5 cursor-pointer">
                                     <input type="radio" name="lingkup" value="lokal" checked
                                         class="mt-0.5 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Hanya untuk pengajuan ini</span>
-                                        <span class="text-xs text-purple-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Hanya untuk pengajuan ini</span>
+                                        <span class="text-[11px] text-purple-600 font-semibold block">(Pilihan aman / Default)</span>
                                     </div>
                                 </label>
-                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-slate-200">
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-slate-200">
                                     <input type="radio" name="lingkup" value="global"
                                         class="mt-0.5 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Terapkan ke template pengajuan baru</span>
-                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya otomatis memiliki syarat ini</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Terapkan ke template pengajuan baru</span>
+                                        <span class="text-[11px] text-gray-500 block">Pengajuan baru berikutnya otomatis memiliki syarat ini</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-2">
-
+                        <div class="grid grid-cols-2 gap-4 w-full">
                             <button type="button"
                                 onclick="closeTambahModal()"
-                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md font-medium">
+                                style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+                                class="w-full transition hover:bg-slate-100 cursor-pointer flex items-center justify-center text-center">
                                 Batal
                             </button>
 
-
                             <button type="submit"
-                                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium">
+                                style="background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35); min-height: 48px;"
+                                class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center text-center">
                                 Tambah
                             </button>
-
                         </div>
 
                     </form>
@@ -1412,31 +1414,37 @@
              MODAL EDIT DOKUMEN
         ================================================================= --}}
         <div id="modalEdit"
-            class="hidden fixed inset-0 z-50 overflow-y-auto">
+            class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;">
 
-            <div class="flex items-center justify-center min-h-screen px-4">
+            {{-- BACKGROUND GELAP & BLUR SOLID --}}
+            <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;"
+                onclick="closeEditModal()">
+            </div>
 
-                <div class="fixed inset-0 bg-black bg-opacity-50"
-                    onclick="closeEditModal()">
-                </div>
+            <div class="flex items-center justify-center min-h-screen p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
 
+                {{-- MODAL CARD --}}
+                <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-md p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
 
-                <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                    {{-- Close Button X --}}
+                    <button type="button"
+                        onclick="closeEditModal()"
+                        style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background-color: #F1F5F9; color: #64748B; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                        class="hover:bg-slate-200 hover:text-slate-800 transition"
+                        aria-label="Tutup">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
 
-                    <div class="flex items-center justify-between mb-5">
-
-                        <h3 class="text-lg font-bold text-gray-900">
+                    <div class="mb-5 text-left">
+                        <h3 class="text-xl font-black text-gray-900">
                             Edit Dokumen
                         </h3>
-
-                        <button type="button"
-                            onclick="closeEditModal()"
-                            class="text-gray-400 hover:text-gray-600 text-2xl">
-                            &times;
-                        </button>
-
+                        <p class="text-xs text-gray-500 mt-1">
+                            Perbarui nama dokumen persyaratan verifikasi.
+                        </p>
                     </div>
-
 
                     <form action="{{ route('keuangan.checkandupate', $pengajuan->id) }}"
                         method="POST">
@@ -1448,67 +1456,60 @@
                             name="aksi"
                             value="edit_dokumen">
 
-
                         <input type="hidden"
                             name="row"
                             id="editRow">
 
-
-                        <div class="mb-5">
-
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <div class="mb-4 text-left">
+                            <label class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Nama Dokumen & TTD
                             </label>
-
                             <input type="text"
                                 name="nama_dokumen"
                                 id="editNamaDokumen"
                                 required
                                 autocomplete="off"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-
+                                style="width: 100%; font-size: 13px; color: #0F172A; background-color: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 14px; padding: 12px 14px; outline: none; box-sizing: border-box;">
                         </div>
 
-
-                         {{-- PILIHAN LINGKUP PERUBAHAN NAMA --}}
-                        <div class="mb-5 bg-blue-50 border border-blue-200 rounded-lg p-3.5">
-                            <label class="block text-xs font-bold text-blue-800 uppercase tracking-wider mb-2.5">
+                        {{-- PILIHAN LINGKUP PERUBAHAN NAMA --}}
+                        <div class="mb-6 bg-blue-50 border border-blue-200 rounded-2xl p-4 text-left">
+                            <label class="block text-[11px] font-black text-blue-900 uppercase tracking-wider mb-2.5">
                                 Lingkup Perubahan:
                             </label>
-                            <div class="space-y-2">
+                            <div class="space-y-2.5">
                                 <label class="flex items-start gap-2.5 cursor-pointer">
                                     <input type="radio" name="lingkup" value="lokal" checked
                                         class="mt-0.5 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Hanya untuk pengajuan ini</span>
-                                        <span class="text-xs text-blue-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Hanya untuk pengajuan ini</span>
+                                        <span class="text-[11px] text-blue-600 font-semibold block">(Pilihan aman / Default)</span>
                                     </div>
                                 </label>
-                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-blue-200">
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-blue-200">
                                     <input type="radio" name="lingkup" value="global"
                                         class="mt-0.5 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Ubah juga di template pengajuan baru</span>
-                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya otomatis memakai nama baru ini</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Ubah juga di template pengajuan baru</span>
+                                        <span class="text-[11px] text-gray-500 block">Pengajuan baru berikutnya otomatis memakai nama baru ini</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-2">
-
+                        <div class="grid grid-cols-2 gap-4 w-full">
                             <button type="button"
                                 onclick="closeEditModal()"
-                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md font-medium">
+                                style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+                                class="w-full transition hover:bg-slate-100 cursor-pointer flex items-center justify-center text-center">
                                 Batal
                             </button>
 
-
                             <button type="submit"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium">
-                                Simpan Perubahan
+                                style="background: linear-gradient(135deg, #003A8F 0%, #0066CC 100%); color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(0, 58, 143, 0.35); min-height: 48px;"
+                                class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center text-center">
+                                Simpan
                             </button>
-
                         </div>
 
                     </form>
@@ -1524,31 +1525,44 @@
              MODAL HAPUS DOKUMEN
         ================================================================= --}}
         <div id="modalHapus"
-            class="hidden fixed inset-0 z-50 overflow-y-auto">
+            class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;">
 
-            <div class="flex items-center justify-center min-h-screen px-4">
+            {{-- BACKGROUND GELAP & BLUR SOLID --}}
+            <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;"
+                onclick="closeHapusModal()">
+            </div>
 
-                <div class="fixed inset-0 bg-black bg-opacity-50"
-                    onclick="closeHapusModal()">
-                </div>
+            <div class="flex items-center justify-center min-h-screen p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
 
+                {{-- MODAL CARD --}}
+                <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-md p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
 
-                <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                    {{-- Close Button X --}}
+                    <button type="button"
+                        onclick="closeHapusModal()"
+                        style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background-color: #F1F5F9; color: #64748B; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                        class="hover:bg-slate-200 hover:text-slate-800 transition"
+                        aria-label="Tutup">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
 
-                    <div class="flex items-center justify-between mb-5">
-
-                        <h3 class="text-lg font-bold text-gray-900">
-                            Hapus Dokumen
-                        </h3>
-
-                        <button type="button"
-                            onclick="closeHapusModal()"
-                            class="text-gray-400 hover:text-gray-600 text-2xl">
-                            &times;
-                        </button>
-
+                    {{-- Icon Badge --}}
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl mb-4 shadow-inner" style="background-color: #FEF2F2; color: #DC2626;">
+                        <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
                     </div>
 
+                    <div class="text-center mb-4">
+                        <h3 class="text-xl font-black text-gray-900">
+                            Hapus Dokumen
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Yakin ingin menghapus dokumen persyaratan berikut?
+                        </p>
+                    </div>
 
                     <form action="{{ route('keuangan.checkandupate', $pengajuan->id) }}"
                         method="POST">
@@ -1560,69 +1574,63 @@
                             name="aksi"
                             value="hapus_dokumen">
 
-
                         <input type="hidden"
                             name="row"
                             id="hapusRow">
 
-
-                        <p class="text-sm text-gray-600 mb-2">
-                            Yakin ingin menghapus dokumen berikut?
-                        </p>
-
-
-                        <div class="bg-gray-50 border border-gray-200 rounded-md p-3 mb-5">
-
+                        <div class="border rounded-2xl p-3.5 mb-5 text-left" style="background-color: #F8FAFC !important; border: 1.5px solid #E2E8F0;">
                             <p id="hapusNamaDokumen"
-                                class="font-semibold text-gray-900">
+                                class="font-bold text-gray-900 text-sm">
                             </p>
-
                         </div>
 
-                                                {{-- PILIHAN LINGKUP PENGHAPUSAN --}}
-                        <div class="mb-5 bg-red-50 border border-red-200 rounded-lg p-3.5">
-                            <label class="block text-xs font-bold text-red-800 uppercase tracking-wider mb-2.5">
+                        {{-- PILIHAN LINGKUP PENGHAPUSAN --}}
+                        <div class="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 text-left">
+                            <label class="block text-[11px] font-black text-red-900 uppercase tracking-wider mb-2.5">
                                 Lingkup Penghapusan:
                             </label>
-                            <div class="space-y-2">
+                            <div class="space-y-2.5">
                                 <label class="flex items-start gap-2.5 cursor-pointer">
                                     <input type="radio" name="lingkup" value="lokal" checked
                                         class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Hanya dari pengajuan ini</span>
-                                        <span class="text-xs text-red-600 font-semibold block">(Pilihan aman / Default)</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Hanya dari pengajuan ini</span>
+                                        <span class="text-[11px] text-red-600 font-semibold block">(Pilihan aman / Default)</span>
                                     </div>
                                 </label>
-                                <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-red-200">
+                                <label class="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-red-200">
                                     <input type="radio" name="lingkup" value="global"
                                         class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300">
-                                    <div class="text-sm">
-                                        <span class="font-medium text-gray-800">Hapus juga dari template pengajuan baru</span>
-                                        <span class="text-xs text-gray-500 block">Pengajuan baru berikutnya tidak akan memiliki syarat ini</span>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-gray-800">Hapus juga dari template pengajuan baru</span>
+                                        <span class="text-[11px] text-gray-500 block">Pengajuan baru berikutnya tidak akan memiliki syarat ini</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-2">
-
+                        <div class="grid grid-cols-2 gap-4 w-full">
                             <button type="button"
                                 onclick="closeHapusModal()"
-                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md font-medium">
+                                style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+                                class="w-full transition hover:bg-slate-100 cursor-pointer flex items-center justify-center text-center">
                                 Batal
                             </button>
 
-
                             <button type="submit"
-                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium">
+                                style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); min-height: 48px;"
+                                class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center text-center">
                                 Ya, Hapus
                             </button>
-
                         </div>
 
                     </form>
 
                 </div>
+
+            </div>
+
+        </div>
 
             </div>
 

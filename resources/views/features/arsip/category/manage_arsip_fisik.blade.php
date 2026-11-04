@@ -173,79 +173,91 @@
         </div>
 
         {{-- MODAL POP-UP CREATE ARSIP FISIK --}}
-        <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" x-transition>
-            <div @click.away="showCreateModal = false" class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 transform transition-all">
-                <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
-                    <h3 class="text-base font-bold text-gray-800">Tambah Arsip Fisik Baru</h3>
-                    <button type="button" @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div x-show="showCreateModal" style="display: none; position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" x-transition>
+            {{-- Backdrop --}}
+            <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" @click="showCreateModal = false"></div>
+
+            <div class="flex min-h-screen items-center justify-center p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+                <div @click.away="showCreateModal = false" class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all max-w-md w-full p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
+                    
+                    <button type="button" @click="showCreateModal = false" style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; background-color: #F1F5F9; color: #64748B; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
+
+                    <div class="mb-5">
+                        <h3 class="text-xl font-black text-slate-900">Tambah Arsip Fisik Baru</h3>
+                        <p class="text-xs text-slate-500 mt-1">Unggah berkas rekapitulasi fisik sesuai tahun.</p>
+                    </div>
+
+                    <form action="{{ route('category.uploadArsipFisik', $category->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Tahun Arsip</label>
+                            <input type="text" name="tahun" placeholder="Masukkan tahun (Contoh: 2026)" required style="width: 100%; font-size: 13px; color: #0F172A; background-color: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 14px; padding: 12px 14px; outline: none; box-sizing: border-box;">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">File Excel Rekapitulasi (.xlsx / .xls)</label>
+                            <input type="file" name="file_excel" accept=".xlsx, .xls" required style="width: 100%; font-size: 13px; color: #475569; background-color: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 14px; padding: 10px 14px; outline: none; box-sizing: border-box;">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 w-full mt-6 pt-2">
+                            <button type="button" @click="showCreateModal = false" style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 12px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 46px; cursor: pointer;">
+                                Batal
+                            </button>
+                            <button type="submit" style="background: linear-gradient(135deg, #003A8F 0%, #0066CC 100%); color: #FFFFFF; padding: 12px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(0, 58, 143, 0.35); min-height: 46px; cursor: pointer;">
+                                Simpan Arsip
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <form action="{{ route('category.uploadArsipFisik', $category->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-4">
-                        <label class="block text-xs font-semibold text-gray-700 mb-2">Tahun Arsip</label>
-                        <input type="text" name="tahun" placeholder="Masukkan tahun (Contoh: 2026)" required class="block w-full text-xs text-gray-700 border border-gray-200 rounded-xl p-2.5 bg-gray-50 focus:bg-white focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-xs font-semibold text-gray-700 mb-2">File Excel Rekapitulasi (.xlsx / .xls)</label>
-                        <input type="file" name="file_excel" accept=".xlsx, .xls" required class="block w-full text-xs text-gray-500 border border-gray-200 rounded-xl p-2 bg-gray-50">
-                    </div>
-
-                    <div class="flex items-center justify-end gap-3">
-                        <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition">Batal</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-md hover:bg-blue-700 transition">Simpan Arsip</button>
-                    </div>
-                </form>
             </div>
         </div>
 
         {{-- MODAL POP-UP KONFIRMASI HAPUS --}}
-        <div x-show="showDeleteModal" style="display: none;" 
-             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" 
+        <div x-show="showDeleteModal" style="display: none; position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" 
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0">
-             
-            <div @click.away="showDeleteModal = false" 
-                 class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95">
-                
-                {{-- Icon Peringatan Merah --}}
-                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-inner">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+            
+            <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" @click="showDeleteModal = false"></div>
+
+            <div class="flex min-h-screen items-center justify-center p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+                <div @click.away="showDeleteModal = false" 
+                     class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all max-w-md w-full p-7 sm:p-8"
+                     style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
+                    
+                    {{-- Icon Peringatan Merah --}}
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-inner" style="background-color: #FEF2F2; color: #DC2626;">
+                        <svg style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+
+                    <div class="text-center">
+                        <h3 class="text-xl font-black text-gray-900" x-text="deleteTitle">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-gray-500 mt-2 leading-relaxed" x-text="deleteMessage">
+                            Yakin ingin menghapus berkas ini?
+                        </p>
+                    </div>
+
+                    <form :action="deleteActionUrl" method="POST" class="grid grid-cols-2 gap-4 w-full mt-7">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" @click="showDeleteModal = false" style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer;" class="w-full text-center">
+                            Batal
+                        </button>
+                        <button type="submit" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); min-height: 48px; cursor: pointer;" class="w-full text-center">
+                            Ya, Hapus
+                        </button>
+                    </form>
+
                 </div>
-
-                <h3 class="text-base font-bold text-gray-800 mb-1" x-text="deleteTitle">Konfirmasi Hapus</h3>
-                <p class="text-xs text-gray-500 mb-6" x-text="deleteMessage">
-                    Yakin ingin menghapus berkas ini?
-                </p>
-
-                <form :action="deleteActionUrl" method="POST" class="flex items-center justify-center gap-3">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" @click="showDeleteModal = false" class="w-1/2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                        Batal
-                    </button>
-                    <button type="submit" class="w-1/2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-red-200 transition">
-                        Ya, Hapus
-                    </button>
-                </form>
-
             </div>
         </div>
     </div>

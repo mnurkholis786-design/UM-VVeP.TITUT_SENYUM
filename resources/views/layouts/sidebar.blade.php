@@ -628,6 +628,7 @@ if ($role === 'Admin') {
 
         {{-- LOGOUT --}}
         <form
+            id="sidebarLogoutForm"
             method="POST"
             action="{{ route('logout') }}"
             class="sidebar-logout-form"
@@ -636,7 +637,8 @@ if ($role === 'Admin') {
             @csrf
 
             <button
-                type="submit"
+                type="button"
+                onclick="openGlobalLogoutModal()"
                 class="sidebar-menu-item sidebar-logout"
             >
 

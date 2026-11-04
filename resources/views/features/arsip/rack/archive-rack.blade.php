@@ -1625,34 +1625,74 @@
                                     </a>
 
 
-                                    <form
-                                        action="{{ route('digital.destroy', $archive->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus arsip digital ini?')"
-                                    >
+                                    @php
+                                        $isAdmin = strtolower(trim(Auth::user()->role ?? '')) === 'admin';
+                                        $isPendingDelete = ($archive->status === 'menunggu_persetujuan_hapus');
+                                    @endphp
 
-                                        @csrf
-                                        @method('DELETE')
+                                    @if($isPendingDelete)
+                                        {{-- JIKA SEDANG MENUNGGU PERSETUJUAN --}}
+                                        @if($isAdmin)
+                                            {{-- KHUSUS ADMIN: TAMPILKAN TOMBOL SETUJUI / TOLAK --}}
+                                            <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2 py-1 rounded-xl shadow-sm">
+                                                <span class="text-xs text-amber-700 font-bold hidden sm:inline" title="{{ $archive->keterangan }}">
+                                                    ⏳ Menunggu Persetujuan
+                                                </span>
 
+                                                {{-- Tombol Setujui Hapus (Admin) --}}
+                                                <button
+                                                    type="button"
+                                                    onclick="openApproveModal('{{ route('digital.destroy', $archive->id) }}', '{{ addslashes($archive->archive_name) }}')"
+                                                    class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition cursor-pointer"
+                                                    title="Setujui Hapus Permanen"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                </button>
+
+                                                {{-- Tombol Tolak Permohonan (Admin) --}}
+                                                <button
+                                                    type="button"
+                                                    onclick="openRejectModal('{{ route('digital.rejectDelete', $archive->id) }}', '{{ addslashes($archive->archive_name) }}')"
+                                                    class="p-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow-sm transition cursor-pointer"
+                                                    title="Tolak Permohonan"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @else
+                                            {{-- BUKAN ADMIN: TAMPILKAN BADGE MENUNGGU ADMIN --}}
+                                            <span class="inline-flex items-center gap-1 px-3 py-2 bg-amber-100 border border-amber-300 text-amber-800 rounded-xl text-xs font-semibold shadow-sm"
+                                                  title="{{ $archive->keterangan }}">
+                                                <svg class="w-4 h-4 text-amber-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                                </svg>
+                                                Menunggu Admin
+                                            </span>
+                                        @endif
+                                    @else
+                                        {{-- TOMBOL HAPUS BIASA: BUKA POP-UP VERIFIKASI 2 LANGKAH --}}
                                         <button
-                                            type="submit"
+                                            type="button"
+                                            onclick="openDeleteRequestModal({{ $archive->id }}, '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}', {{ $isAdmin ? 'true' : 'false' }})"
                                             class="inline-flex items-center justify-center
                                                    w-10 h-10
                                                    bg-red-500 hover:bg-red-600
                                                    text-white rounded-xl
                                                    shadow-sm hover:shadow-md
                                                    transition"
-                                            title="Hapus"
+                                            title="{{ $isAdmin ? 'Hapus Arsip' : 'Ajukan Permohonan Hapus ke Admin' }}"
                                         >
-
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
-                                             </svg>
-
-                                         </button>
-
-                                     </form>
+                                            </svg>
+                                        </button>
+                                     @endif
                                      @endif
 
                                  </div>
@@ -1739,4 +1779,265 @@
         });
     </script>
 
+    {{-- ========================================================================= --}}
+    {{-- MODAL POPUP VERIFIKASI 2 LANGKAH HAPUS ARSIP DIGITAL                      --}}
+    {{-- ========================================================================= --}}
+    <div id="deleteRequestModal" class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        {{-- Backdrop Gelap & Blur Solid (Anti Tembus) --}}
+        <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" onclick="closeDeleteRequestModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+            <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all sm:w-full sm:max-w-lg" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 20px; border: 1px solid #E2E8F0;">
+                
+                {{-- Header Modal Solid Merah Bergradasi --}}
+                <div style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important; padding: 18px 24px; color: #FFFFFF !important; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 22px; height: 22px; color: #FFFFFF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 style="color: #FFFFFF !important; font-size: 16px; font-weight: 800; margin: 0; line-height: 1.3;" id="modalHeaderTitle">Permohonan Penghapusan Arsip</h3>
+                            <p style="color: #FEE2E2 !important; font-size: 12px; margin: 2px 0 0 0;">Verifikasi 2 langkah untuk keamanan data</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeDeleteRequestModal()" style="color: #FFFFFF !important; font-size: 26px; font-weight: bold; line-height: 1; background: none; border: none; cursor: pointer; padding: 4px; opacity: 0.9;" aria-label="Tutup">&times;</button>
+                </div>
+
+                {{-- Form Permohonan --}}
+                <form id="deleteRequestForm" method="POST" action="">
+                    @csrf
+                    <input type="hidden" name="_method" id="deleteFormMethod" value="POST">
+
+                    <div style="padding: 22px; display: flex; flex-direction: column; gap: 18px;">
+                        
+                        {{-- Ringkasan Arsip --}}
+                        <div style="background-color: #F8FAFC !important; border: 1.5px solid #E2E8F0 !important; border-radius: 14px; padding: 14px 16px; text-align: left;">
+                            <p style="color: #64748B !important; font-weight: 700; font-size: 12px; margin: 0 0 4px 0;">Arsip yang akan dihapus:</p>
+                            <p style="color: #0F172A !important; font-weight: 900; font-size: 15px; margin: 0; line-height: 1.4;" id="modalArchiveName">-</p>
+                            <p style="color: #64748B !important; font-size: 12px; margin: 6px 0 0 0;">Kode Arsip: <span style="color: #003A8F !important; font-weight: 800;" id="modalArchiveCode">-</span></p>
+                        </div>
+
+                        {{-- LANGKAH 1 --}}
+                        <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                            <label style="color: #0F172A !important; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                <span style="background-color: #FEE2E2 !important; color: #DC2626 !important; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 900; flex-shrink: 0;">1</span>
+                                Alasan Penghapusan <span style="color: #DC2626 !important;">*</span>
+                            </label>
+                            <textarea 
+                                name="reason" 
+                                id="deleteReasonInput" 
+                                rows="3" 
+                                required 
+                                placeholder="Jelaskan alasan mengapa arsip ini perlu dihapus (contoh: berkas double, salah unggah lampiran, revisi nomor SPJ)..."
+                                style="width: 100%; font-size: 13px; color: #0F172A !important; background-color: #FFFFFF !important; border: 1.5px solid #CBD5E1 !important; border-radius: 14px; padding: 12px 14px; outline: none; box-sizing: border-box;"
+                                onfocus="this.style.borderColor='#DC2626'"
+                                onblur="this.style.borderColor='#CBD5E1'"
+                                oninput="checkDeleteFormValidity()"
+                            ></textarea>
+                        </div>
+
+                        {{-- LANGKAH 2 --}}
+                        <div style="background-color: #FFFBEB !important; border: 1.5px solid #FCD34D !important; border-radius: 14px; padding: 14px 16px; text-align: left;">
+                            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin: 0;">
+                                <input 
+                                    type="checkbox" 
+                                    id="deleteAgreementCheckbox" 
+                                    style="width: 18px; height: 18px; margin-top: 2px; accent-color: #DC2626; cursor: pointer; flex-shrink: 0;"
+                                    onchange="checkDeleteFormValidity()"
+                                >
+                                <span style="color: #78350F !important; font-size: 12.5px; line-height: 1.5;">
+                                    <strong style="color: #92400E !important; font-weight: 900;">Langkah 2:</strong> Saya menyatakan bertanggung jawab atas pengajuan ini dan memahami bahwa arsip <strong style="color: #B45309 !important; font-weight: 900;">tidak langsung terhapus sampai disetujui oleh Admin</strong>.
+                                </span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    {{-- Footer Modal --}}
+                    <div style="background-color: #F8FAFC !important; border-top: 1px solid #E2E8F0 !important; padding: 16px 24px; display: flex; align-items: center; justify-content: flex-end; gap: 12px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                        <button 
+                            type="button" 
+                            onclick="closeDeleteRequestModal()" 
+                            style="padding: 11px 22px; font-size: 13.5px; font-weight: 700; border-radius: 14px; background-color: #FFFFFF !important; color: #475569 !important; border: 1.5px solid #CBD5E1 !important; min-height: 44px; cursor: pointer;"
+                            class="hover:bg-slate-100 transition shadow-sm"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            type="submit" 
+                            id="submitDeleteRequestBtn" 
+                            disabled 
+                            style="padding: 11px 24px; font-size: 13.5px; font-weight: 800; border-radius: 14px; min-height: 44px; background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important; color: #FFFFFF !important; border: none !important; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); cursor: pointer;"
+                            class="disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
+                        >
+                            <svg style="width: 16px; height: 16px; color: #FFFFFF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                            <span id="submitBtnText" style="color: #FFFFFF !important;">Kirim Permohonan ke Admin</span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- Script Kontrol Modal --}}
+    <script>
+        function openDeleteRequestModal(archiveId, archiveName, archiveCode, isAdmin) {
+            const modal = document.getElementById('deleteRequestModal');
+            const form = document.getElementById('deleteRequestForm');
+            const nameEl = document.getElementById('modalArchiveName');
+            const codeEl = document.getElementById('modalArchiveCode');
+            const methodInput = document.getElementById('deleteFormMethod');
+            const headerTitle = document.getElementById('modalHeaderTitle');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const reasonInput = document.getElementById('deleteReasonInput');
+            const agreementCb = document.getElementById('deleteAgreementCheckbox');
+
+            nameEl.textContent = archiveName;
+            codeEl.textContent = archiveCode;
+            reasonInput.value = '';
+            agreementCb.checked = false;
+
+            if (isAdmin) {
+                form.action = '/digital/' + archiveId;
+                methodInput.value = 'DELETE';
+                headerTitle.textContent = 'Konfirmasi Hapus Permanen (Admin)';
+                submitBtnText.textContent = 'Hapus Permanen Sekarang';
+            } else {
+                form.action = '/digital/' + archiveId + '/request-delete';
+                methodInput.value = 'POST';
+                headerTitle.textContent = 'Permohonan Penghapusan Arsip';
+                submitBtnText.textContent = 'Kirim Permohonan ke Admin';
+            }
+
+            checkDeleteFormValidity();
+            modal.classList.remove('hidden');
+        }
+
+        function closeDeleteRequestModal() {
+            document.getElementById('deleteRequestModal').classList.add('hidden');
+        }
+
+        function checkDeleteFormValidity() {
+            const reason = document.getElementById('deleteReasonInput').value.trim();
+            const agreed = document.getElementById('deleteAgreementCheckbox').checked;
+            const submitBtn = document.getElementById('submitDeleteRequestBtn');
+
+            if (reason.length >= 5 && agreed) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        function openApproveModal(actionUrl, archiveName) {
+            const modal = document.getElementById('adminActionModal');
+            const form = document.getElementById('adminActionForm');
+            const methodInput = document.getElementById('adminActionMethod');
+            const iconBg = document.getElementById('actionModalIconBg');
+            const icon = document.getElementById('actionModalIcon');
+            const title = document.getElementById('actionModalTitle');
+            const desc = document.getElementById('actionModalDesc');
+            const archiveNameEl = document.getElementById('actionModalArchiveName');
+            const submitBtn = document.getElementById('adminActionSubmitBtn');
+            const submitText = document.getElementById('adminActionSubmitText');
+
+            form.action = actionUrl;
+            methodInput.value = 'DELETE';
+            
+            iconBg.style.backgroundColor = '#FEF2F2';
+            icon.innerHTML = `<svg style="width: 32px; height: 32px; color: #DC2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+            
+            title.textContent = 'Setujui & Hapus Permanen?';
+            desc.textContent = 'Arsip beserta seluruh berkas PDF fisiknya di server akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.';
+            archiveNameEl.textContent = archiveName;
+            
+            submitBtn.style.backgroundColor = '#DC2626';
+            submitText.textContent = 'Ya, Setujui & Hapus';
+
+            modal.classList.remove('hidden');
+        }
+
+        function openRejectModal(actionUrl, archiveName) {
+            const modal = document.getElementById('adminActionModal');
+            const form = document.getElementById('adminActionForm');
+            const methodInput = document.getElementById('adminActionMethod');
+            const iconBg = document.getElementById('actionModalIconBg');
+            const icon = document.getElementById('actionModalIcon');
+            const title = document.getElementById('actionModalTitle');
+            const desc = document.getElementById('actionModalDesc');
+            const archiveNameEl = document.getElementById('actionModalArchiveName');
+            const submitBtn = document.getElementById('adminActionSubmitBtn');
+            const submitText = document.getElementById('adminActionSubmitText');
+
+            form.action = actionUrl;
+            methodInput.value = 'POST';
+            
+            iconBg.style.backgroundColor = '#F1F5F9';
+            icon.innerHTML = `<svg style="width: 32px; height: 32px; color: #475569;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+            
+            title.textContent = 'Tolak Permohonan Hapus?';
+            desc.textContent = 'Permohonan penghapusan ini akan ditolak dan status arsip akan dikembalikan normal.';
+            archiveNameEl.textContent = archiveName;
+            
+            submitBtn.style.backgroundColor = '#475569';
+            submitText.textContent = 'Ya, Tolak Permohonan';
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeAdminActionModal() {
+            const modal = document.getElementById('adminActionModal');
+            if (modal) modal.classList.add('hidden');
+        }
+    </script>
+
+    {{-- MODAL KONFIRMASI TINDAKAN ADMIN (SETUJUI / TOLAK) --}}
+    <div id="adminActionModal" class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        {{-- Backdrop Gelap & Blur Solid (Anti Tembus) --}}
+        <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" onclick="closeAdminActionModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+            <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all sm:w-full sm:max-w-lg p-7 sm:p-8" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 24px; border: 1px solid #E2E8F0;">
+                <div id="actionModalIconBg" class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl mb-4 shadow-inner">
+                    <div id="actionModalIcon"></div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-black text-gray-900" id="actionModalTitle">Konfirmasi Tindakan</h3>
+                    <p class="text-sm text-gray-500 mt-2 leading-relaxed" id="actionModalDesc">
+                        Apakah Anda yakin ingin melanjutkan tindakan ini?
+                    </p>
+                    <div class="mt-4 p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm font-bold text-slate-800 line-clamp-2" id="actionModalArchiveName">
+                        -
+                    </div>
+                </div>
+                <form id="adminActionForm" method="POST" action="" class="mt-7 w-full">
+                    @csrf
+                    <input type="hidden" name="_method" id="adminActionMethod" value="POST">
+                    <div class="grid grid-cols-2 gap-4 w-full">
+                        <button
+                            type="button"
+                            onclick="closeAdminActionModal()"
+                            style="background-color: #F8FAFC; color: #475569; border: 1.5px solid #CBD5E1; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; min-height: 48px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+                            class="w-full transition hover:bg-slate-100 cursor-pointer flex items-center justify-center text-center"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            id="adminActionSubmitBtn"
+                            style="background-color: #DC2626; color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); min-height: 48px;"
+                            class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center gap-2 text-center"
+                        >
+                            <span id="adminActionSubmitText">Konfirmasi</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

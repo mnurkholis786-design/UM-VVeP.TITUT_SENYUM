@@ -90,7 +90,7 @@ class DigitalArchiveController extends Controller
             'digital_name' => 'required|string|max:255',
             'digital_code' => 'nullable|string|max:100',
             'from_division' => 'nullable|string|max:255',
-            'kategori' => 'required|in:' . implode(',', DigitalArchive::KATEGORI_LIST),
+            'kategori' => 'nullable|in:' . implode(',', DigitalArchive::KATEGORI_LIST),
             'kode_klasifikasi' => 'nullable|string|max:100',
             'indeks1' => 'nullable|string|max:100',
             'indeks2' => 'nullable|string|max:100',
@@ -162,10 +162,21 @@ class DigitalArchiveController extends Controller
             }
         }
 
+        // Auto-deteksi kategori dari PDF jika user tidak memilih kategori
+        $kategoriTerpilih = $validated['kategori'] ?? null;
+        if (empty($kategoriTerpilih) && !empty($filePaths)) {
+            // Buat objek sementara untuk memanggil extractKuitansiDataFromPdf
+            $tempArchive = new DigitalArchive(['file_path_archive' => $filePaths]);
+            $pdfData = $tempArchive->extractKuitansiDataFromPdf();
+            if (!empty($pdfData['kategori'])) {
+                $kategoriTerpilih = $pdfData['kategori'];
+            }
+        }
+
         DigitalArchive::create([
             'category_id' => $category->id,
             'folder_id' => $validated['folder_id'] ?? null,
-            'kategori' => $validated['kategori'],
+            'kategori' => $kategoriTerpilih,
             'archive_name' => $validated['digital_name'],
             'from_division' => $validated['from_division'] ?? '',
             'submiter_name' => $validated['submiter_name'] ?? '',
@@ -256,7 +267,7 @@ class DigitalArchiveController extends Controller
             'digital_name' => 'required|string|max:255',
             'digital_code' => 'nullable|string|max:100',
             'from_division' => 'nullable|string|max:255',
-            'kategori' => 'required|in:' . implode(',', DigitalArchive::KATEGORI_LIST),
+            'kategori' => 'nullable|in:' . implode(',', DigitalArchive::KATEGORI_LIST),
             'kode_klasifikasi' => 'nullable|string|max:100',
             'indeks1' => 'nullable|string|max:100',
             'indeks2' => 'nullable|string|max:100',
@@ -357,10 +368,21 @@ class DigitalArchiveController extends Controller
             }
         }
 
+        // Auto-deteksi kategori dari PDF jika user tidak memilih / kategori kosong
+        $kategoriTerpilih = $validated['kategori'] ?? null;
+        if (empty($kategoriTerpilih) && !empty($allFiles)) {
+            $archive->file_path_archive = $allFiles; // set file baru agar bisa dibaca
+            $archive->cachedKuitansiData = null;      // reset cache
+            $pdfData = $archive->extractKuitansiDataFromPdf();
+            if (!empty($pdfData['kategori'])) {
+                $kategoriTerpilih = $pdfData['kategori'];
+            }
+        }
+
         $archive->update([
             'category_id' => $archive->category_id,
             'folder_id' => $validated['folder_id'] ?? null,
-            'kategori' => $validated['kategori'],
+            'kategori' => $kategoriTerpilih,
             'archive_name' => $validated['digital_name'],
             'from_division' => $validated['from_division'] ?? '',
             'submiter_name' => $validated['submiter_name'] ?? '',
@@ -407,10 +429,73 @@ class DigitalArchiveController extends Controller
     }
 
     /**
-     * Destroy.
+     * Mengajukan Permohonan Hapus Arsip (Verifikasi 2 Langkah tanpa migrasi baru).
+     */
+    public function requestDelete(Request $request, string $id)
+    {
+        $archive = DigitalArchive::findOrFail($id);
+
+        $request->validate([
+            'reason' => 'required|string|min:5|max:500',
+        ], [
+            'reason.required' => 'Alasan penghapusan wajib diisi.',
+            'reason.min' => 'Alasan penghapusan minimal 5 karakter.',
+        ]);
+
+        $userName = Auth::user()->name ?? 'Pengguna';
+
+        // Simpan status dan alasan ke kolom 'status' & 'keterangan' yang sudah ada di database
+        $archive->update([
+            'status'     => 'menunggu_persetujuan_hapus',
+            'keterangan' => '[PERMOHONAN HAPUS - oleh ' . $userName . ']: ' . $request->reason,
+        ]);
+
+        // Kirim Notifikasi ke Seluruh Akun Admin
+        $admins = \App\Models\User::whereRaw('LOWER(role) = ?', ['admin'])->get();
+        foreach ($admins as $admin) {
+            \App\Models\Notification::create([
+                'user_id' => $admin->id,
+                'title'   => 'Permohonan Hapus Arsip Digital',
+                'message' => 'Pengguna ' . e($userName) . ' mengajukan penghapusan arsip "' . e($archive->archive_name) . '". Alasan: ' . e($request->reason),
+                'type'    => 'warning',
+                'url'     => route('year.show', $archive->category_id),
+                'is_read' => false,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Permohonan penghapusan berhasil diajukan dan sedang menunggu persetujuan Admin.');
+    }
+
+    /**
+     * Tolak Permohonan Hapus Arsip (Hanya Admin).
+     */
+    public function rejectDelete(Request $request, string $id)
+    {
+        if (strtolower(trim(Auth::user()->role ?? '')) !== 'admin') {
+            abort(403, 'Hanya Admin yang berhak menolak permohonan hapus.');
+        }
+
+        $archive = DigitalArchive::findOrFail($id);
+
+        // Kembalikan status arsip menjadi normal
+        $archive->update([
+            'status'     => 'terbatas',
+            'keterangan' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Permohonan penghapusan arsip telah ditolak dan status arsip dikembalikan.');
+    }
+
+    /**
+     * Destroy (Hanya Admin yang bisa eksekusi hapus).
      */
     public function destroy(string $id)
     {
+        // Proteksi: Hanya Admin yang dapat menghapus arsip secara permanen
+        if (strtolower(trim(Auth::user()->role ?? '')) !== 'admin') {
+            return redirect()->back()->with('error', 'Penghapusan arsip harus melalui permohonan persetujuan Admin.');
+        }
+
         $archive = DigitalArchive::findOrFail($id);
 
         $pengajuan = BudgetSubmission::where(
@@ -844,11 +929,13 @@ class DigitalArchiveController extends Controller
                 ['No SPM', $archive->no_spm ?? '-'],
                 ['Jenis SPM', $archive->jenis_spm ?? '-'],
             ] : []),
-            ['No SP2D', $archive->no_sp2d ?? '-'],
-            ['Nilai SP2D', $archive->nilai_sp2d ? 'Rp ' . number_format($archive->nilai_sp2d, 0, ',', '.') : '-'],
-            ['Jenis SP2D', $archive->jenis_sp2d ?? '-'],
-            ['Tanggal SP2D', $archive->tgl_sp2d ? \Carbon\Carbon::parse($archive->tgl_sp2d)->format('d F Y') : '-'],
-            ['Tanggal Selesai SP2D', $archive->tgl_selesai_sp2d ? \Carbon\Carbon::parse($archive->tgl_selesai_sp2d)->format('d F Y') : '-'],
+            ...(!$isUpBendahara ? [
+                ['No SP2D', $archive->no_sp2d ?? '-'],
+                ['Nilai SP2D', $archive->nilai_sp2d ? 'Rp ' . number_format($archive->nilai_sp2d, 0, ',', '.') : '-'],
+                ['Jenis SP2D', $archive->jenis_sp2d ?? '-'],
+                ['Tanggal SP2D', $archive->tgl_sp2d ? \Carbon\Carbon::parse($archive->tgl_sp2d)->format('d F Y') : '-'],
+                ['Tanggal Selesai SP2D', $archive->tgl_selesai_sp2d ? \Carbon\Carbon::parse($archive->tgl_selesai_sp2d)->format('d F Y') : '-'],
+            ] : []),
             ['No Kuitansi', $archive->no_kuitansi_display ?? '-'],
             ['Tanggal Kuitansi', $archive->tanggal_kuitansi_display ?? '-'],
             ['No Invoice', $archive->no_invoice ?? '-'],
