@@ -21,3 +21,13 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Folder Non-Source Code & Dokumen Laporan (Jangan di-push ke GitHub)
+/catatan
+/scratch
+/jurnal
+/Entity Relationship Diagram  ERD
+/Use Case Diagram
+restore_routing_slip.php
+
+
