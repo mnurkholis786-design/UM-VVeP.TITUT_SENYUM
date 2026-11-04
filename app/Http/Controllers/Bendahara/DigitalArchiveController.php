@@ -934,22 +934,14 @@ class DigitalArchiveController extends Controller
                     )->format('d F Y')
                     : '-'],
 
-            ['No Invoice',
-                $archive->no_invoice ?? '-'],
+            ['No Kuitansi',
+                $archive->no_kuitansi_display ?? '-'],
 
-            ['Tanggal Invoice',
-                $archive->tgl_invoice
-                    ? \Carbon\Carbon::parse(
-                        $archive->tgl_invoice
-                    )->format('d F Y')
-                    : '-'],
+            ['Tanggal Kuitansi',
+                $archive->tanggal_kuitansi_display ?? '-'],
 
             ['Tanggal Terima',
-                $archive->tgl_terima
-                    ? \Carbon\Carbon::parse(
-                        $archive->tgl_terima
-                    )->format('d F Y')
-                    : '-'],
+                $archive->tanggal_terima_display ?? '-'],
 
             ['Tingkat Pertimbangan',
                 $archive->tingkat_pertimbangan ?? '-'],

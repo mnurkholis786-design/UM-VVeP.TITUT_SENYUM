@@ -938,8 +938,6 @@ class DigitalArchiveController extends Controller
             ] : []),
             ['No Kuitansi', $archive->no_kuitansi_display ?? '-'],
             ['Tanggal Kuitansi', $archive->tanggal_kuitansi_display ?? '-'],
-            ['No Invoice', $archive->no_invoice ?? '-'],
-            ['Tanggal Invoice', $archive->tgl_invoice ? \Carbon\Carbon::parse($archive->tgl_invoice)->format('d F Y') : '-'],
             ['Tanggal Terima', $archive->tanggal_terima_display ?? '-'],
             ['Tingkat Perkembangan', $tingkatPerkembangan],
             ['Jumlah Halaman', $jumlahHalaman],
