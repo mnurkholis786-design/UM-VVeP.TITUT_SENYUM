@@ -264,7 +264,7 @@
                         {{-- Tanggal Terima --}}
                         <div>
                             <label class="text-sm font-medium text-gray-500 mb-2 block">Tanggal Terima</label>
-                            <input type="date" name="tgl_terima" value="{{ old('tgl_terima', $digital->tgl_terima) }}"
+                            <input type="date" name="tgl_terima" value="{{ old('tgl_terima', $digital->tanggal_terima_input) }}"
                                 class="w-full text-gray-800 px-4 py-2.5 bg-gray-50 rounded-md border border-gray-200
                                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                             @error('tgl_terima')

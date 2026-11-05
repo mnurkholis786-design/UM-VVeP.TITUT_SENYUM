@@ -23,9 +23,24 @@
 
 
      @php
-        $isUpBendahara = ($digital->category && str_contains(strtoupper($digital->category->category_name), 'UP'))
-            || !empty($digital->no_spby)
-            || (isset($digital->category_archive) && str_contains(strtoupper($digital->category_archive->category_name ?? ''), 'UP'));
+        // 1. Cek No SPBy (abaikan tanda strip '-' dan spasi kosong)
+        $cleanSpby = trim($digital->no_spby ?? '');
+        $hasRealSpby = !empty($cleanSpby) && $cleanSpby !== '-';
+
+        // 2. Ambil informasi nama kategori & metode pembayaran
+        $catName = strtoupper($digital->category->category_name ?? '');
+        $subCat = strtoupper($digital->category->sub_category ?? '');
+        $payName = strtoupper($digital->category->payment_method->payment_method_name ?? '');
+
+        // 3. Deteksi LS SPM (Prioritaskan kategori LS atau arsip yang tidak memiliki SPBy fisik)
+        $isLsSpm = str_contains($catName, 'LS')
+            || str_contains($subCat, 'LS')
+            || str_contains($payName, 'LS')
+            || (!$hasRealSpby && (!empty($digital->no_spm) || !empty($digital->jenis_spm)))
+            || !$hasRealSpby;
+
+        // 4. UP Bendahara adalah yang bukan LS SPM
+        $isUpBendahara = !$isLsSpm;
     @endphp
 
     {{-- ========================================================= --}}
@@ -33,7 +48,7 @@
     {{-- ========================================================= --}}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-        <a href="{{ route('year.show', $digital->category_id) }}"
+        <a href="{{ route('year.show', array_merge(['year' => $digital->category_id], (request('category') ?: $digital->kategori) ? ['category' => (request('category') ?: $digital->kategori)] : [])) }}"
             class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
             bg-white border border-gray-200 text-gray-600
             shadow-sm hover:shadow-md hover:border-blue-200 hover:text-blue-600
@@ -521,39 +536,6 @@
                             </div>
 
 
-                            {{-- NOMINAL --}}
-
-                            <div>
-
-                                <label class="form-label">
-                                    Nominal
-                                </label>
-
-                                <div class="relative">
-
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2
-                                        text-sm font-semibold text-gray-400">
-                                        Rp
-                                    </span>
-
-<input
-    type="number"
-    name="nominal"
-    value="{{ old('nominal', $digital->nominal) }}"
-    class="form-input"
-    style="padding-left: 2.75rem !important;"
-    placeholder="0"
->
-
-                                </div>
-
-                                @error('nominal')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-
-                            </div>
-
-
                             {{-- URAIAN --}}
 
                             <div class="md:col-span-2">
@@ -611,7 +593,7 @@
                                 </h4>
 
                                 <p class="text-sm text-gray-500">
-                                    Data SPBy, SPM, SP2D, dan invoice
+                                    Informasi SPBy, SPM dan SP2D
                                 </p>
                             </div>
 
@@ -622,13 +604,10 @@
 
 
                             {{-- NO SPBY --}}
-
-                            <div class="md:col-span-2">
-
+                            <div class="{{ $isLsSpm ? '' : 'md:col-span-2' }}">
                                 <label class="form-label">
                                     No SPBy
                                 </label>
-
                                 <input
                                     type="text"
                                     name="no_spby"
@@ -636,182 +615,142 @@
                                     class="form-input"
                                     placeholder="No SPBy"
                                 >
-
                                 @error('no_spby')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
-
                             </div>
 
-
-                            {{-- HANYA MUNCUL DI LS SPM (DI UP BENDAHARA TIDAK ADA) --}}
+                            {{-- HANYA MUNCUL DI LS SPM (DI UP BENDAHARA DIHAPUS/DISEMBUNYIKAN) --}}
                             @if(!$isUpBendahara)
-                            {{-- NO SPM --}}
-                            <div>
-                                <label class="form-label">
-                                    No SPM
-                                </label>
-                                <input
-                                    type="text"
-                                    name="no_spm"
-                                    value="{{ old('no_spm', $digital->no_spm) }}"
-                                    class="form-input"
-                                    placeholder="No SPM"
-                                >
-                                @error('no_spm')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            {{-- JENIS SPM --}}
-                            <div>
-                                <label class="form-label">
-                                    Jenis SPM
-                                </label>
-                                <input
-                                    type="text"
-                                    name="jenis_spm"
-                                    value="{{ old('jenis_spm', $digital->jenis_spm) }}"
-                                    class="form-input"
-                                    placeholder="Jenis SPM"
-                                >
-                                @error('jenis_spm')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            @endif
-
-                            {{-- NO SP2D --}}
-
-                            <div>
-
-                                <label class="form-label">
-                                    No SP2D
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="no_sp2d"
-                                    value="{{ old('no_sp2d', $digital->no_sp2d) }}"
-                                    class="form-input"
-                                    placeholder="No SP2D"
-                                >
-
-                                @error('no_sp2d')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-
-                            </div>
-
-
-                            {{-- NILAI SP2D --}}
-
-                            <div>
-
-                                <label class="form-label">
-                                    Nilai SP2D
-                                </label>
-
-                                <div class="relative">
-
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2
-                                        text-sm font-semibold text-gray-400">
-                                        Rp
-                                    </span>
-
-<input
-    type="number"
-    name="nilai_sp2d"
-    value="{{ old('nilai_sp2d', $digital->nilai_sp2d) }}"
-    class="form-input"
-    style="padding-left: 2.75rem !important;"
-    placeholder="0"
->
-
+                                {{-- NO SPM --}}
+                                <div>
+                                    <label class="form-label">
+                                        No SPM
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="no_spm"
+                                        value="{{ old('no_spm', $digital->no_spm) }}"
+                                        class="form-input"
+                                        placeholder="No SPM"
+                                    >
+                                    @error('no_spm')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
-                                @error('nilai_sp2d')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
+                                {{-- JENIS SPM --}}
+                                <div>
+                                    <label class="form-label">
+                                        Jenis SPM
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="jenis_spm"
+                                        value="{{ old('jenis_spm', $digital->jenis_spm) }}"
+                                        class="form-input"
+                                        placeholder="Jenis SPM"
+                                    >
+                                    @error('jenis_spm')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            </div>
+                                {{-- NO SP2D --}}
+                                <div>
+                                    <label class="form-label">
+                                        No SP2D
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="no_sp2d"
+                                        value="{{ old('no_sp2d', $digital->no_sp2d) }}"
+                                        class="form-input"
+                                        placeholder="No SP2D"
+                                    >
+                                    @error('no_sp2d')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
+                                {{-- NILAI SP2D --}}
+                                <div>
+                                    <label class="form-label">
+                                        Nilai SP2D
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+                                            Rp
+                                        </span>
+                                        <input
+                                            type="number"
+                                            name="nilai_sp2d"
+                                            value="{{ old('nilai_sp2d', $digital->nilai_sp2d) }}"
+                                            class="form-input"
+                                            style="padding-left: 2.75rem !important;"
+                                            placeholder="0"
+                                        >
+                                    </div>
+                                    @error('nilai_sp2d')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            {{-- JENIS SP2D --}}
+                                {{-- JENIS SP2D --}}
+                                <div>
+                                    <label class="form-label">
+                                        Jenis SP2D
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="jenis_sp2d"
+                                        value="{{ old('jenis_sp2d', $digital->jenis_sp2d) }}"
+                                        class="form-input"
+                                        placeholder="Jenis SP2D"
+                                    >
+                                    @error('jenis_sp2d')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div>
+                                {{-- TANGGAL SP2D --}}
+                                <div>
+                                    <label class="form-label">
+                                        Tanggal SP2D
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="tgl_sp2d"
+                                        value="{{ old('tgl_sp2d', $digital->tgl_sp2d) }}"
+                                        class="form-input"
+                                    >
+                                    @error('tgl_sp2d')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                                <label class="form-label">
-                                    Jenis SP2D
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="jenis_sp2d"
-                                    value="{{ old('jenis_sp2d', $digital->jenis_sp2d) }}"
-                                    class="form-input"
-                                    placeholder="Jenis SP2D"
-                                >
-
-                                @error('jenis_sp2d')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-
-                            </div>
-
-
-                            {{-- TANGGAL SP2D --}}
-
-                            <div>
-
-                                <label class="form-label">
-                                    Tanggal SP2D
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="tgl_sp2d"
-                                    value="{{ old('tgl_sp2d', $digital->tgl_sp2d) }}"
-                                    class="form-input"
-                                >
-
-                                @error('tgl_sp2d')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-
-                            </div>
-
-
-                            {{-- TANGGAL SELESAI SP2D --}}
-
-                            <div>
-
-                                <label class="form-label">
-                                    Tanggal Selesai SP2D
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="tgl_selesai_sp2d"
-                                    value="{{ old('tgl_selesai_sp2d', $digital->tgl_selesai_sp2d) }}"
-                                    class="form-input"
-                                >
-
-                                @error('tgl_selesai_sp2d')
-                                    <p class="form-error">{{ $message }}</p>
-                                @enderror
-
-                            </div>
-
+                                {{-- TANGGAL SELESAI SP2D --}}
+                                <div class="md:col-span-2">
+                                    <label class="form-label">
+                                        Tanggal Selesai SP2D
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="tgl_selesai_sp2d"
+                                        value="{{ old('tgl_selesai_sp2d', $digital->tgl_selesai_sp2d) }}"
+                                        class="form-input"
+                                    >
+                                    @error('tgl_selesai_sp2d')
+                                        <p class="form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
 
                             {{-- NO KUITANSI --}}
-
                             <div>
-
                                 <label class="form-label">
                                     No Kuitansi
                                 </label>
-
                                 <input
                                     type="text"
                                     name="no_invoice"
@@ -819,22 +758,16 @@
                                     class="form-input"
                                     placeholder="No Kuitansi"
                                 >
-
                                 @error('no_invoice')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
-
                             </div>
 
-
                             {{-- TANGGAL KUITANSI --}}
-
                             <div>
-
                                 <label class="form-label">
                                     Tanggal Kuitansi
                                 </label>
-
                                 <input
                                     type="date"
                                     name="tgl_invoice"
@@ -844,29 +777,45 @@
                                 @error('tgl_invoice')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
-
                             </div>
 
-
                             {{-- TANGGAL TERIMA --}}
-
                             <div>
-
                                 <label class="form-label">
                                     Tanggal Terima
                                 </label>
-
                                 <input
                                     type="date"
                                     name="tgl_terima"
-                                    value="{{ old('tgl_terima', $digital->tgl_terima) }}"
+                                    value="{{ old('tgl_terima', $digital->tanggal_terima_input) }}"
                                     class="form-input"
                                 >
-
                                 @error('tgl_terima')
                                     <p class="form-error">{{ $message }}</p>
                                 @enderror
+                            </div>
 
+                            {{-- NOMINAL --}}
+                            <div>
+                                <label class="form-label">
+                                    Nominal
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+                                        Rp
+                                    </span>
+                                    <input
+                                        type="number"
+                                        name="nominal"
+                                        value="{{ old('nominal', $digital->nominal) }}"
+                                        class="form-input"
+                                        style="padding-left: 2.75rem !important;"
+                                        placeholder="0"
+                                    >
+                                </div>
+                                @error('nominal')
+                                    <p class="form-error">{{ $message }}</p>
+                                @enderror
                             </div>
 
                         </div>
@@ -1799,7 +1748,7 @@
                                 {{-- BATAL --}}
 
                                 <a
-                                    href="{{ route('year.show', $digital->category_id) }}"
+                                    href="{{ route('year.show', array_merge(['year' => $digital->category_id], (request('category') ?: $digital->kategori) ? ['category' => (request('category') ?: $digital->kategori)] : [])) }}"
                                     class="inline-flex items-center justify-center gap-2
                                     px-5 py-3 bg-white border border-gray-300
                                     hover:bg-gray-100 hover:border-gray-400

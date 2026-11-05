@@ -569,6 +569,38 @@ class DigitalArchive extends Model
     }
 
     /**
+     * Format tanggal terima khusus untuk input type="date" (format Y-m-d)
+     */
+    public function getTanggalTerimaInputAttribute(): ?string
+    {
+        if (!empty($this->tgl_terima) && trim($this->tgl_terima) !== '-') {
+            try {
+                return \Carbon\Carbon::parse($this->tgl_terima)->format('Y-m-d');
+            } catch (\Throwable $e) {}
+        }
+
+        $data = $this->extractKuitansiDataFromPdf();
+        if (!empty($data['tanggal_terima'])) {
+            $indoMonths = [
+                'Januari' => 'January', 'Februari' => 'February', 'Maret' => 'March',
+                'April' => 'April', 'Mei' => 'May', 'Juni' => 'June',
+                'Juli' => 'July', 'Agustus' => 'August', 'September' => 'September',
+                'Oktober' => 'October', 'November' => 'November', 'Desember' => 'December',
+            ];
+            $trans = str_ireplace(array_keys($indoMonths), array_values($indoMonths), $data['tanggal_terima']);
+            try {
+                return \Carbon\Carbon::parse($trans)->format('Y-m-d');
+            } catch (\Throwable $e) {}
+        }
+
+        if (!empty($this->tanggal_kuitansi_input)) {
+            return $this->tanggal_kuitansi_input;
+        }
+
+        return $this->created_at ? \Carbon\Carbon::parse($this->created_at)->format('Y-m-d') : null;
+    }
+
+    /**
      * Ekstrak teks 'Untuk Pembayaran' langsung dari file PDF arsip.
      */
     public function extractUraianFromPdf(): ?string

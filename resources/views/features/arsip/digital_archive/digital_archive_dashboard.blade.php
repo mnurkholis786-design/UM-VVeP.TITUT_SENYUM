@@ -265,4 +265,87 @@
         </div>
     </div>
 
+    {{-- =========================================================
+        SCROLL POSITION MEMORY & AUTO-RESTORE
+        Menyimpan posisi scroll saat user mengklik kartu kategori
+        atau baris tabel, lalu memulihkannya ketika mereka kembali.
+    ========================================================== --}}
+    <script>
+    (function () {
+        const SCROLL_KEY = 'digital_archive_scroll_y';
+        const PAGE_KEY   = 'digital_archive_last_url';
+
+        // ── 1. Simpan posisi scroll saat user akan meninggalkan halaman ──────
+        // (klik tombol Detail / baris arsip)
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('a[href]');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            // Simpan hanya jika link mengarah ke halaman detail arsip digital
+            if (href && href.includes('/digital/') && !href.includes('kategori')) {
+                localStorage.setItem(SCROLL_KEY, String(window.scrollY));
+                localStorage.setItem(PAGE_KEY, window.location.href);
+            }
+        });
+
+        // ── 2. Pulihkan posisi scroll saat halaman dimuat ────────────────────
+        const savedScroll = localStorage.getItem(SCROLL_KEY);
+        const savedPage   = localStorage.getItem(PAGE_KEY);
+        const currentUrl  = window.location.href.split('#')[0]; // tanpa fragment
+
+        // Hanya restore jika referrer adalah halaman detail arsip digital
+        const referrer = document.referrer || '';
+        const comingFromDetail = referrer.includes('/digital/') && !referrer.includes('kategori');
+
+        // Juga cek apakah URL saat ini cocok dengan halaman yang disimpan
+        const urlMatch = savedPage && savedPage.split('#')[0] === currentUrl;
+
+        if (savedScroll && (comingFromDetail || urlMatch)) {
+            // Pulihkan setelah DOM + gambar selesai dirender
+            window.addEventListener('load', function () {
+                setTimeout(function () {
+                    window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+                    // Hapus setelah dipakai agar tidak mengganggu navigasi biasa
+                    localStorage.removeItem(SCROLL_KEY);
+                    localStorage.removeItem(PAGE_KEY);
+                }, 60);
+            });
+        } else {
+            // Tidak ada state tersimpan — bersihkan sisa-sisa lama
+            localStorage.removeItem(SCROLL_KEY);
+            localStorage.removeItem(PAGE_KEY);
+        }
+
+        // ── 3. Jika ada kategori aktif (kembali dari halaman detail) ─────────
+        //    scroll halaman ke kartu kategori yang aktif agar tetap terlihat,
+        //    dan terapkan animasi highlight sementara.
+        @if($selectedKategori)
+        window.addEventListener('load', function () {
+            // Hanya lakukan auto-scroll ke kartu jika TIDAK ada saved scroll
+            // (supaya tidak bertabrakan dengan pemulihan scroll di atas)
+            if (!savedScroll || !comingFromDetail) {
+                // Scroll ke #daftar-dokumen jika hash ada di URL
+                if (window.location.hash === '#daftar-dokumen') {
+                    const target = document.getElementById('daftar-dokumen');
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+
+            // Highlight kartu kategori aktif dengan animasi pulse singkat
+            const activeCard = document.getElementById('kategori-card-{{ $selectedKategori }}');
+            if (activeCard) {
+                activeCard.classList.add('ring-2', 'ring-cyan-400', 'ring-offset-2');
+                // Hapus highlight setelah 2 detik
+                setTimeout(function () {
+                    activeCard.classList.remove('ring-offset-2');
+                }, 2000);
+            }
+        });
+        @endif
+
+    })();
+    </script>
+
 </x-app-layout>

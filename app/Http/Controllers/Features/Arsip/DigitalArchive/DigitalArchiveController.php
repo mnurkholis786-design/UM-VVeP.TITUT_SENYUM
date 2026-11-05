@@ -229,9 +229,13 @@ class DigitalArchiveController extends Controller
     {
         $archive = DigitalArchive::findOrFail($id);
 
+        // Kategori arsip ini — dipakai untuk membangun URL "Kembali ke Arsip"
+        // agar halaman daftar kembali ke tab yang sama (tidak reset ke SEMUA)
+        $backKategori = $archive->kategori ?? null;
+
         return view(
             'features.arsip.digital_archive.show-digital-archive',
-            compact('archive')
+            compact('archive', 'backKategori')
         );
     }
 

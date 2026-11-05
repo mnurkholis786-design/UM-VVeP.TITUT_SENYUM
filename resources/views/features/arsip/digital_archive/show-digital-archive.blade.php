@@ -62,7 +62,22 @@
 
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
 
-                <a href="{{ route('year.show', $archive->category_id) }}"
+                @php
+                    // Prioritaskan parameter kategori yang sedang aktif (dari URL, database, atau auto-extract PDF)
+                    $activeCat = request('category') 
+                        ?: ($archive->kategori ?: ($archive->extractKuitansiKategori() ?: null));
+
+                    $catParams = $activeCat ? ['category' => $activeCat] : [];
+
+                    // Kembalikan ke halaman daftar arsip (year.show) dengan membawa parameter category
+                    if (!empty($archive->category_id)) {
+                        $backUrl = route('year.show', array_merge(['year' => $archive->category_id], $catParams));
+                    } else {
+                        $backUrl = route('digital.index', $activeCat ? ['kategori' => $activeCat] : []);
+                    }
+                @endphp
+                <a href="{{ $backUrl }}"
+                    id="btn-kembali-arsip"
                     class="group inline-flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur border border-gray-200
                     text-gray-700 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5
                     hover:border-blue-300 hover:text-blue-700 transition-all duration-200">

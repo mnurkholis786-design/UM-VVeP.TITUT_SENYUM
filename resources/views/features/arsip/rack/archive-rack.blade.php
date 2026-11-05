@@ -32,7 +32,7 @@
 
 
     {{-- ========================================================= --}}
-    {{-- GLOBAL STYLE --}}
+    {{-- GLOBAL STYLE & 3D TAB ENHANCEMENTS --}}
     {{-- ========================================================= --}}
 
     <style>
@@ -44,10 +44,10 @@
         }
 
         .archive-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow:
-                0 18px 35px rgba(15, 23, 42, .10),
-                0 6px 12px rgba(37, 99, 235, .06);
+                0 12px 28px rgba(15, 23, 42, .08),
+                0 4px 10px rgba(37, 99, 235, .04);
         }
 
         .archive-item {
@@ -61,7 +61,7 @@
         .archive-item:hover {
             transform: translateY(-2px);
             box-shadow:
-                0 12px 25px rgba(15, 23, 42, .09);
+                0 8px 20px rgba(15, 23, 42, .06);
         }
 
         .category-dropdown summary {
@@ -99,6 +99,41 @@
             background: #cbd5e1;
             border-radius: 999px;
         }
+
+        /* 3D INTERACTIVE TAB STYLES */
+        .tab-container-3d {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(255, 255, 255, 0.8);
+        }
+
+        .tab-btn-3d {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .tab-btn-3d.active-tab {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            color: #003A8F;
+            font-weight: 800;
+            box-shadow: 0 10px 25px -5px rgba(0, 58, 143, 0.15), 
+                        0 8px 10px -6px rgba(0, 58, 143, 0.1), 
+                        inset 0 1px 0 rgba(255, 255, 255, 1),
+                        inset 0 -2px 0 rgba(0, 58, 143, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn-3d.inactive-tab {
+            color: #64748B;
+            font-weight: 600;
+            background: transparent;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .tab-btn-3d.inactive-tab:hover {
+            color: #0F172A;
+            background: rgba(255, 255, 255, 0.6);
+            transform: translateY(-1px);
+        }
     </style>
 
 
@@ -106,16 +141,16 @@
     {{-- MAIN --}}
     {{-- ========================================================= --}}
 
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+    <div class="min-h-screen bg-slate-50/70 py-6">
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
 
             {{-- ========================================================= --}}
             {{-- TOMBOL KEMBALI + HERO --}}
             {{-- ========================================================= --}}
 
-            <div class="mb-6">
+            <div class="mb-5">
 
                 @php
                     if (!empty($category->sub_category)) {
@@ -129,14 +164,14 @@
 
                 <a
                     href="{{ $backUrl }}"
-                    class="inline-flex items-center gap-2 px-4 py-2.5
+                    class="inline-flex items-center gap-2 px-3.5 py-2
                            bg-white text-gray-700 rounded-xl
-                           border border-gray-200 shadow-sm
+                           border border-gray-200 shadow-sm text-sm
                            hover:bg-blue-50 hover:text-blue-700
                            hover:border-blue-200 hover:shadow-md
                            transition-all duration-200"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
 
@@ -150,32 +185,32 @@
 
             {{-- HERO --}}
             <div
-                class="relative overflow-hidden rounded-3xl
+                class="relative overflow-hidden rounded-2xl
                        bg-gradient-to-br from-[#003A8F] via-[#0057B8] to-[#172554]
-                       shadow-2xl shadow-blue-900/20
+                       shadow-xl shadow-blue-900/10
                        border border-blue-400/20
-                       mb-7"
+                       mb-6"
             >
 
                 {{-- dekorasi --}}
-                <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10"></div>
-                <div class="absolute right-20 -bottom-24 w-72 h-72 rounded-full bg-cyan-300/10"></div>
-                <div class="absolute left-1/3 -top-24 w-52 h-52 rounded-full bg-blue-300/10"></div>
+                <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 pointer-events-none"></div>
+                <div class="absolute right-20 -bottom-24 w-72 h-72 rounded-full bg-cyan-300/10 pointer-events-none"></div>
+                <div class="absolute left-1/3 -top-24 w-52 h-52 rounded-full bg-blue-300/10 pointer-events-none"></div>
 
-                <div class="relative z-10 p-6 sm:p-8">
+                <div class="relative z-10 p-6 sm:p-7">
 
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
                         <div class="flex items-start gap-4">
 
                             <div
-                                class="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16
+                                class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14
                                        rounded-2xl bg-white/15
                                        border border-white/20
                                        flex items-center justify-center
                                        shadow-lg backdrop-blur-sm"
                             >
-                                <svg class="w-8 h-8 sm:w-9 sm:h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
                                           d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"
@@ -186,7 +221,7 @@
 
                             <div class="min-w-0">
 
-                                <p class="text-blue-100 text-sm font-medium mb-1">
+                                <p class="text-blue-100 text-xs uppercase tracking-wider font-semibold mb-1">
                                     Kategori Arsip
                                 </p>
 
@@ -195,18 +230,18 @@
                                 </h1>
 
                                 @if (!empty($category->sub_category))
-                                    <p class="mt-2 text-blue-100 text-sm sm:text-base">
+                                    <p class="mt-1 text-blue-100 text-sm">
                                         {{ $category->sub_category }}
                                     </p>
                                 @endif
 
                                 @if (!empty($category->year))
-                                    <div class="mt-3 inline-flex items-center gap-2
-                                                px-3 py-1.5 rounded-full
+                                    <div class="mt-2.5 inline-flex items-center gap-2
+                                                px-3 py-1 rounded-full
                                                 bg-white/15 border border-white/20
-                                                text-white text-sm font-semibold">
+                                                text-white text-xs font-semibold">
 
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                         </svg>
@@ -223,31 +258,31 @@
                         {{-- STAT --}}
                         <div class="grid grid-cols-2 gap-3 sm:gap-4">
 
-                            <div class="min-w-[130px] px-5 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm">
+                            <div class="min-w-[120px] px-4 py-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm cursor-pointer hover:bg-white/20 transition shadow-sm" onclick="switchTab('fisik')">
                                 <p class="text-blue-100 text-xs font-medium">
                                     Arsip Fisik
                                 </p>
 
-                                <p class="text-2xl font-bold text-white mt-1">
+                                <p class="text-xl font-bold text-white mt-0.5">
                                     {{ $racks->count() }}
                                 </p>
 
-                                <p class="text-blue-100 text-xs mt-1">
+                                <p class="text-blue-100 text-[11px] mt-0.5">
                                     Rak tersedia
                                 </p>
                             </div>
 
 
-                            <div class="min-w-[130px] px-5 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm">
+                            <div class="min-w-[120px] px-4 py-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm cursor-pointer hover:bg-white/20 transition shadow-sm" onclick="switchTab('digital')">
                                 <p class="text-blue-100 text-xs font-medium">
                                     Arsip Digital
                                 </p>
 
-                                <p class="text-2xl font-bold text-white mt-1">
+                                <p class="text-xl font-bold text-white mt-0.5">
                                     {{ $digitalarchive->total() }}
                                 </p>
 
-                                <p class="text-blue-100 text-xs mt-1">
+                                <p class="text-blue-100 text-[11px] mt-0.5">
                                     Dokumen
                                 </p>
                             </div>
@@ -261,388 +296,63 @@
 
 
             {{-- ========================================================= --}}
-            {{-- SECTION ARSIP FISIK --}}
+            {{-- 3D INTERACTIVE TAB SWITCHER NAVIGATION --}}
             {{-- ========================================================= --}}
-
-            <div
-                class="archive-card bg-white/95 rounded-3xl
-                       border border-gray-200/80
-                       shadow-xl shadow-slate-200/50
-                       p-5 sm:p-7 mb-7"
-            >
-
-                {{-- HEADER --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-
-                    <div class="flex items-center gap-4">
-
-                        <div
-                            class="w-12 h-12 rounded-2xl
-                                   bg-gradient-to-br from-emerald-500 to-teal-600
-                                   flex items-center justify-center
-                                   shadow-lg shadow-emerald-500/20"
-                        >
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
-                            </svg>
-                        </div>
-
-
-                        <div>
-
-                            <h3 class="text-xl font-bold text-gray-800">
-                                Arsip Fisik
-                            </h3>
-
-                            <p class="text-sm text-gray-500 mt-0.5">
-                                Kelola rak dan dokumen fisik
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
-                    {{-- TAMBAH RAK --}}
-                    <form action="{{ route('rack.create') }}">
-
-                        <input type="hidden" name="category_id" value="{{ $category->id }}">
-
-                        <button
-                            type="submit"
-                            class="w-full sm:w-auto inline-flex items-center
-                                   justify-center gap-2 px-5 py-2.5
-                                   bg-gradient-to-r from-emerald-500 to-teal-600
-                                   hover:from-emerald-600 hover:to-teal-700
-                                   text-white font-semibold rounded-xl
-                                   shadow-lg shadow-emerald-500/20
-                                   hover:shadow-xl hover:-translate-y-0.5
-                                   transition-all duration-200"
-                        >
-
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-
-                            Tambah Rak Arsip
-
-                        </button>
-
-                    </form>
-                    @endif
-
-                </div>
-
-
-                {{-- SEARCH FISIK --}}
-                <form
-                    method="GET"
-                    action="{{ url()->current() }}"
-                    class="mb-6 p-5 rounded-2xl
-                           bg-gradient-to-br from-slate-50 to-blue-50/50
-                           border border-blue-100"
+            <div class="tab-container-3d flex items-center gap-1.5 p-1.5 rounded-2xl mb-6 w-full sm:w-fit border border-slate-300/60 shadow-inner">
+                <button
+                    id="btn-tab-digital"
+                    type="button"
+                    onclick="switchTab('digital')"
+                    class="tab-btn-3d active-tab flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs sm:text-sm cursor-pointer"
                 >
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8h8M8 12h8M8 16h5"/>
+                    </svg>
+                    <span>Arsip Digital</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-blue-600 text-white font-black shadow-sm ml-1">{{ $digitalarchive->total() }}</span>
+                </button>
 
-                    <div class="flex items-center gap-2 mb-4">
-
-                        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
-                            </svg>
-                        </div>
-
-                        <div>
-                            <p class="text-sm font-bold text-gray-800">
-                                Cari Rak Arsip
-                            </p>
-
-                            <p class="text-xs text-gray-500">
-                                Cari berdasarkan nama rak
-                            </p>
-                        </div>
-
-                    </div>
-
-
-                    <div class="flex flex-col sm:flex-row gap-3">
-
-                        <input
-                            type="text"
-                            name="search_fisik"
-                            value="{{ request('search_fisik') }}"
-                            placeholder="Contoh: Rak A, Rak 01..."
-                            class="flex-1 px-4 py-3 text-sm
-                                   border border-gray-200
-                                   rounded-xl bg-white
-                                   shadow-sm
-                                   focus:outline-none
-                                   focus:ring-2 focus:ring-blue-500/30
-                                   focus:border-blue-500"
-                        >
-
-
-                        <button
-                            type="submit"
-                            class="inline-flex items-center justify-center gap-2
-                                   px-6 py-3 bg-blue-600 hover:bg-blue-700
-                                   text-white text-sm font-semibold
-                                   rounded-xl shadow-lg shadow-blue-500/20
-                                   transition"
-                        >
-
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
-                            </svg>
-
-                            Cari
-
-                        </button>
-
-
-                        <a
-                            href="{{ url()->current() }}"
-                            class="inline-flex items-center justify-center
-                                   px-6 py-3 bg-white
-                                   hover:bg-gray-100
-                                   text-gray-700 text-sm font-semibold
-                                   rounded-xl border border-gray-200
-                                   transition"
-                        >
-                            Reset
-                        </a>
-
-                    </div>
-
-                </form>
-
-
-                {{-- LIST RAK --}}
-                @if ($racks->count() > 0)
-
-                    <div class="space-y-3">
-
-                        @php
-                            $no = 1;
-                        @endphp
-
-                        @foreach ($racks as $rak)
-
-                            <div
-                                class="archive-item group
-                                       flex flex-col sm:flex-row
-                                       sm:items-center sm:justify-between
-                                       gap-4 p-4 sm:p-5
-                                       bg-white
-                                       border border-gray-200
-                                       rounded-2xl"
-                            >
-
-                                <a
-                                    href="{{ route('rack.show', $rak->id) }}"
-                                    class="flex items-center gap-4 flex-1 min-w-0"
-                                >
-
-                                    {{-- NOMOR --}}
-                                    <div
-                                        class="flex-shrink-0 w-11 h-11
-                                               flex items-center justify-center
-                                               rounded-xl
-                                               bg-gradient-to-br
-                                               from-[#003A8F] to-[#002766]
-                                               text-white font-bold
-                                               shadow-lg shadow-blue-900/20
-                                               group-hover:scale-105
-                                               transition"
-                                    >
-                                        {{ $no++ }}
-                                    </div>
-
-
-                                    {{-- INFO --}}
-                                    <div class="min-w-0">
-
-                                        <p
-                                            class="text-gray-900 font-bold
-                                                   text-base sm:text-lg
-                                                   truncate
-                                                   group-hover:text-blue-700
-                                                   transition"
-                                        >
-                                            {{ $rak->rack_name }}
-                                        </p>
-
-
-                                        <div class="flex flex-wrap items-center gap-2 mt-2">
-
-                                            <span
-                                                class="inline-flex items-center gap-1.5
-                                                       px-2.5 py-1
-                                                       rounded-lg
-                                                       bg-indigo-50
-                                                       text-indigo-700
-                                                       border border-indigo-100
-                                                       text-xs font-semibold"
-                                            >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                          d="M5 5h14M5 12h14M5 19h14"/>
-                                                </svg>
-
-                                                {{ $rak->category->category_name ?? '-' }}
-                                            </span>
-
-
-                                            <span class="text-xs text-gray-400">
-                                                Rak Arsip Fisik
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                </a>
-
-
-                                {{-- AKSI --}}
-                                <div class="flex items-center gap-2 sm:ml-4">
-
-                                    <a
-                                        href="{{ route('rack.show', $rak->id) }}"
-                                        class="hidden sm:inline-flex items-center gap-1.5
-                                               px-3 py-2
-                                               bg-blue-50 hover:bg-blue-100
-                                               text-blue-700
-                                               rounded-lg text-xs font-semibold
-                                               transition"
-                                    >
-                                        Buka
-                                    </a>
-
-
-                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
-                                    {{-- TOMBOL EDIT RAK (ICON PENSIL) --}}
-                                    <a
-                                        href="{{ route('rack.edit', $rak->id) }}"
-                                        class="inline-flex items-center justify-center
-                                               w-10 h-10
-                                               bg-amber-500 hover:bg-amber-600
-                                               text-white rounded-xl
-                                               shadow-sm hover:shadow-md
-                                               transition"
-                                        title="Edit"
-                                    >
-
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
-                                            />
-                                        </svg>
-
-                                    </a>
-
-
-                                    <form
-                                        action="{{ route('rack.destroy', $rak->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus rak ini?')"
-                                    >
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="inline-flex items-center justify-center
-                                                   w-10 h-10
-                                                   bg-red-500 hover:bg-red-600
-                                                   text-white rounded-xl
-                                                   shadow-sm hover:shadow-md
-                                                   transition"
-                                            title="Hapus"
-                                        >
-
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
-                                            </svg>
-
-                                        </button>
-
-                                    </form>
-                                    @endif
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
-                    </div>
-
-                @else
-
-                    {{-- EMPTY FISIK --}}
-                    <div
-                        class="text-center py-12 px-5
-                               rounded-2xl
-                               bg-gradient-to-br from-slate-50 to-blue-50/40
-                               border border-dashed border-gray-300"
-                    >
-
-                        <div class="mx-auto w-20 h-20 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-5">
-                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
-                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
-                            </svg>
-                        </div>
-
-                        <h4 class="text-lg font-bold text-gray-700">
-                            Belum Ada Rak Arsip
-                        </h4>
-
-                        <p class="text-sm text-gray-500 mt-2 max-w-md mx-auto">
-                            Belum terdapat rak arsip fisik pada kategori ini.
-                            Tambahkan rak untuk mulai mengelola dokumen fisik.
-                        </p>
-
-                    </div>
-
-                @endif
-
+                <button
+                    id="btn-tab-fisik"
+                    type="button"
+                    onclick="switchTab('fisik')"
+                    class="tab-btn-3d inactive-tab flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-xs sm:text-sm cursor-pointer"
+                >
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                    </svg>
+                    <span>Arsip Fisik (Rak)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-blue-600 text-white font-black shadow-sm ml-1">{{ $racks->count() }}</span>
+                </button>
             </div>
 
 
 
             {{-- ========================================================= --}}
-            {{-- SECTION ARSIP DIGITAL --}}
+            {{-- TAB CONTENT 1: SECTION ARSIP DIGITAL --}}
             {{-- ========================================================= --}}
 
             <div
-                class="archive-card bg-white/95 rounded-3xl
+                id="tab-content-digital"
+                class="archive-card bg-white rounded-2xl
                        border border-gray-200/80
-                       shadow-xl shadow-slate-200/50
-                       p-5 sm:p-7"
+                       shadow-sm
+                       p-5 sm:p-6"
             >
 
                 {{-- HEADER DIGITAL --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 pb-4 border-b border-gray-100">
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
 
                         <div
-                            class="w-12 h-12 rounded-2xl
+                            class="w-10 h-10 rounded-xl
                                    bg-gradient-to-br from-blue-500 to-indigo-600
                                    flex items-center justify-center
-                                   shadow-lg shadow-blue-500/20"
+                                   shadow-md shadow-blue-500/10"
                         >
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                       d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
@@ -653,11 +363,11 @@
 
                         <div>
 
-                            <h3 class="text-xl font-bold text-gray-800">
+                            <h3 class="text-lg font-bold text-gray-800">
                                 Arsip Digital
                             </h3>
 
-                            <p class="text-sm text-gray-500 mt-0.5">
+                            <p class="text-xs text-gray-500 mt-0.5">
                                 Kelola dokumen digital dan pencarian arsip
                             </p>
 
@@ -675,16 +385,15 @@
                         <button
                             type="submit"
                             class="w-full sm:w-auto inline-flex items-center
-                                   justify-center gap-2 px-5 py-2.5
+                                   justify-center gap-2 px-4 py-2
                                    bg-gradient-to-r from-blue-600 to-indigo-600
                                    hover:from-blue-700 hover:to-indigo-700
-                                   text-white font-semibold rounded-xl
-                                   shadow-lg shadow-blue-500/20
-                                   hover:shadow-xl hover:-translate-y-0.5
-                                   transition-all duration-200"
+                                   text-white text-xs font-semibold rounded-xl
+                                   shadow-md shadow-blue-500/15
+                                   hover:shadow-lg transition-all duration-200"
                         >
 
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
 
@@ -705,10 +414,9 @@
                 <form
                     method="GET"
                     action="{{ url()->current() }}"
-                    class="mb-6 p-5 rounded-2xl
-                           bg-gradient-to-br from-slate-50
-                           via-blue-50/40 to-indigo-50/50
-                           border border-blue-100"
+                    class="mb-5 p-4 rounded-xl
+                           bg-slate-50/80
+                           border border-slate-200/80"
                 >
                     <!-- Menjaga parameter tanggal & klasifikasi agar tidak mereset saat cari/filter divisi -->
                     @if(request('tanggal_mulai'))
@@ -721,14 +429,14 @@
                         <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
                         {{-- SEARCH --}}
                         <div>
 
-                            <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-                                <span class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-gray-700 mb-1.5">
+                                <span class="w-5 h-5 rounded bg-blue-100 flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                                     </svg>
@@ -743,7 +451,7 @@
                                 name="search_digital"
                                 value="{{ request('search_digital') }}"
                                 placeholder="Cari nama arsip atau pengaju..."
-                                class="w-full px-4 py-3 text-sm
+                                class="w-full px-3.5 py-2 text-xs
                                        border border-gray-200
                                        rounded-xl bg-white
                                        shadow-sm
@@ -758,9 +466,9 @@
                         {{-- DIVISI --}}
                         <div>
 
-                            <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-                                <span class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <label class="flex items-center gap-1.5 text-xs font-bold text-gray-700 mb-1.5">
+                                <span class="w-5 h-5 rounded bg-indigo-100 flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M4 6h16M4 12h16M4 18h10"/>
                                     </svg>
@@ -773,7 +481,7 @@
                             <select
                                 name="divisi"
                                 onchange="this.form.submit()"
-                                class="w-full px-4 py-3 text-sm
+                                class="w-full px-3.5 py-2 text-xs
                                        border border-gray-200
                                        rounded-xl bg-white
                                        shadow-sm
@@ -815,18 +523,18 @@
                     </div>
 
 
-                    <div class="flex flex-wrap items-center gap-2 mt-5 pt-5 border-t border-blue-100">
+                    <div class="flex flex-wrap items-center gap-2 mt-3.5 pt-3 border-t border-gray-200/60">
 
                         <button
                             type="submit"
-                            class="inline-flex items-center justify-center gap-2
-                                   px-6 py-2.5
+                            class="inline-flex items-center justify-center gap-1.5
+                                   px-4 py-2
                                    bg-blue-600 hover:bg-blue-700
-                                   text-white text-sm font-semibold
-                                   rounded-xl shadow-lg shadow-blue-500/20
+                                   text-white text-xs font-semibold
+                                   rounded-xl shadow-md shadow-blue-500/15
                                    transition"
                         >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
                             </svg>
@@ -838,9 +546,9 @@
                         <a
                             href="{{ url()->current() }}"
                             class="inline-flex items-center justify-center
-                                   px-6 py-2.5
+                                   px-4 py-2
                                    bg-white hover:bg-gray-100
-                                   text-gray-700 text-sm font-semibold
+                                   text-gray-700 text-xs font-semibold
                                    rounded-xl border border-gray-200
                                    transition"
                         >
@@ -873,17 +581,17 @@
                 @endphp
 
 
-                <div class="mb-7">
+                <div class="mb-6">
 
-                    <div class="flex items-center justify-between gap-3 mb-4">
+                    <div class="flex items-center justify-between gap-3 mb-3">
 
                         <div>
 
-                            <h4 class="text-base font-bold text-gray-800">
+                            <h4 class="text-sm font-bold text-gray-800">
                                 Klasifikasi Arsip Digital
                             </h4>
 
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-[11px] text-gray-500 mt-0.5">
                                 Pilih klasifikasi untuk memfilter arsip.
                             </p>
 
@@ -894,7 +602,7 @@
 
                             <a
                                 href="{{ url()->current() . '?' . http_build_query($queryParams) }}"
-                                class="hidden sm:inline-flex items-center gap-1.5
+                                class="hidden sm:inline-flex items-center gap-1
                                        text-xs font-semibold text-blue-600
                                        hover:text-blue-800"
                             >
@@ -908,24 +616,24 @@
 
                     <div
                         id="category-dropdowns"
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5"
                     >
 
                         {{-- SEMUA --}}
                         <a
                             href="{{ url()->current() . ($queryParams ? '?' . http_build_query($queryParams) : '') }}"
                             class="flex items-center justify-between
-                                   px-4 py-3 rounded-xl
-                                   text-sm font-bold
+                                   px-3.5 py-2.5 rounded-xl
+                                   text-xs font-bold
                                    border transition-all duration-200
                                    {{ !$activeCategory
-                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                         : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                         >
 
                             <span>SEMUA</span>
 
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
                             </svg>
 
@@ -933,33 +641,33 @@
 
 
                         {{-- AEC --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isAecActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isAecActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">AEC - Kerja Sama</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'AEC.001'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'AEC.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -973,33 +681,33 @@
 
 
                         {{-- BAH --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isBahActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isBahActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">BAH - Pelayanan Publik Lainnya</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.001'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'BAH.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1009,7 +717,7 @@
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.002'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'BAH.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1019,7 +727,7 @@
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'BAH.003'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'BAH.003'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1033,33 +741,33 @@
 
 
                         {{-- CBR --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isCbrActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isCbrActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">CBR - Dukungan Teknis</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBR.001'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'CBR.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1073,33 +781,33 @@
 
 
                         {{-- CBT --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isCbtActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isCbtActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">CBT - Prasarana TIK</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CBT.002'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'CBT.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1113,33 +821,33 @@
 
 
                         {{-- CDS --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isCdsActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isCdsActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">CDS OP - Prasarana Bidang Teknologi</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.001'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'CDS.001'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1149,7 +857,7 @@
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.002'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'CDS.002'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1159,7 +867,7 @@
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'CDS.003'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'CDS.003'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1173,33 +881,33 @@
 
 
                         {{-- EBA --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isEbaActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isEbaActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">EBA - Layanan Dukungan Manajemen</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
                             </summary>
 
 
-                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2">
+                            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-1.5">
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'EBA.994'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'EBA.994'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1213,22 +921,22 @@
 
 
                         {{-- WA --}}
-                        <details class="category-dropdown relative">
+                        <details class="category-dropdown relative" {{ $isWaActive ? 'open' : '' }}>
 
                             <summary
                                 class="cursor-pointer
                                        flex items-center justify-between
-                                       px-4 py-3 rounded-xl
-                                       text-sm font-bold
+                                       px-3.5 py-2.5 rounded-xl
+                                       text-xs font-bold
                                        border transition-all duration-200
                                        {{ $isWaActive
-                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-sm'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700' }}"
                             >
 
                                 <span class="truncate">WA - Dukungan Manajemen</span>
 
-                                <svg class="arrow-icon w-4 h-4 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="arrow-icon w-3.5 h-3.5 flex-shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
 
@@ -1236,15 +944,15 @@
 
 
                             <div
-                                class="absolute right-0 top-full mt-2
+                                class="absolute right-0 top-full mt-1.5
                                        bg-white border border-gray-200
-                                       rounded-2xl shadow-2xl z-50 p-2
-                                       w-full sm:w-auto sm:min-w-[320px]"
+                                       rounded-xl shadow-xl z-50 p-1.5
+                                       w-full sm:w-auto sm:min-w-[300px]"
                             >
 
                                 <a
                                     href="{{ url()->current() . '?' . http_build_query(array_merge($queryParams, ['category' => 'WA.4376'])) }}"
-                                    class="block px-3 py-3 rounded-xl text-sm transition
+                                    class="block px-3 py-2 rounded-lg text-xs transition
                                     {{ $activeCategory === 'WA.4376'
                                         ? 'bg-blue-100 text-blue-700 font-bold'
                                         : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}"
@@ -1267,15 +975,15 @@
                 {{-- ========================================================= --}}
 
                 <div
-                    class="mb-7 rounded-2xl
-                           bg-gradient-to-br from-slate-50 to-gray-50
-                           border border-gray-200 p-5 sm:p-6"
+                    class="mb-6 rounded-xl
+                           bg-slate-50/80
+                           border border-slate-200/80 p-4 sm:p-5"
                 >
 
-                    <div class="flex items-start gap-3 mb-5">
+                    <div class="flex items-start gap-2.5 mb-4">
 
-                        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
@@ -1284,11 +992,11 @@
 
                         <div>
 
-                            <h3 class="text-base font-bold text-gray-800">
+                            <h3 class="text-sm font-bold text-gray-800">
                                 Periode Laporan Pengajuan
                             </h3>
 
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-[11px] text-gray-500 mt-0.5">
                                 Tentukan rentang tanggal berdasarkan tanggal dibuatnya pengajuan.
                             </p>
 
@@ -1311,17 +1019,17 @@
                             <input type="hidden" name="category" value="{{ request('category') }}">
                         @endif
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 
                             {{-- 1. PILIH SUB KATEGORI (SEMUA ATAU 1 SUB KATEGORI) --}}
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1.5">
                                     Sub Kategori Arsip
                                 </label>
                                 <select
                                     id="filter_sub_category"
                                     name="sub_category_id"
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 cursor-pointer"
+                                    class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 cursor-pointer"
                                 >
                                     <option value="all" {{ request('sub_category_id') === 'all' ? 'selected' : '' }}>
                                         📑 Semua Sub Kategori (Gabungan)
@@ -1338,7 +1046,7 @@
 
                             {{-- 2. MULAI TANGGAL --}}
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1.5">
                                     Mulai Tanggal
                                 </label>
                                 <input
@@ -1346,13 +1054,13 @@
                                     id="input_tanggal_mulai"
                                     name="tanggal_mulai"
                                     value="{{ request('tanggal_mulai') }}"
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                                    class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                                 >
                             </div>
 
                             {{-- 3. SAMPAI TANGGAL --}}
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1.5">
                                     Sampai Tanggal
                                 </label>
                                 <input
@@ -1360,27 +1068,27 @@
                                     id="input_tanggal_selesai"
                                     name="tanggal_selesai"
                                     value="{{ request('tanggal_selesai') }}"
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                                    class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-xs bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                                 >
                             </div>
 
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2 mt-5 pt-5 border-t border-gray-200">
+                        <div class="flex flex-wrap items-center gap-2 mt-4 pt-3.5 border-t border-gray-200/60">
 
                             <!-- TOMBOL SUBMIT UNTUK MEMFILTER DATA TANGGAL PADA WEB -->
                             <button
                                 type="submit"
-                                class="inline-flex items-center gap-2
-                                       px-5 py-2.5
+                                class="inline-flex items-center gap-1.5
+                                       px-4 py-2
                                        bg-blue-600 hover:bg-blue-700
-                                       text-white text-sm font-semibold
-                                       rounded-xl shadow-lg
-                                       shadow-blue-500/20
+                                       text-white text-xs font-semibold
+                                       rounded-xl shadow-md
+                                       shadow-blue-500/15
                                        transition"
                             >
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414V19l-4 2v-5.293L2.293 7.293A1 1 0 012 6.586V4z"/>
                                 </svg>
@@ -1393,10 +1101,10 @@
                             <a
                                 href="{{ url()->current() }}"
                                 class="inline-flex items-center
-                                       px-5 py-2.5
+                                       px-4 py-2
                                        bg-white hover:bg-gray-100
                                        text-gray-700
-                                       text-sm font-semibold
+                                       text-xs font-semibold
                                        rounded-xl border border-gray-200
                                        transition"
                             >
@@ -1408,17 +1116,17 @@
                             <button
                                 type="button"
                                 onclick="exportReport('{{ route('digital.report.pdf', ['id' => $category->id]) }}')"
-                                class="inline-flex items-center gap-2
-                                       px-5 py-2.5
+                                class="inline-flex items-center gap-1.5
+                                       px-4 py-2
                                        bg-gradient-to-r from-red-500 to-rose-600
                                        hover:from-red-600 hover:to-rose-700
-                                       text-white text-sm font-semibold
-                                       rounded-xl shadow-lg
-                                       shadow-red-500/20
-                                       transition"
+                                       text-white text-xs font-semibold
+                                       rounded-xl shadow-md
+                                       shadow-red-500/15
+                                       transition ml-auto"
                             >
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M7 18h10M7 14h10M7 10h4m-4 8V4h10v14"/>
                                 </svg>
@@ -1432,17 +1140,17 @@
                             <button
                                 type="button"
                                 onclick="exportReport('{{ route('digital.report.excel', ['id' => $category->id]) }}')"
-                                class="inline-flex items-center gap-2
-                                       px-5 py-2.5
+                                class="inline-flex items-center gap-1.5
+                                       px-4 py-2
                                        bg-gradient-to-r from-emerald-600 to-teal-600
                                        hover:from-emerald-700 hover:to-teal-700
-                                       text-white text-sm font-semibold
-                                       rounded-xl shadow-lg
-                                       shadow-emerald-500/20
+                                       text-white text-xs font-semibold
+                                       rounded-xl shadow-md
+                                       shadow-emerald-500/15
                                        transition"
                             >
 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
@@ -1465,7 +1173,7 @@
 
                 @if ($digitalarchive->count() > 0)
 
-                    <div class="space-y-3">
+                    <div class="space-y-2.5">
 
                         @php
                             $noDigital = ($digitalarchive->currentPage() - 1)
@@ -1479,26 +1187,27 @@
                                 class="archive-item group
                                        flex flex-col sm:flex-row
                                        sm:items-center sm:justify-between
-                                       gap-4 p-4 sm:p-5
+                                       gap-3 p-3.5 sm:p-4
                                        bg-white
                                        border border-gray-200
-                                       rounded-2xl"
+                                       rounded-xl hover:border-blue-300"
                             >
 
                                 <a
-                                    href="{{ route('digital.show', $archive->id) }}"
-                                    class="flex items-center gap-4 flex-1 min-w-0"
+                                    href="{{ route('digital.show', array_merge(['id' => $archive->id], (request('category') ?: $archive->kategori) ? ['category' => (request('category') ?: $archive->kategori)] : [])) }}"
+                                    onclick="saveScrollPosition()"
+                                    class="flex items-center gap-3.5 flex-1 min-w-0"
                                 >
 
                                     {{-- NOMOR --}}
                                     <div
-                                        class="flex-shrink-0 w-11 h-11
+                                        class="flex-shrink-0 w-9 h-9
                                                flex items-center justify-center
-                                               rounded-xl
+                                               rounded-lg
                                                bg-gradient-to-br
                                                from-[#003A8F] to-[#002766]
-                                               text-white font-bold
-                                               shadow-lg shadow-blue-900/20
+                                               text-white text-xs font-bold
+                                               shadow-md shadow-blue-900/15
                                                group-hover:scale-105
                                                transition"
                                     >
@@ -1510,7 +1219,7 @@
 
                                         <p
                                             class="text-gray-900 font-bold
-                                                   text-base sm:text-lg
+                                                   text-sm
                                                    leading-tight
                                                    break-words
                                                    group-hover:text-blue-700
@@ -1520,11 +1229,11 @@
                                         </p>
 
 
-                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs sm:text-sm">
+                                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs">
 
-                                            <span class="inline-flex items-center gap-1.5 text-gray-600">
+                                            <span class="inline-flex items-center gap-1 text-gray-600">
 
-                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 21a8 8 0 0116 0"/>
                                                 </svg>
@@ -1541,9 +1250,9 @@
                                             <span class="hidden sm:inline text-gray-300">•</span>
 
 
-                                            <span class="inline-flex items-center gap-1.5 text-gray-600">
+                                            <span class="inline-flex items-center gap-1 text-gray-600">
 
-                                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 3c-2.755 0-5.29.926-7.13 2.484A11.95 11.95 0 003 12c0 2.755.926 5.29 2.484 7.13A11.95 11.95 0 0012 21c2.755 0 5.29-.926 7.13-2.484A11.95 11.95 0 0021 12c0-2.755-.926-5.29-2.484-7.13z"/>
                                                 </svg>
@@ -1561,16 +1270,16 @@
 
                                         @if (!empty($archive->kategori))
 
-                                            <div class="mt-3">
+                                            <div class="mt-1.5">
 
                                                 <span
                                                     class="inline-flex items-center
-                                                           px-2.5 py-1
-                                                           rounded-lg
+                                                           px-2 py-0.5
+                                                           rounded-md
                                                            bg-blue-50
                                                            text-blue-700
                                                            border border-blue-100
-                                                           text-xs font-semibold"
+                                                           text-[10px] font-semibold"
                                                 >
                                                     {{ $archive->kategori }}
                                                 </span>
@@ -1585,12 +1294,13 @@
 
 
                                 {{-- AKSI --}}
-                                <div class="flex items-center gap-2 sm:ml-4 self-end sm:self-center">
+                                <div class="flex items-center gap-1.5 sm:ml-2 self-end sm:self-center">
 
                                     <a
-                                        href="{{ route('digital.show', $archive->id) }}"
-                                        class="hidden sm:inline-flex items-center gap-1.5
-                                               px-3 py-2
+                                        href="{{ route('digital.show', array_merge(['id' => $archive->id], (request('category') ?: $archive->kategori) ? ['category' => (request('category') ?: $archive->kategori)] : [])) }}"
+                                        onclick="saveScrollPosition()"
+                                        class="hidden sm:inline-flex items-center gap-1
+                                               px-2.5 py-1.5
                                                bg-blue-50 hover:bg-blue-100
                                                text-blue-700
                                                rounded-lg text-xs font-semibold
@@ -1603,17 +1313,17 @@
                                      @if(Auth::user()->role !== 'Kepala Kantor TVRI')
                                     {{-- TOMBOL EDIT ARSIP DIGITAL (ICON PENSIL) --}}
                                     <a
-                                        href="{{ route('digital.edit', $archive->id) }}"
+                                        href="{{ route('digital.edit', array_merge(['id' => $archive->id], (request('category') ?: $archive->kategori) ? ['category' => (request('category') ?: $archive->kategori)] : [])) }}"
+                                        onclick="saveScrollPosition()"
                                         class="inline-flex items-center justify-center
-                                               w-10 h-10
+                                               w-8 h-8
                                                bg-amber-500 hover:bg-amber-600
-                                               text-white rounded-xl
-                                               shadow-sm hover:shadow-md
-                                               transition"
+                                               text-white rounded-lg
+                                               shadow-sm hover:shadow transition"
                                         title="Edit"
                                     >
 
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
@@ -1634,19 +1344,19 @@
                                         {{-- JIKA SEDANG MENUNGGU PERSETUJUAN --}}
                                         @if($isAdmin)
                                             {{-- KHUSUS ADMIN: TAMPILKAN TOMBOL SETUJUI / TOLAK --}}
-                                            <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-2 py-1 rounded-xl shadow-sm">
-                                                <span class="text-xs text-amber-700 font-bold hidden sm:inline" title="{{ $archive->keterangan }}">
+                                            <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg shadow-sm">
+                                                <span class="text-[11px] text-amber-700 font-bold hidden sm:inline" title="{{ $archive->keterangan }}">
                                                     ⏳ Menunggu Persetujuan
                                                 </span>
 
                                                 {{-- Tombol Setujui Hapus (Admin) --}}
                                                 <button
                                                     type="button"
-                                                    onclick="openApproveModal('{{ route('digital.destroy', $archive->id) }}', '{{ addslashes($archive->archive_name) }}')"
-                                                    class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition cursor-pointer"
+                                                    onclick="openApproveModal('{{ route('digital.destroy', $archive->id) }}', '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}')"
+                                                    class="p-1 bg-red-600 hover:bg-red-700 text-white rounded transition cursor-pointer"
                                                     title="Setujui Hapus Permanen"
                                                 >
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                     </svg>
                                                 </button>
@@ -1654,20 +1364,20 @@
                                                 {{-- Tombol Tolak Permohonan (Admin) --}}
                                                 <button
                                                     type="button"
-                                                    onclick="openRejectModal('{{ route('digital.rejectDelete', $archive->id) }}', '{{ addslashes($archive->archive_name) }}')"
-                                                    class="p-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow-sm transition cursor-pointer"
+                                                    onclick="openRejectModal('{{ route('digital.rejectDelete', $archive->id) }}', '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}')"
+                                                    class="p-1 bg-gray-500 hover:bg-gray-600 text-white rounded transition cursor-pointer"
                                                     title="Tolak Permohonan"
                                                 >
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                     </svg>
                                                 </button>
                                             </div>
                                         @else
                                             {{-- BUKAN ADMIN: TAMPILKAN BADGE MENUNGGU ADMIN --}}
-                                            <span class="inline-flex items-center gap-1 px-3 py-2 bg-amber-100 border border-amber-300 text-amber-800 rounded-xl text-xs font-semibold shadow-sm"
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-100 border border-amber-300 text-amber-800 rounded-lg text-[11px] font-semibold shadow-sm"
                                                   title="{{ $archive->keterangan }}">
-                                                <svg class="w-4 h-4 text-amber-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-3.5 h-3.5 text-amber-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                                 </svg>
@@ -1675,23 +1385,41 @@
                                             </span>
                                         @endif
                                     @else
-                                        {{-- TOMBOL HAPUS BIASA: BUKA POP-UP VERIFIKASI 2 LANGKAH --}}
-                                        <button
-                                            type="button"
-                                            onclick="openDeleteRequestModal({{ $archive->id }}, '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}', {{ $isAdmin ? 'true' : 'false' }})"
-                                            class="inline-flex items-center justify-center
-                                                   w-10 h-10
-                                                   bg-red-500 hover:bg-red-600
-                                                   text-white rounded-xl
-                                                   shadow-sm hover:shadow-md
-                                                   transition"
-                                            title="{{ $isAdmin ? 'Hapus Arsip' : 'Ajukan Permohonan Hapus ke Admin' }}"
-                                        >
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
-                                            </svg>
-                                        </button>
+                                        @if($isAdmin)
+                                            {{-- ADMIN: HAPUS LANGSUNG SECARA PERMANEN --}}
+                                            <button
+                                                type="button"
+                                                onclick="openAdminDirectDeleteModal('{{ route('digital.destroy', $archive->id) }}', '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}')"
+                                                class="inline-flex items-center justify-center
+                                                       w-8 h-8
+                                                       bg-red-500 hover:bg-red-600
+                                                       text-white rounded-lg
+                                                       shadow-sm hover:shadow transition cursor-pointer"
+                                                title="Hapus Arsip Permanen (Admin)"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
+                                                </svg>
+                                            </button>
+                                        @else
+                                            {{-- BUKAN ADMIN: AJUKAN PERMOHONAN HAPUS --}}
+                                            <button
+                                                type="button"
+                                                onclick="openDeleteRequestModal({{ $archive->id }}, '{{ addslashes($archive->archive_name) }}', '{{ $archive->archive_code ?? '-' }}')"
+                                                class="inline-flex items-center justify-center
+                                                       w-8 h-8
+                                                       bg-red-500 hover:bg-red-600
+                                                       text-white rounded-lg
+                                                       shadow-sm hover:shadow transition cursor-pointer"
+                                                title="Ajukan Permohonan Hapus ke Admin"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
+                                                </svg>
+                                            </button>
+                                        @endif
                                      @endif
                                      @endif
 
@@ -1705,25 +1433,484 @@
 
                      {{-- TOMBOL HALAMAN SELANJUTNYA (PAGINASI) --}}
                      @if (method_exists($digitalarchive, 'links'))
-                         <div class="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between">
+                         <div class="pt-5 mt-5 border-t border-gray-100 flex items-center justify-between">
                              {{ $digitalarchive->withQueryString()->links() }}
                          </div>
                      @endif
 
                  @endif
 
-             </div>
-
-         </div>
-
-     </div>
+            </div>
 
 
-     {{-- ========================================================= --}}
-     {{-- SCRIPT JAVASCRIPT --}}
-     {{-- ========================================================= --}}
+            {{-- ========================================================= --}}
+            {{-- TAB CONTENT 2: SECTION ARSIP FISIK --}}
+            {{-- ========================================================= --}}
+
+            <div
+                id="tab-content-fisik"
+                class="hidden archive-card bg-white rounded-2xl
+                       border border-gray-200/80
+                       shadow-sm
+                       p-5 sm:p-6 mb-7"
+            >
+
+                {{-- HEADER --}}
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 pb-4 border-b border-gray-100">
+
+                    <div class="flex items-center gap-3">
+
+                        <div
+                            class="w-10 h-10 rounded-xl
+                                   bg-gradient-to-br from-blue-600 to-indigo-700
+                                   flex items-center justify-center
+                                   shadow-md shadow-blue-500/10"
+                        >
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                            </svg>
+                        </div>
+
+
+                        <div>
+
+                            <h3 class="text-lg font-bold text-gray-800">
+                                Arsip Fisik
+                            </h3>
+
+                            <p class="text-xs text-gray-500 mt-0.5">
+                                Kelola rak dan dokumen fisik
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                    {{-- TAMBAH RAK --}}
+                    <form action="{{ route('rack.create') }}">
+
+                        <input type="hidden" name="category_id" value="{{ $category->id }}">
+
+                        <button
+                            type="submit"
+                            class="w-full sm:w-auto inline-flex items-center
+                                   justify-center gap-2 px-4 py-2
+                                   bg-gradient-to-r from-blue-600 to-indigo-600
+                                   hover:from-blue-700 hover:to-indigo-700
+                                   text-white text-xs font-semibold rounded-xl
+                                   shadow-md shadow-blue-500/15
+                                   hover:shadow-lg transition-all duration-200"
+                        >
+
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+
+                            Tambah Rak Arsip
+
+                        </button>
+
+                    </form>
+                    @endif
+
+                </div>
+
+
+                {{-- SEARCH FISIK --}}
+                <form
+                    method="GET"
+                    action="{{ url()->current() }}"
+                    class="mb-5 p-4 rounded-xl
+                           bg-slate-50/80
+                           border border-slate-200/80"
+                >
+
+                    <div class="flex items-center gap-2 mb-3">
+
+                        <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-bold text-gray-800">
+                                Cari Rak Arsip
+                            </p>
+
+                            <p class="text-[11px] text-gray-500">
+                                Cari berdasarkan nama rak
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+
+                        <input
+                            type="text"
+                            name="search_fisik"
+                            value="{{ request('search_fisik') }}"
+                            placeholder="Contoh: Rak A, Rak 01..."
+                            class="flex-1 px-3.5 py-2 text-xs
+                                   border border-gray-200
+                                   rounded-xl bg-white
+                                   shadow-sm
+                                   focus:outline-none
+                                   focus:ring-2 focus:ring-blue-500/30
+                                   focus:border-blue-500"
+                        >
+
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center gap-1.5
+                                   px-5 py-2 bg-blue-600 hover:bg-blue-700
+                                   text-white text-xs font-semibold
+                                   rounded-xl shadow-md shadow-blue-500/15
+                                   transition"
+                        >
+
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"/>
+                            </svg>
+
+                            Cari
+
+                        </button>
+
+
+                        <a
+                            href="{{ url()->current() }}"
+                            class="inline-flex items-center justify-center
+                                   px-5 py-2 bg-white
+                                   hover:bg-gray-100
+                                   text-gray-700 text-xs font-semibold
+                                   rounded-xl border border-gray-200
+                                   transition"
+                        >
+                            Reset
+                        </a>
+
+                    </div>
+
+                </form>
+
+
+                {{-- LIST RAK (KEBAWAH / 1 KOLOM STACKED) --}}
+                @if ($racks->count() > 0)
+
+                    <div class="flex flex-col space-y-3">
+
+                        @php
+                            $no = 1;
+                        @endphp
+
+                        @foreach ($racks as $rak)
+
+                            <div
+                                class="archive-item group
+                                       flex items-center justify-between
+                                       gap-3 p-3.5 sm:p-4
+                                       bg-white
+                                       border border-gray-200
+                                       rounded-xl hover:border-blue-300"
+                            >
+
+                                <a
+                                    href="{{ route('rack.show', $rak->id) }}"
+                                    onclick="saveScrollPosition()"
+                                    class="flex items-center gap-3.5 flex-1 min-w-0"
+                                >
+
+                                    {{-- NOMOR --}}
+                                    <div
+                                        class="flex-shrink-0 w-9 h-9
+                                               flex items-center justify-center
+                                               rounded-lg
+                                               bg-gradient-to-br
+                                               from-[#003A8F] to-[#002766]
+                                               text-white text-xs font-bold
+                                               shadow-md shadow-blue-900/15
+                                               group-hover:scale-105
+                                               transition"
+                                    >
+                                        {{ $no++ }}
+                                    </div>
+
+
+                                    {{-- INFO --}}
+                                    <div class="min-w-0 flex-1">
+
+                                        <p
+                                            class="text-gray-900 font-bold
+                                                   text-sm
+                                                   truncate
+                                                   group-hover:text-blue-700
+                                                   transition"
+                                        >
+                                            {{ $rak->rack_name }}
+                                        </p>
+
+
+                                        <div class="flex flex-wrap items-center gap-1.5 mt-1">
+
+                                            <span
+                                                class="inline-flex items-center gap-1
+                                                       px-2 py-0.5
+                                                       rounded-md
+                                                       bg-indigo-50
+                                                       text-indigo-700
+                                                       border border-indigo-100
+                                                       text-[10px] font-semibold"
+                                            >
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M5 5h14M5 12h14M5 19h14"/>
+                                                </svg>
+
+                                                {{ $rak->category->category_name ?? '-' }}
+                                            </span>
+
+
+                                            <span class="text-[10px] text-gray-400">
+                                                Rak Arsip Fisik
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+
+                                {{-- AKSI --}}
+                                <div class="flex items-center gap-1.5 sm:ml-2">
+
+                                    <a
+                                        href="{{ route('rack.show', $rak->id) }}"
+                                        onclick="saveScrollPosition()"
+                                        class="hidden sm:inline-flex items-center gap-1
+                                               px-2.5 py-1.5
+                                               bg-blue-50 hover:bg-blue-100
+                                               text-blue-700
+                                               rounded-lg text-xs font-semibold
+                                               transition"
+                                    >
+                                        Buka
+                                    </a>
+
+
+                                    @if(Auth::user()->role !== 'Kepala Kantor TVRI')
+                                    {{-- TOMBOL EDIT RAK (ICON PENSIL) --}}
+                                    <a
+                                        href="{{ route('rack.edit', $rak->id) }}"
+                                        onclick="saveScrollPosition()"
+                                        class="inline-flex items-center justify-center
+                                               w-8 h-8
+                                               bg-amber-500 hover:bg-amber-600
+                                               text-white rounded-lg
+                                               shadow-sm hover:shadow transition"
+                                        title="Edit"
+                                    >
+
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"
+                                            />
+                                        </svg>
+
+                                    </a>
+
+
+                                    <form
+                                        action="{{ route('rack.destroy', $rak->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus rak ini?')"
+                                    >
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="inline-flex items-center justify-center
+                                                   w-8 h-8
+                                                   bg-red-500 hover:bg-red-600
+                                                   text-white rounded-lg
+                                                   shadow-sm hover:shadow transition"
+                                            title="Hapus"
+                                        >
+
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M6 7h12M9 7V4h6v3m-7 0l1 13h6l1-13M10 11v6m4-6v6"/>
+                                            </svg>
+
+                                        </button>
+
+                                    </form>
+                                    @endif
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                @else
+
+                    {{-- EMPTY FISIK --}}
+                    <div
+                        class="text-center py-8 px-4
+                               rounded-xl
+                               bg-slate-50/60
+                               border border-dashed border-gray-200"
+                    >
+
+                        <div class="mx-auto w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-3 border border-gray-100">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                      d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                            </svg>
+                        </div>
+
+                        <h4 class="text-sm font-bold text-gray-700">
+                            Belum Ada Rak Arsip
+                        </h4>
+
+                        <p class="text-xs text-gray-500 mt-1 max-w-md mx-auto">
+                            Belum terdapat rak arsip fisik pada kategori ini.
+                            Tambahkan rak untuk mulai mengelola dokumen fisik.
+                        </p>
+
+                    </div>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- ========================================================= --}}
+    {{-- SCRIPT JAVASCRIPT --}}
+    {{-- ========================================================= --}}
 
     <script>
+        // Nonaktifkan pemulihan scroll otomatis bawaan browser agar tidak meloncat ke atas
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        // FUNGSI MENYIMPAN POSISI SCROLL SEBELUM PINDAH HALAMAN
+        function saveScrollPosition() {
+            const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+            const exactKey = 'archive_scroll_pos_' + window.location.pathname + window.location.search;
+            localStorage.setItem(exactKey, String(currentY));
+
+            // Simpan juga state general untuk fallback yang akurat
+            const scrollState = {
+                pathname: window.location.pathname,
+                search: window.location.search,
+                category: new URLSearchParams(window.location.search).get('category') || '',
+                scrollY: currentY,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('archive_scroll_pos_latest', JSON.stringify(scrollState));
+        }
+
+        // Otomatis tangkap klik pada seluruh link arsip (digital/rack) untuk menyimpan posisi scroll
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('a');
+            if (!link) return;
+            const href = link.getAttribute('href') || '';
+            if (href.includes('/digital/') || href.includes('/rack/') || link.closest('.archive-item')) {
+                saveScrollPosition();
+            }
+        }, true);
+
+        // FUNGSI MEMULIHKAN POSISI SCROLL DARI LOCALSTORAGE
+        function restoreScrollPosition() {
+            const exactKey = 'archive_scroll_pos_' + window.location.pathname + window.location.search;
+            let savedPos = localStorage.getItem(exactKey);
+
+            if (savedPos === null) {
+                try {
+                    const raw = localStorage.getItem('archive_scroll_pos_latest');
+                    if (raw) {
+                        const latest = JSON.parse(raw);
+                        if (latest && latest.pathname === window.location.pathname && (Date.now() - latest.timestamp < 30 * 60 * 1000)) {
+                            savedPos = latest.scrollY;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (savedPos !== null) {
+                const y = parseInt(savedPos, 10);
+                if (!isNaN(y) && y > 0) {
+                    window.scrollTo({ top: y, behavior: 'instant' });
+                    requestAnimationFrame(function () {
+                        window.scrollTo({ top: y, behavior: 'instant' });
+                    });
+                    setTimeout(function () {
+                        window.scrollTo({ top: y, behavior: 'instant' });
+                    }, 60);
+                    setTimeout(function () {
+                        window.scrollTo({ top: y, behavior: 'instant' });
+                        localStorage.removeItem(exactKey);
+                        localStorage.removeItem('archive_scroll_pos_latest');
+                    }, 250);
+                }
+            }
+        }
+
+        // FUNGSI SWITCH TAB ARSIP DIGITAL & FISIK DENGAN EFEK 3D
+        function switchTab(tabName) {
+            const digitalContent = document.getElementById('tab-content-digital');
+            const fisikContent = document.getElementById('tab-content-fisik');
+            const btnDigital = document.getElementById('btn-tab-digital');
+            const btnFisik = document.getElementById('btn-tab-fisik');
+
+            if (tabName === 'digital') {
+                digitalContent.classList.remove('hidden');
+                fisikContent.classList.add('hidden');
+
+                btnDigital.classList.add('active-tab');
+                btnDigital.classList.remove('inactive-tab');
+
+                btnFisik.classList.add('inactive-tab');
+                btnFisik.classList.remove('active-tab');
+
+                localStorage.setItem('active_archive_tab', 'digital');
+            } else {
+                fisikContent.classList.remove('hidden');
+                digitalContent.classList.add('hidden');
+
+                btnFisik.classList.add('active-tab');
+                btnFisik.classList.remove('inactive-tab');
+
+                btnDigital.classList.add('inactive-tab');
+                btnDigital.classList.remove('active-tab');
+
+                localStorage.setItem('active_archive_tab', 'fisik');
+            }
+        }
+
         // Fungsi untuk Export PDF / Excel dengan membawa filter tanggal dan pilihan sub kategori
         function exportReport(baseUrl) {
             const tMulai = document.getElementById('input_tanggal_mulai')?.value;
@@ -1746,36 +1933,52 @@
 
         document.addEventListener('DOMContentLoaded', function () {
 
-            const dropdownContainer =
-                document.getElementById('category-dropdowns');
+            // Pulihkan posisi scroll
+            restoreScrollPosition();
 
-            if (!dropdownContainer) {
-                return;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('search_fisik')) {
+                switchTab('fisik');
+            } else {
+                const savedTab = localStorage.getItem('active_archive_tab') || 'digital';
+                switchTab(savedTab);
             }
 
-            const dropdowns =
-                dropdownContainer.querySelectorAll('details');
+            const dropdownContainer = document.getElementById('category-dropdowns');
+            if (dropdownContainer) {
+                const dropdowns = dropdownContainer.querySelectorAll('details');
+                const activeCat = urlParams.get('category');
 
-            dropdowns.forEach(function (dropdown) {
+                // Pastikan details kategori yang aktif otomatis terbuka & tersorot
+                if (activeCat) {
+                    dropdowns.forEach(function (dropdown) {
+                        const matchingLink = dropdown.querySelector(`a[href*="category=${encodeURIComponent(activeCat)}"]`);
+                        if (matchingLink) {
+                            dropdown.open = true;
+                            matchingLink.classList.add('bg-blue-100', 'text-blue-700', 'font-bold', 'ring-2', 'ring-blue-400');
+                        }
+                    });
+                }
 
-                dropdown.addEventListener('toggle', function () {
-
-                    if (dropdown.open) {
-
-                        dropdowns.forEach(function (otherDropdown) {
-
-                            if (otherDropdown !== dropdown) {
-                                otherDropdown.open = false;
-                            }
-
-                        });
-
-                    }
-
+                // Accordion behavior: jika satu dropdown dibuka manual, tutup yang lain
+                dropdowns.forEach(function (dropdown) {
+                    dropdown.addEventListener('toggle', function () {
+                        if (dropdown.open) {
+                            dropdowns.forEach(function (otherDropdown) {
+                                if (otherDropdown !== dropdown) {
+                                    otherDropdown.open = false;
+                                }
+                            });
+                        }
+                    });
                 });
+            }
 
-            });
+        });
 
+        // Pulihkan scroll juga saat seluruh window selesai memuat gambar dan font
+        window.addEventListener('load', function () {
+            restoreScrollPosition();
         });
     </script>
 
@@ -1886,7 +2089,46 @@
 
     {{-- Script Kontrol Modal --}}
     <script>
-        function openDeleteRequestModal(archiveId, archiveName, archiveCode, isAdmin) {
+        // FUNGSI KHUSUS ADMIN: HAPUS ARSIP LANGSUNG SECARA PERMANEN
+        function openAdminDirectDeleteModal(actionUrl, archiveName, archiveCode) {
+            const modal = document.getElementById('adminActionModal');
+            const form = document.getElementById('adminActionForm');
+            const methodInput = document.getElementById('adminActionMethod');
+            const iconBg = document.getElementById('actionModalIconBg');
+            const icon = document.getElementById('actionModalIcon');
+            const title = document.getElementById('actionModalTitle');
+            const desc = document.getElementById('actionModalDesc');
+            const archiveNameEl = document.getElementById('actionModalArchiveName');
+            const archiveCodeEl = document.getElementById('actionModalArchiveCode');
+            const codeRow = document.getElementById('actionModalCodeRow');
+            const submitBtn = document.getElementById('adminActionSubmitBtn');
+            const submitText = document.getElementById('adminActionSubmitText');
+
+            form.action = actionUrl;
+            methodInput.value = 'DELETE';
+            
+            iconBg.style.backgroundColor = '#FEF2F2';
+            icon.innerHTML = `<svg style="width: 32px; height: 32px; color: #DC2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+            
+            title.textContent = 'Hapus Arsip Permanen?';
+            desc.textContent = 'Sebagai Admin, Anda memiliki wewenang penuh untuk langsung menghapus arsip ini beserta seluruh berkas fisiknya secara permanen.';
+            archiveNameEl.textContent = archiveName;
+            
+            if (archiveCode && archiveCode !== '-') {
+                archiveCodeEl.textContent = archiveCode;
+                codeRow.style.display = 'flex';
+            } else {
+                codeRow.style.display = 'none';
+            }
+            
+            submitBtn.style.background = 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)';
+            submitText.textContent = 'Ya, Hapus Permanen Sekarang';
+
+            modal.classList.remove('hidden');
+        }
+
+        // FUNGSI KHUSUS NON-ADMIN (BENDAHARA/STAF): AJUKAN PERMOHONAN HAPUS DENGAN VERIFIKASI 2 LANGKAH
+        function openDeleteRequestModal(archiveId, archiveName, archiveCode) {
             const modal = document.getElementById('deleteRequestModal');
             const form = document.getElementById('deleteRequestForm');
             const nameEl = document.getElementById('modalArchiveName');
@@ -1902,17 +2144,10 @@
             reasonInput.value = '';
             agreementCb.checked = false;
 
-            if (isAdmin) {
-                form.action = '/digital/' + archiveId;
-                methodInput.value = 'DELETE';
-                headerTitle.textContent = 'Konfirmasi Hapus Permanen (Admin)';
-                submitBtnText.textContent = 'Hapus Permanen Sekarang';
-            } else {
-                form.action = '/digital/' + archiveId + '/request-delete';
-                methodInput.value = 'POST';
-                headerTitle.textContent = 'Permohonan Penghapusan Arsip';
-                submitBtnText.textContent = 'Kirim Permohonan ke Admin';
-            }
+            form.action = '/digital/' + archiveId + '/request-delete';
+            methodInput.value = 'POST';
+            headerTitle.textContent = 'Permohonan Penghapusan Arsip';
+            submitBtnText.textContent = 'Kirim Permohonan ke Admin';
 
             checkDeleteFormValidity();
             modal.classList.remove('hidden');
@@ -1934,7 +2169,7 @@
             }
         }
 
-        function openApproveModal(actionUrl, archiveName) {
+        function openApproveModal(actionUrl, archiveName, archiveCode) {
             const modal = document.getElementById('adminActionModal');
             const form = document.getElementById('adminActionForm');
             const methodInput = document.getElementById('adminActionMethod');
@@ -1943,6 +2178,8 @@
             const title = document.getElementById('actionModalTitle');
             const desc = document.getElementById('actionModalDesc');
             const archiveNameEl = document.getElementById('actionModalArchiveName');
+            const archiveCodeEl = document.getElementById('actionModalArchiveCode');
+            const codeRow = document.getElementById('actionModalCodeRow');
             const submitBtn = document.getElementById('adminActionSubmitBtn');
             const submitText = document.getElementById('adminActionSubmitText');
 
@@ -1953,16 +2190,23 @@
             icon.innerHTML = `<svg style="width: 32px; height: 32px; color: #DC2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
             
             title.textContent = 'Setujui & Hapus Permanen?';
-            desc.textContent = 'Arsip beserta seluruh berkas PDF fisiknya di server akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.';
+            desc.textContent = 'Permohonan penghapusan akan disetujui. Arsip beserta seluruh berkas PDF di server akan langsung dihapus permanen.';
             archiveNameEl.textContent = archiveName;
             
-            submitBtn.style.backgroundColor = '#DC2626';
+            if (archiveCode && archiveCode !== '-') {
+                archiveCodeEl.textContent = archiveCode;
+                codeRow.style.display = 'flex';
+            } else {
+                codeRow.style.display = 'none';
+            }
+            
+            submitBtn.style.background = 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)';
             submitText.textContent = 'Ya, Setujui & Hapus';
 
             modal.classList.remove('hidden');
         }
 
-        function openRejectModal(actionUrl, archiveName) {
+        function openRejectModal(actionUrl, archiveName, archiveCode) {
             const modal = document.getElementById('adminActionModal');
             const form = document.getElementById('adminActionForm');
             const methodInput = document.getElementById('adminActionMethod');
@@ -1971,6 +2215,8 @@
             const title = document.getElementById('actionModalTitle');
             const desc = document.getElementById('actionModalDesc');
             const archiveNameEl = document.getElementById('actionModalArchiveName');
+            const archiveCodeEl = document.getElementById('actionModalArchiveCode');
+            const codeRow = document.getElementById('actionModalCodeRow');
             const submitBtn = document.getElementById('adminActionSubmitBtn');
             const submitText = document.getElementById('adminActionSubmitText');
 
@@ -1984,7 +2230,14 @@
             desc.textContent = 'Permohonan penghapusan ini akan ditolak dan status arsip akan dikembalikan normal.';
             archiveNameEl.textContent = archiveName;
             
-            submitBtn.style.backgroundColor = '#475569';
+            if (archiveCode && archiveCode !== '-') {
+                archiveCodeEl.textContent = archiveCode;
+                codeRow.style.display = 'flex';
+            } else {
+                codeRow.style.display = 'none';
+            }
+            
+            submitBtn.style.background = '#475569';
             submitText.textContent = 'Ya, Tolak Permohonan';
 
             modal.classList.remove('hidden');
@@ -2011,8 +2264,17 @@
                     <p class="text-sm text-gray-500 mt-2 leading-relaxed" id="actionModalDesc">
                         Apakah Anda yakin ingin melanjutkan tindakan ini?
                     </p>
-                    <div class="mt-4 p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm font-bold text-slate-800 line-clamp-2" id="actionModalArchiveName">
-                        -
+                    
+                    {{-- KOTAK INFORMASI ARSIP (LEGA & TIDAK NUMPUK) --}}
+                    <div class="mt-5 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-left" style="background-color: #F8FAFC !important; border: 1.5px solid #E2E8F0 !important;">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Arsip:</p>
+                        <p class="text-sm font-bold text-slate-900 leading-relaxed break-words" id="actionModalArchiveName">
+                            -
+                        </p>
+                        <div id="actionModalCodeRow" class="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Kode Arsip:</span>
+                            <span class="font-black text-blue-700 px-2.5 py-0.5 bg-blue-50 border border-blue-200 rounded-md" id="actionModalArchiveCode">-</span>
+                        </div>
                     </div>
                 </div>
                 <form id="adminActionForm" method="POST" action="" class="mt-7 w-full">
@@ -2030,7 +2292,7 @@
                         <button
                             type="submit"
                             id="adminActionSubmitBtn"
-                            style="background-color: #DC2626; color: #FFFFFF; padding: 13px 20px; font-size: 13.5px; font-weight: 700; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); min-height: 48px;"
+                            style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important; color: #FFFFFF !important; padding: 13px 20px; font-size: 13.5px; font-weight: 800; border-radius: 14px; border: none; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); min-height: 48px;"
                             class="w-full transition hover:brightness-110 cursor-pointer flex items-center justify-center gap-2 text-center"
                         >
                             <span id="adminActionSubmitText">Konfirmasi</span>
