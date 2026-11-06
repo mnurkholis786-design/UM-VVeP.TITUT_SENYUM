@@ -1115,7 +1115,7 @@
                             {{-- EXPORT PDF --}}
                             <button
                                 type="button"
-                                onclick="exportReport('{{ route('digital.report.pdf', ['id' => $category->id]) }}')"
+                                onclick="openPdfPreviewModal('{{ route('digital.report.pdf', ['id' => $category->id]) }}')"
                                 class="inline-flex items-center gap-1.5
                                        px-4 py-2
                                        bg-gradient-to-r from-red-500 to-rose-600
@@ -1139,7 +1139,7 @@
                             {{-- EXPORT EXCEL --}}
                             <button
                                 type="button"
-                                onclick="exportReport('{{ route('digital.report.excel', ['id' => $category->id]) }}')"
+                                onclick="openExcelPreviewModal('{{ route('digital.report.excel', ['id' => $category->id]) }}')"
                                 class="inline-flex items-center gap-1.5
                                        px-4 py-2
                                        bg-gradient-to-r from-emerald-600 to-teal-600
@@ -1931,6 +1931,156 @@
             window.open(url, '_blank');
         }
 
+        // Fungsi untuk Buka Modal Preview Laporan PDF
+        function openPdfPreviewModal(baseUrl) {
+            const tMulai = document.getElementById('input_tanggal_mulai')?.value;
+            const tSelesai = document.getElementById('input_tanggal_selesai')?.value;
+            const subKategoriId = document.getElementById('filter_sub_category')?.value;
+
+            const params = new URLSearchParams();
+            if (tMulai) params.append('tanggal_mulai', tMulai);
+            if (tSelesai) params.append('tanggal_selesai', tSelesai);
+            if (subKategoriId) params.append('sub_category_id', subKategoriId);
+
+            const queryString = params.toString();
+            const streamUrl = baseUrl + (queryString ? (baseUrl.includes('?') ? '&' : '?') + queryString : '');
+
+            // Download URL (menggunakan query param download=1)
+            const downloadParams = new URLSearchParams(params);
+            downloadParams.append('download', '1');
+            const downloadUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + downloadParams.toString();
+
+            // Set link tombol download & buka tab baru
+            const btnDownload = document.getElementById('btnDownloadPdf');
+            if (btnDownload) {
+                btnDownload.href = downloadUrl;
+            }
+
+            const btnOpenTab = document.getElementById('btnOpenNewTabPdf');
+            if (btnOpenTab) {
+                btnOpenTab.href = streamUrl;
+            }
+
+            // Tampilkan loading spinner
+            const spinner = document.getElementById('pdfLoadingIndicator');
+            if (spinner) {
+                spinner.style.display = 'flex';
+            }
+
+            // Set iframe src
+            const iframe = document.getElementById('pdfPreviewIframe');
+            if (iframe) {
+                iframe.src = streamUrl;
+            }
+
+            // Buka modal
+            const modal = document.getElementById('pdfPreviewModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function onPdfIframeLoaded() {
+            const iframe = document.getElementById('pdfPreviewIframe');
+            if (iframe && iframe.src && iframe.src !== 'about:blank') {
+                const spinner = document.getElementById('pdfLoadingIndicator');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            }
+        }
+
+        function closePdfPreviewModal() {
+            const modal = document.getElementById('pdfPreviewModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            const iframe = document.getElementById('pdfPreviewIframe');
+            if (iframe) {
+                iframe.src = 'about:blank';
+            }
+        }
+
+        // Fungsi untuk Buka Modal Preview Laporan Excel
+        function openExcelPreviewModal(baseUrl) {
+            const tMulai = document.getElementById('input_tanggal_mulai')?.value;
+            const tSelesai = document.getElementById('input_tanggal_selesai')?.value;
+            const subKategoriId = document.getElementById('filter_sub_category')?.value;
+
+            const params = new URLSearchParams();
+            if (tMulai) params.append('tanggal_mulai', tMulai);
+            if (tSelesai) params.append('tanggal_selesai', tSelesai);
+            if (subKategoriId) params.append('sub_category_id', subKategoriId);
+
+            const queryString = params.toString();
+            const streamUrl = baseUrl + (queryString ? (baseUrl.includes('?') ? '&' : '?') + queryString : '');
+
+            // Download URL (menggunakan query param download=1)
+            const downloadParams = new URLSearchParams(params);
+            downloadParams.append('download', '1');
+            const downloadUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + downloadParams.toString();
+
+            const btnDownload = document.getElementById('btnDownloadExcel');
+            if (btnDownload) {
+                btnDownload.href = downloadUrl;
+            }
+
+            const btnOpenTab = document.getElementById('btnOpenNewTabExcel');
+            if (btnOpenTab) {
+                btnOpenTab.href = streamUrl;
+            }
+
+            const spinner = document.getElementById('excelLoadingIndicator');
+            if (spinner) {
+                spinner.style.display = 'flex';
+            }
+
+            const iframe = document.getElementById('excelPreviewIframe');
+            if (iframe) {
+                iframe.src = streamUrl;
+            }
+
+            const modal = document.getElementById('excelPreviewModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function onExcelIframeLoaded() {
+            const iframe = document.getElementById('excelPreviewIframe');
+            if (iframe && iframe.src && iframe.src !== 'about:blank') {
+                const spinner = document.getElementById('excelLoadingIndicator');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            }
+        }
+
+        function closeExcelPreviewModal() {
+            const modal = document.getElementById('excelPreviewModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            const iframe = document.getElementById('excelPreviewIframe');
+            if (iframe) {
+                iframe.src = 'about:blank';
+            }
+        }
+
+        // Listener tombol ESC untuk menutup modal preview PDF & Excel
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closePdfPreviewModal();
+                closeExcelPreviewModal();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
 
             // Pulihkan posisi scroll
@@ -2299,6 +2449,132 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- MODAL PREVIEW LAPORAN PDF ARSIP DIGITAL                                   --}}
+    {{-- ========================================================================= --}}
+    <div id="pdfPreviewModal" class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" aria-labelledby="pdfModalTitle" role="dialog" aria-modal="true">
+        {{-- Backdrop Gelap & Blur --}}
+        <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" onclick="closePdfPreviewModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-2 sm:p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+            <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-6xl" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 20px; border: 1px solid #E2E8F0;">
+                
+                {{-- Header Modal --}}
+                <div style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important; padding: 14px 20px; color: #FFFFFF !important; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
+                            <svg style="width: 20px; height: 20px; color: #FFFFFF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 18h10M7 14h10M7 10h4m-4 8V4h10v14" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 style="color: #FFFFFF !important; font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;" id="pdfModalTitle">Preview Laporan Arsip Digital</h3>
+                            <p style="color: #94A3B8 !important; font-size: 11px; margin: 2px 0 0 0;" id="pdfModalSubtitle">Periksa tampilan laporan sebelum mengunduh</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {{-- Tombol Buka Tab Baru --}}
+                        <a id="btnOpenNewTabPdf" href="#" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-200 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Buka di Tab Baru
+                        </a>
+
+                        {{-- Tombol Download PDF --}}
+                        <a id="btnDownloadPdf" href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 shadow-md shadow-red-500/25 transition active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download PDF
+                        </a>
+
+                        {{-- Tombol Tutup --}}
+                        <button type="button" onclick="closePdfPreviewModal()" style="color: #94A3B8; font-size: 26px; font-weight: bold; line-height: 1; background: none; border: none; cursor: pointer; padding: 2px 8px; border-radius: 8px;" class="hover:text-white hover:bg-slate-800 transition" aria-label="Tutup">&times;</button>
+                    </div>
+                </div>
+
+                {{-- Body Modal (Iframe PDF + Loading Indicator) --}}
+                <div style="position: relative; height: 80vh; background-color: #525659; overflow: hidden; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    {{-- Spinner Loading --}}
+                    <div id="pdfLoadingIndicator" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #F8FAFC; z-index: 10;">
+                        <div class="w-12 h-12 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin mb-3"></div>
+                        <p class="text-sm font-bold text-gray-700">Memuat Preview Laporan PDF...</p>
+                        <p class="text-xs text-gray-500 mt-1">Menyiapkan dokumen arsip digital</p>
+                    </div>
+
+                    {{-- Iframe --}}
+                    <iframe id="pdfPreviewIframe" src="about:blank" style="width: 100%; height: 100%; border: none;" onload="onPdfIframeLoaded()"></iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- MODAL PREVIEW LAPORAN EXCEL ARSIP DIGITAL                                 --}}
+    {{-- ========================================================================= --}}
+    <div id="excelPreviewModal" class="hidden" style="position: fixed; inset: 0; z-index: 99999; overflow-y: auto;" aria-labelledby="excelModalTitle" role="dialog" aria-modal="true">
+        {{-- Backdrop Gelap & Blur --}}
+        <div class="fixed inset-0 transition-opacity" style="position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 99998;" onclick="closeExcelPreviewModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-2 sm:p-4 text-center" style="position: relative; z-index: 100000; min-height: 100vh;">
+            <div class="relative transform overflow-hidden rounded-3xl text-left shadow-2xl transition-all w-full max-w-6xl" style="background-color: #FFFFFF !important; position: relative; z-index: 100001; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45); border-radius: 20px; border: 1px solid #E2E8F0;">
+                
+                {{-- Header Modal (Emerald Theme) --}}
+                <div style="background: linear-gradient(135deg, #0F172A 0%, #064E3B 100%) !important; padding: 14px 20px; color: #FFFFFF !important; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #065F46;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                            <svg style="width: 20px; height: 20px; color: #FFFFFF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 style="color: #FFFFFF !important; font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;" id="excelModalTitle">Preview Laporan Excel Arsip Digital</h3>
+                            <p style="color: #A7F3D0 !important; font-size: 11px; margin: 2px 0 0 0;" id="excelModalSubtitle">Periksa tampilan spreadsheet sebelum mengunduh</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {{-- Tombol Buka Tab Baru --}}
+                        <a id="btnOpenNewTabExcel" href="#" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-200 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Buka di Tab Baru
+                        </a>
+
+                        {{-- Tombol Download Excel --}}
+                        <a id="btnDownloadExcel" href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md shadow-emerald-500/25 transition active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Excel
+                        </a>
+
+                        {{-- Tombol Tutup --}}
+                        <button type="button" onclick="closeExcelPreviewModal()" style="color: #94A3B8; font-size: 26px; font-weight: bold; line-height: 1; background: none; border: none; cursor: pointer; padding: 2px 8px; border-radius: 8px;" class="hover:text-white hover:bg-slate-800 transition" aria-label="Tutup">&times;</button>
+                    </div>
+                </div>
+
+                {{-- Body Modal (Iframe Excel HTML + Loading Indicator) --}}
+                <div style="position: relative; height: 80vh; background-color: #F8FAFC; overflow: hidden; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    {{-- Spinner Loading --}}
+                    <div id="excelLoadingIndicator" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #F8FAFC; z-index: 10;">
+                        <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3"></div>
+                        <p class="text-sm font-bold text-gray-700">Memuat Preview Laporan Excel...</p>
+                        <p class="text-xs text-gray-500 mt-1">Menyiapkan lembar spreadsheet arsip</p>
+                    </div>
+
+                    {{-- Iframe --}}
+                    <iframe id="excelPreviewIframe" src="about:blank" style="width: 100%; height: 100%; border: none;" onload="onExcelIframeLoaded()"></iframe>
+                </div>
+
             </div>
         </div>
     </div>

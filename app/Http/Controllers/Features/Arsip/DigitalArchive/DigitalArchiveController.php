@@ -618,7 +618,11 @@ class DigitalArchiveController extends Controller
         $categoryName = $category->category_name ?? $category->name ?? 'arsip';
         $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . '.pdf';
 
-        return $pdf->download($fileName);
+        if ($request->boolean('download') || $request->input('action') === 'download') {
+            return $pdf->download($fileName);
+        }
+
+        return $pdf->stream($fileName);
     }
 
     /**
@@ -875,17 +879,38 @@ class DigitalArchiveController extends Controller
         $categoryName = $category->category_name ?? $category->name ?? 'arsip';
         $safeSubNama = str_replace([' ', '/', '\\', '(', ')'], '-', strtolower($subKategoriNama ?? ''));
         $fileName = 'Daftar-Arsip-Aktif-' . str_replace(' ', '-', strtolower($categoryName)) . ($safeSubNama ? '-' . $safeSubNama : '') . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
 
-        return response()->streamDownload(
-            function () use ($writer) {
-                $writer->save('php://output');
-            },
-            $fileName,
-            [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            ]
-        );
+        if ($request->boolean('download') || $request->input('action') === 'download') {
+            $writer = new Xlsx($spreadsheet);
+            return response()->streamDownload(
+                function () use ($writer) {
+                    $writer->save('php://output');
+                },
+                $fileName,
+                [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ]
+            );
+        }
+
+        // Tampilkan Preview HTML dari Spreadsheet
+        $htmlWriter = new \PhpOffice\PhpSpreadsheet\Writer\Html($spreadsheet);
+        $htmlContent = $htmlWriter->generateHtmlAll();
+
+        $customStyles = '
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 24px; background-color: #f1f5f9; margin: 0; }
+            table { border-collapse: collapse; background-color: #ffffff; box-shadow: 0 4px 15px -1px rgba(0,0,0,0.08); margin: 0 auto; border-radius: 8px; }
+            th, td { padding: 6px 12px; font-size: 11px; }
+            ::-webkit-scrollbar { width: 8px; height: 8px; }
+            ::-webkit-scrollbar-track { background: #f1f5f9; }
+            ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+            ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        </style>
+        ';
+        $htmlContent = str_replace('</head>', $customStyles . '</head>', $htmlContent);
+
+        return response($htmlContent)->header('Content-Type', 'text/html; charset=utf-8');
     }
 
     /**
