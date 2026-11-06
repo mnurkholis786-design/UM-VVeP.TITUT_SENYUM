@@ -558,6 +558,11 @@ class DigitalArchiveController extends Controller
      */
     public function exportReportPdf(Request $request, string $id)
     {
+        // Hilangkan batas waktu eksekusi agar tidak timeout saat export data banyak
+        set_time_limit(0);
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit', '512M');
+
         $category = Category::findOrFail($id);
 
         // ================= LOGIKA PILIH SEMUA ATAU 1 SUB KATEGORI =================

@@ -631,6 +631,12 @@ class DigitalArchive extends Model
             if (preg_match('/Untuk\s+Pembayaran\s*[:\s]?\s*([^\n\r]+(?:\r?\n(?!\s*(?:Atas\s+Dasar|Banjarmasin|Setuju|Diterima|Lunas|An\s+Kuasa|Diajukan|\d+\.))[^\n\r]+)*)/i', $text, $match)) {
                 $clean = trim(preg_replace('/\s+/', ' ', $match[1]));
                 if (strlen($clean) > 5) {
+                    if ($this->exists && !empty($this->id)) {
+                        try {
+                            \Illuminate\Support\Facades\DB::table('digital_archives')->where('id', $this->id)->update(['uraian' => $clean]);
+                            $this->attributes['uraian'] = $clean;
+                        } catch (\Throwable $e) {}
+                    }
                     return $clean;
                 }
             }
@@ -639,6 +645,12 @@ class DigitalArchive extends Model
             if (preg_match('/Untuk\s+(?:Program\s+Kegiatan\s+)?([^\n\r]+(?:\r?\n(?!\s*(?:Program|Kegiatan|KRO|RO|Komponen|MAK|Diajukan))[^\n\r]+)*)/i', $text, $match)) {
                 $clean = trim(preg_replace('/\s+/', ' ', $match[1]));
                 if (strlen($clean) > 5) {
+                    if ($this->exists && !empty($this->id)) {
+                        try {
+                            \Illuminate\Support\Facades\DB::table('digital_archives')->where('id', $this->id)->update(['uraian' => $clean]);
+                            $this->attributes['uraian'] = $clean;
+                        } catch (\Throwable $e) {}
+                    }
                     return $clean;
                 }
             }

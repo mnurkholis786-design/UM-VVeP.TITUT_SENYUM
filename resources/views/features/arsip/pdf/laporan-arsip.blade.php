@@ -206,6 +206,7 @@
                 ];
 
                 $nomorBerkas = 1;
+                $totalDisplayed = 0;
             @endphp
 
             @foreach ($klasifikasiUrutan as $keyKlasifikasi => $namaKlasifikasi)
@@ -227,22 +228,24 @@
                     $totalItem = $dataKlasifikasi->count();
                 @endphp
 
-                <tr class="archive-header">
-                    <td class="center">{{ $nomorBerkas }}</td>
-                    <td class="center">{{ $kodeKlasifikasiDefault }}</td>
-                    <td class="left">{{ $namaKlasifikasi }}</td>
-                    <td class="center">{{ $totalItem }}</td>
-                    <td class="center">&nbsp;</td>
-                    <td class="left">&nbsp;</td>
-                    <td class="center">&nbsp;</td>
-                    <td class="center">&nbsp;</td>
-                    <td class="center">&nbsp;</td>
-                    <td class="center">&nbsp;</td>
-                    <td class="left">&nbsp;</td>
-                    <td class="left">Server Arsip Keuangan</td>
-                </tr>
-
                 @if ($totalItem > 0)
+                    @php
+                        $totalDisplayed++;
+                    @endphp
+                    <tr class="archive-header">
+                        <td class="center">{{ $nomorBerkas }}</td>
+                        <td class="center">{{ $kodeKlasifikasiDefault }}</td>
+                        <td class="left">{{ $namaKlasifikasi }}</td>
+                        <td class="center">{{ $totalItem }}</td>
+                        <td class="center">&nbsp;</td>
+                        <td class="left">&nbsp;</td>
+                        <td class="center">&nbsp;</td>
+                        <td class="center">&nbsp;</td>
+                        <td class="center">&nbsp;</td>
+                        <td class="center">&nbsp;</td>
+                        <td class="left">&nbsp;</td>
+                        <td class="left">Server Arsip Keuangan</td>
+                    </tr>
                     @foreach ($dataKlasifikasi as $index => $archive)
                         @php
                             $uraianArsip = !empty(trim((string)($archive->uraian ?? ''))) ? $archive->uraian : '-';
@@ -255,45 +258,55 @@
                             $keterangan = !empty(trim((string)($archive->keterangan ?? ''))) ? $archive->keterangan : '-';
 
                             $totalHalaman = 0;
-                            $rawFiles = $archive->file_path_archive;
-                            if (is_string($rawFiles)) {
-                                $decoded = json_decode($rawFiles, true);
-                                $files = is_array($decoded) ? $decoded : [$rawFiles];
-                            } elseif (is_array($rawFiles)) {
-                                $files = $rawFiles;
+                            if (!empty($archive->jumlah_halaman) && is_numeric($archive->jumlah_halaman) && (int)$archive->jumlah_halaman > 0) {
+                                $totalHalaman = (int)$archive->jumlah_halaman;
                             } else {
-                                $files = [];
-                            }
+                                $rawFiles = $archive->file_path_archive;
+                                if (is_string($rawFiles)) {
+                                    $decoded = json_decode($rawFiles, true);
+                                    $files = is_array($decoded) ? $decoded : [$rawFiles];
+                                } elseif (is_array($rawFiles)) {
+                                    $files = $rawFiles;
+                                } else {
+                                    $files = [];
+                                }
 
-                            foreach ($files as $filePath) {
-                                if (empty($filePath)) continue;
+                                foreach ($files as $filePath) {
+                                    if (empty($filePath)) continue;
 
-                                $possiblePaths = [
-                                    storage_path('app/private/' . $filePath),
-                                    storage_path('app/public/' . $filePath),
-                                    storage_path('app/' . $filePath),
-                                    public_path('storage/' . $filePath),
-                                    public_path($filePath),
-                                ];
+                                    $possiblePaths = [
+                                        storage_path('app/private/' . $filePath),
+                                        storage_path('app/public/' . $filePath),
+                                        storage_path('app/' . $filePath),
+                                        public_path('storage/' . $filePath),
+                                        public_path($filePath),
+                                    ];
 
-                                $fullPath = null;
-                                foreach ($possiblePaths as $path) {
-                                    if (file_exists($path) && is_file($path)) {
-                                        $fullPath = $path;
-                                        break;
+                                    $fullPath = null;
+                                    foreach ($possiblePaths as $path) {
+                                        if (file_exists($path) && is_file($path)) {
+                                            $fullPath = $path;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($fullPath) {
+                                        $content = @file_get_contents($fullPath);
+                                        if ($content) {
+                                            if (preg_match_all("/\/Count\s+(\d+)/", $content, $matches)) {
+                                                $totalHalaman += (int) max($matches[1]);
+                                            } else {
+                                                $pageCount = preg_match_all("/\/Type\s*\/Page\b/", $content, $dummy);
+                                                $totalHalaman += $pageCount > 0 ? $pageCount : 1;
+                                            }
+                                        }
                                     }
                                 }
 
-                                if ($fullPath) {
-                                    $content = @file_get_contents($fullPath);
-                                    if ($content) {
-                                        if (preg_match_all("/\/Count\s+(\d+)/", $content, $matches)) {
-                                            $totalHalaman += (int) max($matches[1]);
-                                        } else {
-                                            $pageCount = preg_match_all("/\/Type\s*\/Page\b/", $content, $dummy);
-                                            $totalHalaman += $pageCount > 0 ? $pageCount : 1;
-                                        }
-                                    }
+                                if ($totalHalaman > 0 && !empty($archive->id) && empty($archive->jumlah_halaman)) {
+                                    try {
+                                        \Illuminate\Support\Facades\DB::table('digital_archives')->where('id', $archive->id)->update(['jumlah_halaman' => $totalHalaman]);
+                                    } catch (\Throwable $e) {}
                                 }
                             }
 
@@ -345,12 +358,19 @@
                             <td class="left">&nbsp;</td>
                         </tr>
                     @endforeach
+                    @php
+                        $nomorBerkas++;
+                    @endphp
                 @endif
-
-                @php
-                    $nomorBerkas++;
-                @endphp
             @endforeach
+
+            @if ($totalDisplayed === 0)
+                <tr>
+                    <td colspan="12" class="center empty" style="padding: 12px; font-style: italic;">
+                        Tidak ada data arsip untuk periode ini
+                    </td>
+                </tr>
+            @endif
         </tbody>
     </table>
 
